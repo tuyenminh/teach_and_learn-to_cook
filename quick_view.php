@@ -23,8 +23,7 @@ include 'components/add_cart.php';
    <title>Chi tiết khóa học</title>
 
    <!-- font awesome cdn link  -->
-   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
-
+   <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"> -->
    <!-- custom css file link  -->
    <link rel="stylesheet" href="css/style.css">
 
@@ -50,7 +49,7 @@ include 'components/add_cart.php';
       <input type="hidden" name="name" value="<?= $fetch_products['name']; ?>">
       <input type="hidden" name="price" value="<?= $fetch_products['price']; ?>">
       <input type="hidden" name="image" value="<?= $fetch_products['image']; ?>">
-      <input name="description" value="<?= $fetch_products['description']; ?>">
+      <input type="hidden" name="description" value="<?= $fetch_products['description']; ?>">
       <img src="uploaded_img/<?= $fetch_products['image']; ?>" alt="">
       <a href="category.php?category=<?= $fetch_products['category']; ?>" class="cat"><?= $fetch_products['category']; ?></a>
          <div class="name"><?= $fetch_products['name']; ?></div>
@@ -60,20 +59,22 @@ include 'components/add_cart.php';
          <!-- <input type="number" name="qty" class="qty" min="1" max="99" value="1" maxlength="2"> -->
       </div>
       <button type="submit" name="add_to_cart" class="cart-btn">Mua khóa học</button>
-     
+
    </form>
-   <h2 style="font-weight: bold; font-size: 30px;">Thông tin khóa học</h2>
-      <?= $fetch_products['description']; ?>
-
          <!-- <input type="number" name="qty" class="qty" min="1" max="99" value="1" maxlength="2"> -->
-
+         <h2 style="font-weight: bold; font-size: 30px;">Thông tin khóa học</h2>
+         <div stype="height:auto;">
+               <p><?php echo $fetch_products['description'] ?></p>
+         </div>
    <?php
+   
          }
       }else{
          echo '<p class="empty">Không có công thức nào!</p>';
       }
    ?>
 
+  
 </section>
 
 

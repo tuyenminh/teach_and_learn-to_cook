@@ -23,7 +23,8 @@ if(isset($_POST['submit'])){
    // $address = filter_var($address, FILTER_SANITIZE_STRING);
    $total_course = $_POST['total_course'];
    $total_price = $_POST['total_price'];
-
+   $regis_date = time(); 
+   $email = $_POST['email'];
    $check_cart = $conn->prepare("SELECT * FROM `cart` WHERE user_id = ?");
    $check_cart->execute([$user_id]);
 
@@ -33,8 +34,8 @@ if(isset($_POST['submit'])){
       //    $message[] = 'please add your address!';
       // }else{
          
-         $insert_order = $conn->prepare("INSERT INTO `receipt`(user_id, name, number, method, total_course, total_price) VALUES(?,?,?,?,?,?)");
-         $insert_order->execute([$user_id, $name, $number, $method, $total_course, $total_price]);
+         $insert_order = $conn->prepare("INSERT INTO `receipt`(user_id, name, number, method, total_course, total_price, regis_date, email) VALUES(?,?,?,?,?,?,?,?)");
+         $insert_order->execute([$user_id, $name, $number, $method, $total_course, $total_price, $regis_date, $email]);
 
          $delete_cart = $conn->prepare("DELETE FROM `cart` WHERE user_id = ?");
          $delete_cart->execute([$user_id]);
@@ -95,14 +96,14 @@ if(isset($_POST['submit'])){
                $total_course = implode($cart_items);
                $grand_total += ($fetch_cart['price']);
       ?>
-      <p><span class="name"><?= $fetch_cart['name']; ?><?= number_format($fetch_products['price'], 0, ',', '.') . " VNĐ"; ?></span></p>
+      <p><span class="name"><?= $fetch_cart['name'].": "; ?><?= number_format($fetch_cart['price']) . " VNĐ"; ?></span></p>
       <?php
             }
          }else{
             echo '<p class="empty">Giỏ hàng trống!</p>';
          }
       ?>
-      <p class="grand-total"><span class="name">Tổng tiền :</span><span class="price"><?= $grand_total; ?></span></p>
+      <p class="grand-total"><span class="name">Tổng tiền :</span><span class="price"><?= number_format($grand_total). " VNĐ"; ?></span></p>
       <a href="cart.php" class="btn">Xem giỏ hàng</a>
    </div>
 
@@ -116,6 +117,7 @@ if(isset($_POST['submit'])){
    <div class="user-info">
       <h3>Thông tin khách hàng</h3>
       <p><i class="fas fa-user"></i><span><?= $fetch_profile['name'] ?></span></p>
+      <p><i class="fas fa-user"></i><span><?php echo $regis_date ?></span></p>
       <p><i class="fas fa-phone"></i><span><?= $fetch_profile['number'] ?></span></p>
       <p><i class="fas fa-envelope"></i><span><?= $fetch_profile['email'] ?></span></p>
       <a href="update_profile.php" class="btn">Cập nhật hồ sơ</a>

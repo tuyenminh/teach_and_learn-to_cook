@@ -19,7 +19,7 @@ if(isset($_POST['submit'])){
       $select_name = $conn->prepare("SELECT * FROM `admin` WHERE name = ?");
       $select_name->execute([$name]);
       if($select_name->rowCount() > 0){
-         $message[] = 'username already taken!';
+         $message[] = 'Tên tài khoản đã được sử dụng!';
       }else{
          $update_name = $conn->prepare("UPDATE `admin` SET name = ? WHERE id = ?");
          $update_name->execute([$name, $admin_id]);

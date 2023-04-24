@@ -25,7 +25,7 @@ if(isset($_POST['submit'])){
       $_SESSION['user_id'] = $row['id'];
       header('location:home.php');
    }else{
-      $message[] = 'incorrect username or password!';
+      $message[] = 'Tên tài khoản hoặc mật khẩu sai!';
    }
 
 }

@@ -89,6 +89,7 @@ if(isset($_POST['update'])){
    <!-- custom css file link  -->
    <link rel="stylesheet" href="../css/admin_style.css">
    <script type = "text/javascript" src= "ckeditor/ckeditor.js"></script>
+   <script type = "text/javascript" src= "ckfinder/ckfinder.js"></script>
 
 
 </head>
@@ -113,8 +114,6 @@ if(isset($_POST['update'])){
       <input type="hidden" name="pid" value="<?= $fetch_products['id']; ?>">
       <input type="hidden" name="old_image" value="<?= $fetch_products['image']; ?>">
       <img src="../uploaded_img/<?= $fetch_products['image']; ?>" alt="">
-      <!-- <input type="hidden" name="old_video" value="<?= $fetch_products['video']; ?>">
-      <img src="../uploaded_video/<?= $fetch_products['video']; ?>" alt=""> -->
       <span>Tên khóa học</span>
       <input type="text" required placeholder="Nhập tên khóa học" name="name" maxlength="100" class="box" value="<?= $fetch_products['name']; ?>">
       <span>Giá</span>
@@ -132,7 +131,16 @@ if(isset($_POST['update'])){
       <!-- <span>Cập nhật video</span>
       <input type="file" name="video" class="box" accept="video/mp3, video/mp4"> -->
       <span>Mô tả</span>
-      <textarea type="text" required placeholder="Nhập mô tả" id="post_content" name="description" class="box" value="<?= $fetch_products['description']; ?>"></textarea>
+      <textarea type="text" required placeholder="Nhập mô tả" id="post_content" name="description" maxlength="100" class="box" ><?php echo  $fetch_products['description']; ?></textarea>
+      <script type="text/javascript">
+	var editor = CKEDITOR.replace('post_content',{
+		language:'vi',
+		filebrowserImageBrowseUrl : '../admin/ckfinder/ckfinder.html?Type=Images',
+		filebrowserFlashBrowseUrl : '../admin/ckfinder/ckfinder.html?Type=Flash',
+		filebrowserImageUploadUrl : '../admin/ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Images',
+		filebrowserFlashUploadUrl : '../admin/ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Flash',
+	});
+</script>
       <span>Ngày khai giảng</span>
       <input type="text" required placeholder="Nhập ngày khai giảng" name="opening_day" maxlength="100" class="box" value="<?= $fetch_products['opening_day']; ?>">
       <span>Thời gian học</span>
@@ -158,17 +166,11 @@ if(isset($_POST['update'])){
 
 
 
-
-
-
-
 <!-- custom js file link  -->
 <script src="../js/admin_script.js"></script>
-<script src="https://localhost/food_website_backend/admin/ckeditor/ckeditor.js"></script>
-<script>
-    // Thay thế <textarea id="post_content"> với CKEditor
-    CKEDITOR.replace( 'post_content' );// tham số là biến name của textarea
+<script src="https://localhost/teach_and_learn-to_cook/admin/ckeditor/ckeditor.js"></script>
 
-</script>
+
+
 </body>
 </html>

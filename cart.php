@@ -21,7 +21,7 @@ if(isset($_POST['delete'])){
 if(isset($_POST['delete_all'])){
    $delete_cart_item = $conn->prepare("DELETE FROM `cart` WHERE user_id = ?");
    $delete_cart_item->execute([$user_id]);
-   // header('location:cart.php');
+   header('location:cart.php');
    $message[] = 'Xóa tất cả khóa học!';
 }
 
@@ -71,7 +71,6 @@ if(isset($_POST['delete_all'])){
    <h1 class="title">Giỏ hàng của bạn</h1>
 
    <div class="box-container">
-
       <?php
          $grand_total = 0;
          $select_cart = $conn->prepare("SELECT * FROM `cart` WHERE user_id = ?");
@@ -82,18 +81,19 @@ if(isset($_POST['delete_all'])){
       <form action="" method="post" class="box">
          <input type="hidden" name="cart_id" value="<?= $fetch_cart['id']; ?>">
          <a href="quick_view.php?pid=<?= $fetch_cart['pid']; ?>" class="fas fa-eye"></a>
-         <button type="submit" class="fas fa-times" name="delete" onclick="return confirm(xóa khóa học này?');"></button>
+         <button type="submit" class="fas fa-times" name="delete" onclick="return confirm(Xóa khóa học?');"></button>
          <img src="uploaded_img/<?= $fetch_cart['image']; ?>" alt="">
          <div class="name"><?= $fetch_cart['name']; ?></div>
          <div class="flex">
-            <div class="price"><?= number_format($fetch_products['price'], 0, ',', '.') . " VNĐ"; ?></div>
+            <div class="price"><?= number_format($fetch_cart['price']) . " VNĐ"; ?></div>
             <!-- <input type="number" name="qty" class="qty" min="1" max="99" value="<?= $fetch_cart['quantity']; ?>" maxlength="2"> -->
             <!-- <button type="submit" class="fas fa-edit" name="update_qty"></button> -->
          </div>
-         <div class="sub-total"> Giá: <span><?= $sub_total = ($fetch_cart['price']); ?></span> </div>
+         <div class="sub-total"> Giá: <span><?= $sub_total = number_format($fetch_cart['price']) . " VNĐ"; ?></span> </div>
       </form>
       <?php
-               $grand_total += $sub_total;
+               $grand_total += str_replace([',', ' VNĐ'], '', $sub_total);
+
             }
          }else{
             echo '<p class="empty">Giỏ hàng trống</p>';
@@ -103,13 +103,13 @@ if(isset($_POST['delete_all'])){
    </div>
 
    <div class="cart-total">
-      <p>Tổng tiền: <span><?= $grand_total; ?></span></p>
+      <p>Tổng tiền: <span><?php echo number_format($grand_total). " VNĐ"; ?></span></p>
       <a href="checkout.php" class="btn <?= ($grand_total > 1)?'':'disabled'; ?>">Tiến hành kiểm tra</a>
    </div>
 
    <div class="more-btn">
       <form action="" method="post">
-         <button type="submit" class="delete-btn <?= ($grand_total > 1)?'':'disabled'; ?>" name="delete_all" onclick="return confirm('delete all from cart?');">Xóa tất cả</button>
+         <button type="submit" class="delete-btn <?= ($grand_total > 1)?'':'disabled'; ?>" name="delete_all" onclick="return confirm('Xóa tất cả khóa học?');">Xóa tất cả</button>
       </form>
       <a href="menu.php" class="btn">Tiếp tục đăng kí</a>
    </div>

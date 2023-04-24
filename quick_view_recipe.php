@@ -60,7 +60,8 @@ include 'components/add_cart.php';
    <iframe  style = "display: block; margin-left: auto; margin-right: auto; margin-bottom: 20px;"  width="768" height="432" src="<?= $fetch_products['video']; ?>" frameborder="0" allowfullscreen></iframe>
    
    <h1 style="font-size:2vw">Cách làm</h1>
-   <div class="making" ><h1><?= $fetch_products['making']; ?> </h1></div>
+   <!-- <div class="making" ><h1><?= $fetch_products['making']; ?> </h1></div> -->
+   <div><?= $fetch_products['making']; ?> </div>
 
    <?php
          }

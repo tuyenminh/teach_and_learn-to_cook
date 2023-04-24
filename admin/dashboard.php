@@ -21,11 +21,10 @@ if(!isset($admin_id)){
    <title>Dashboard</title>
 
    <!-- font awesome cdn link  -->
-   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+   <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"> -->
 
    <!-- custom css file link  -->
    <link rel="stylesheet" href="../css/admin_style.css">
-
 </head>
 <body>
 
@@ -40,47 +39,47 @@ if(!isset($admin_id)){
    <div class="box-container">
 
    <div class="box">
-      <h3>Welcome!</h3>
+      <h3>Hồ sơ</h3>
       <p><?= $fetch_profile['name']; ?></p>
-      <a href="update_profile.php" class="btn">Cập nhật hồ sơ</a>
+      <a href="update_profile.php" class="btn">Chi tiết</a>
    </div>
 
-   <!-- <div class="box">
+   <div class="box">
       <?php
          $total_pendings = 0;
-         $select_pendings = $conn->prepare("SELECT * FROM `orders` WHERE payment_status = ?");
-         $select_pendings->execute(['pending']);
+         $select_pendings = $conn->prepare("SELECT * FROM `receipt` WHERE pay_status = ?");
+         $select_pendings->execute(['Đang xử lý']);
          while($fetch_pendings = $select_pendings->fetch(PDO::FETCH_ASSOC)){
             $total_pendings += $fetch_pendings['total_price'];
          }
       ?>
-      <h3><span>$</span><?= $total_pendings; ?><span>/-</span></h3>
-      <p>Tổng khóa học chưa thanh toán</p>
-      <a href="placed_orders.php" class="btn">see orders</a>
-   </div> -->
+      <h3><span></span><?= number_format($total_pendings). " VNĐ"; ?><span></span></h3>
+      <p>Đang xử lý</p>
+      <a href="placed_orders.php" class="btn">Chi tiết</a>
+   </div>
 
-   <!-- <div class="box">
+   <div class="box">
       <?php
          $total_completes = 0;
-         $select_completes = $conn->prepare("SELECT * FROM `orders` WHERE payment_status = ?");
-         $select_completes->execute(['completed']);
+         $select_completes = $conn->prepare("SELECT * FROM `receipt` WHERE pay_status = ?");
+         $select_completes->execute(['Đã hoàn thành']);
          while($fetch_completes = $select_completes->fetch(PDO::FETCH_ASSOC)){
             $total_completes += $fetch_completes['total_price'];
          }
       ?>
-      <h3><span>$</span><?= $total_completes; ?><span>/-</span></h3>
-      <p>Tổng khóa học hoàn thành</p>
+      <h3><span></span><?= number_format($total_completes). " VNĐ"; ?><span></span></h3>
+      <p>Đã thanh toán</p>
       <a href="placed_orders.php" class="btn">Chi tiết</a>
-   </div> -->
+   </div>
 
    <div class="box">
       <?php
-         $select_orders = $conn->prepare("SELECT * FROM `orders`");
+         $select_orders = $conn->prepare("SELECT * FROM `receipt`");
          $select_orders->execute();
          $numbers_of_orders = $select_orders->rowCount();
       ?>
       <h3><?= $numbers_of_orders; ?></h3>
-      <p>Tổng khóa học đăng kí</p>
+      <p>Đăng kí</p>
       <a href="placed_orders.php" class="btn">Chi tiết</a>
    </div>
 
@@ -135,7 +134,7 @@ if(!isset($admin_id)){
          $numbers_of_messages = $select_messages->rowCount();
       ?>
       <h3><?= $numbers_of_messages; ?></h3>
-      <p>Tin tức</p>
+      <p>Liên hệ</p>
       <a href="messages.php" class="btn">Chi tiết</a>
    </div>
 
@@ -155,8 +154,8 @@ if(!isset($admin_id)){
 
 <!-- custom js file link  -->
 <script src="../js/admin_script.js"></script>
-<script src="https://localhost/food_website_backend/admin/ckeditor/ckeditor.js"></script>
 
+<script src="https://localhost/food_website_backend/admin/ckeditor/ckeditor.js"></script>
 
 </body>
 </html>

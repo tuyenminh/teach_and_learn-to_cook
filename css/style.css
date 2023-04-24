@@ -885,9 +885,7 @@ section{
    gap:1.5rem;
    margin:1rem 0;
 }
-.quick-view .description{
-   font-size: 50px;
-}
+
 .quick-view form .flex .price{
    font-size: 2.5rem;
    color:var(--black);

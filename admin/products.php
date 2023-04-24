@@ -89,10 +89,17 @@ if(isset($_GET['delete'])){
 
    <!-- font awesome cdn link  -->
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+   <!-- link boostrap -->
+   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 
    <!-- custom css file link  -->
+   <script type = "text/javascript" src= "ckeditor/ckeditor.js"></script>
+   <script type = "text/javascript" src= "ckfinder/ckfinder.js"></script>
+
+   
    <link rel="stylesheet" href="../css/admin_style.css">
-	<script type = "text/javascript" src= "ckeditor/ckeditor.js"></script>
+
+
 
 
 </head>
@@ -116,14 +123,20 @@ if(isset($_GET['delete'])){
          <option value="Ăn vặt">Ăn vặt</option>
       </select>
       <input type="file" name="image" class="box" accept="image/jpg, image/jpeg, image/png, image/webp" required>
-      <!-- <input type="file" name="video" class="box" accept="video/mp3, video/mp4" required> -->
-      <textarea id="post_content" required placeholder="Nhập mô tả" name="description" class="box"></textarea>
-      
+      <textarea id="post_content" required placeholder="Nhập mô tả" name="description" maxlength="100" class="box"></textarea>      
+      <script type="text/javascript">
+	      var editor = CKEDITOR.replace('post_content',{
+            language:'vi',
+            filebrowserImageBrowseUrl : '../admin/ckfinder/ckfinder.html?Type=Images',
+            filebrowserFlashBrowseUrl : '../admin/ckfinder/ckfinder.html?Type=Flash',
+            filebrowserImageUploadUrl : '../admin/ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Images',
+            filebrowserFlashUploadUrl : '../admin/ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Flash',
+	      });
+      </script>
       <input type="text" required placeholder="Nhập ngày khai giảng" name="opening_day" maxlength="100" class="box">
       <input type="text" required placeholder="Nhập thời gian học" name="study_time" maxlength="100" class="box">
       <input type="submit" value="Thêm khóa học" name="add_product" class="btn">
    </form>
-
 </section>
 
 <!-- add products section ends -->
@@ -148,6 +161,8 @@ if(isset($_GET['delete'])){
          <div class="category"><?= $fetch_products['category']; ?></div>
       </div>
       <div class="name"><?= $fetch_products['name']; ?></div>
+      <!-- <div class="description"><?= $fetch_products['description']; ?></div> -->
+
       <div class="flex-btn">
          <a href="update_product.php?update=<?= $fetch_products['id']; ?>" class="option-btn">Cập nhật</a>
          <a href="products.php?delete=<?= $fetch_products['id']; ?>" class="delete-btn" onclick="return confirm('Xóa khóa học này?');">Xóa</a>
@@ -178,10 +193,7 @@ if(isset($_GET['delete'])){
 <!-- custom js file link  -->
 <script src="../js/admin_script.js"></script>
 <script src="https://localhost/food_website_backend/admin/ckeditor/ckeditor.js"></script>
-<script>
-    // Thay thế <textarea id="post_content"> với CKEditor
-    CKEDITOR.replace( 'post_content' );// tham số là biến name của textarea
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 
-</script>
 </body>
 </html>
