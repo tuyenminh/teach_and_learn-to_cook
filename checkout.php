@@ -19,12 +19,14 @@ if(isset($_POST['submit'])){
    $number = filter_var($number, FILTER_SANITIZE_STRING);
    $method = $_POST['method'];
    $method = filter_var($method, FILTER_SANITIZE_STRING);
+
    // $address = $_POST['address'];
    // $address = filter_var($address, FILTER_SANITIZE_STRING);
    $total_course = $_POST['total_course'];
    $total_price = $_POST['total_price'];
-   $regis_date = time(); 
    $email = $_POST['email'];
+   $email = filter_var($email, FILTER_SANITIZE_STRING);
+
    $check_cart = $conn->prepare("SELECT * FROM `cart` WHERE user_id = ?");
    $check_cart->execute([$user_id]);
 
@@ -34,8 +36,8 @@ if(isset($_POST['submit'])){
       //    $message[] = 'please add your address!';
       // }else{
          
-         $insert_order = $conn->prepare("INSERT INTO `receipt`(user_id, name, number, method, total_course, total_price, regis_date, email) VALUES(?,?,?,?,?,?,?,?)");
-         $insert_order->execute([$user_id, $name, $number, $method, $total_course, $total_price, $regis_date, $email]);
+         $insert_order = $conn->prepare("INSERT INTO `receipt`(user_id, name, number, method, total_course, total_price, email) VALUES(?,?,?,?,?,?,?)");
+         $insert_order->execute([$user_id, $name, $number, $method, $total_course, $total_price, $email]);
 
          $delete_cart = $conn->prepare("DELETE FROM `cart` WHERE user_id = ?");
          $delete_cart->execute([$user_id]);
@@ -74,7 +76,7 @@ if(isset($_POST['submit'])){
 
 <div class="heading">
    <h3>Thanh toán</h3>
-   <p><a href="home.php">Trang chủ</a> <span> / Thanh toán</span></p>
+   <p><a href="home.php">Trang chủ</a> <span> /Thanh toán</span></p>
 </div>
 
 <section class="checkout">
@@ -117,7 +119,7 @@ if(isset($_POST['submit'])){
    <div class="user-info">
       <h3>Thông tin khách hàng</h3>
       <p><i class="fas fa-user"></i><span><?= $fetch_profile['name'] ?></span></p>
-      <p><i class="fas fa-user"></i><span><?php echo $regis_date ?></span></p>
+      <!-- <p><i class="fas fa-phone"></i><span><?= $fetch_profile['regis_date'] ?></span></p> -->
       <p><i class="fas fa-phone"></i><span><?= $fetch_profile['number'] ?></span></p>
       <p><i class="fas fa-envelope"></i><span><?= $fetch_profile['email'] ?></span></p>
       <a href="update_profile.php" class="btn">Cập nhật hồ sơ</a>

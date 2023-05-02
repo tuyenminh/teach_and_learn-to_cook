@@ -24,7 +24,8 @@ if(isset($_SESSION['user_id'])){
 
    <!-- font awesome cdn link  -->
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
-
+   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
    <!-- custom css file link  -->
    <link rel="stylesheet" href="css/style.css">
 
@@ -72,22 +73,22 @@ if(isset($_SESSION['user_id'])){
 
    <div class="box-container">
 
-      <a href="category.php?category=Gia đình" class="box">
+      <a href="category_recipe.php?category=Gia đình" class="box">
          <img src="images/cat-1.png" alt="">
          <h3>Gia Đình</h3>
       </a>
 
-      <a href="category.php?category=Tiệc" class="box">
+      <a href="category_recipe.php?category=Tiệc" class="box">
          <img src="images/cat-2.png" alt="">
          <h3>Tiệc</h3>
       </a>
 
-      <a href="category.php?category=Đồ uống" class="box">
+      <a href="category_recipe.php?category=Đồ uống" class="box">
          <img src="images/cat-3.png" alt="">
          <h3>Đồ uống</h3>
       </a>
 
-      <a href="category.php?category=Ăn vặt" class="box">
+      <a href="category_recipe.php?category=Ăn vặt" class="box">
          <img src="images/cat-4.png" alt="">
          <h3>Ăn vặt</h3>
       </a>
@@ -106,7 +107,7 @@ if(isset($_SESSION['user_id'])){
    <div class="box-container">
 
       <?php
-         $select_products = $conn->prepare("SELECT * FROM `recipe` LIMIT 3");
+         $select_products = $conn->prepare("SELECT * FROM `recipe` LIMIT 6");
          $select_products->execute();
          if($select_products->rowCount() > 0){
             while($fetch_products = $select_products->fetch(PDO::FETCH_ASSOC)){
@@ -117,6 +118,7 @@ if(isset($_SESSION['user_id'])){
          <input type="hidden" name="image" value="<?= $fetch_products['image']; ?>">
          <a href="quick_view_recipe.php?pid=<?= $fetch_products['id']; ?>" class="fas fa-eye"></a>
          <img src="uploaded_img/<?= $fetch_products['image']; ?>" alt="">
+         <a href="category.php?category=<?= $fetch_products['category']; ?>" class="cat"><?= $fetch_products['category']; ?></a>
          <div class="name"><?= $fetch_products['name']; ?></div>
          <div class="flex">
             <!-- <input type="number" name="qty" class="qty" min="1" max="99" value="1" maxlength="2"> -->
@@ -132,7 +134,7 @@ if(isset($_SESSION['user_id'])){
    </div>
 
    <div class="more-btn">
-      <a href="menu.html" class="btn">veiw all</a>
+      <a href="all_recipe.php" class="btn">Xem tất cả</a>
    </div>
 
 </section>
@@ -140,100 +142,6 @@ if(isset($_SESSION['user_id'])){
 <!-- steps section ends -->
 
 <!-- reviews section starts  -->
-
-<section class="reviews">
-
-   <h1 class="title">customer's reivews</h1>
-
-   <div class="swiper reviews-slider">
-
-      <div class="swiper-wrapper">
-
-         <div class="swiper-slide slide">
-            <img src="images/pic-1.png" alt="">
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quos voluptate eligendi laborum molestias ut earum nulla sint voluptatum labore nemo.</p>
-            <div class="stars">
-               <i class="fas fa-star"></i>
-               <i class="fas fa-star"></i>
-               <i class="fas fa-star"></i>
-               <i class="fas fa-star"></i>
-               <i class="fas fa-star-half-alt"></i>
-            </div>
-            <h3>john deo</h3>
-         </div>
-
-         <div class="swiper-slide slide">
-            <img src="images/pic-2.png" alt="">
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quos voluptate eligendi laborum molestias ut earum nulla sint voluptatum labore nemo.</p>
-            <div class="stars">
-               <i class="fas fa-star"></i>
-               <i class="fas fa-star"></i>
-               <i class="fas fa-star"></i>
-               <i class="fas fa-star"></i>
-               <i class="fas fa-star-half-alt"></i>
-            </div>
-            <h3>john deo</h3>
-         </div>
-
-         <div class="swiper-slide slide">
-            <img src="images/pic-3.png" alt="">
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quos voluptate eligendi laborum molestias ut earum nulla sint voluptatum labore nemo.</p>
-            <div class="stars">
-               <i class="fas fa-star"></i>
-               <i class="fas fa-star"></i>
-               <i class="fas fa-star"></i>
-               <i class="fas fa-star"></i>
-               <i class="fas fa-star-half-alt"></i>
-            </div>
-            <h3>john deo</h3>
-         </div>
-
-         <div class="swiper-slide slide">
-            <img src="images/pic-4.png" alt="">
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quos voluptate eligendi laborum molestias ut earum nulla sint voluptatum labore nemo.</p>
-            <div class="stars">
-               <i class="fas fa-star"></i>
-               <i class="fas fa-star"></i>
-               <i class="fas fa-star"></i>
-               <i class="fas fa-star"></i>
-               <i class="fas fa-star-half-alt"></i>
-            </div>
-            <h3>john deo</h3>
-         </div>
-
-         <div class="swiper-slide slide">
-            <img src="images/pic-5.png" alt="">
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quos voluptate eligendi laborum molestias ut earum nulla sint voluptatum labore nemo.</p>
-            <div class="stars">
-               <i class="fas fa-star"></i>
-               <i class="fas fa-star"></i>
-               <i class="fas fa-star"></i>
-               <i class="fas fa-star"></i>
-               <i class="fas fa-star-half-alt"></i>
-            </div>
-            <h3>john deo</h3>
-         </div>
-
-         <div class="swiper-slide slide">
-            <img src="images/pic-6.png" alt="">
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quos voluptate eligendi laborum molestias ut earum nulla sint voluptatum labore nemo.</p>
-            <div class="stars">
-               <i class="fas fa-star"></i>
-               <i class="fas fa-star"></i>
-               <i class="fas fa-star"></i>
-               <i class="fas fa-star"></i>
-               <i class="fas fa-star-half-alt"></i>
-            </div>
-            <h3>john deo</h3>
-         </div>
-
-      </div>
-
-      <div class="swiper-pagination"></div>
-
-   </div>
-
-</section>
 
 <!-- reviews section ends -->
 

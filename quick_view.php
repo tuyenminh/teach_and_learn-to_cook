@@ -23,8 +23,10 @@ include 'components/add_cart.php';
    <title>Chi tiết khóa học</title>
 
    <!-- font awesome cdn link  -->
-   <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"> -->
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
    <!-- custom css file link  -->
+   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
    <link rel="stylesheet" href="css/style.css">
 
 
@@ -49,12 +51,12 @@ include 'components/add_cart.php';
       <input type="hidden" name="name" value="<?= $fetch_products['name']; ?>">
       <input type="hidden" name="price" value="<?= $fetch_products['price']; ?>">
       <input type="hidden" name="image" value="<?= $fetch_products['image']; ?>">
-      <input type="hidden" name="description" value="<?= $fetch_products['description']; ?>">
+      <!-- <input type="hidden" name="description" value="<?= $fetch_products['description']; ?>"> -->
       <img src="uploaded_img/<?= $fetch_products['image']; ?>" alt="">
       <a href="category.php?category=<?= $fetch_products['category']; ?>" class="cat"><?= $fetch_products['category']; ?></a>
          <div class="name"><?= $fetch_products['name']; ?></div>
       <div class="flex">
-         <div class="price"><?= number_format($fetch_products['price'], 0, ',', '.') . " VNĐ"; ?>
+         <div class="price"><?= number_format($fetch_products['price']) . " VNĐ"; ?>
 </div>
          <!-- <input type="number" name="qty" class="qty" min="1" max="99" value="1" maxlength="2"> -->
       </div>
@@ -64,8 +66,9 @@ include 'components/add_cart.php';
          <!-- <input type="number" name="qty" class="qty" min="1" max="99" value="1" maxlength="2"> -->
          <h2 style="font-weight: bold; font-size: 30px;">Thông tin khóa học</h2>
          <div stype="height:auto;">
-               <p><?php echo $fetch_products['description'] ?></p>
+         <p><?php echo htmlspecialchars_decode($fetch_products['description']) ?></p>
          </div>
+       
    <?php
    
          }

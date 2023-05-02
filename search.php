@@ -24,7 +24,8 @@ include 'components/add_cart.php';
 
    <!-- font awesome cdn link  -->
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
-
+   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
    <!-- custom css file link  -->
    <link rel="stylesheet" href="css/style.css">
 
@@ -39,7 +40,7 @@ include 'components/add_cart.php';
 
 <section class="search-form">
    <form method="post" action="">
-      <input type="text" name="search_box" placeholder="search here..." class="box">
+      <input type="text" name="search_box" placeholder="Tìm kiếm..." class="box">
       <button type="submit" name="search_btn" class="fas fa-search"></button>
    </form>
 </section>
@@ -70,10 +71,11 @@ include 'components/add_cart.php';
          <a href="category.php?category=<?= $fetch_products['category']; ?>" class="cat"><?= $fetch_products['category']; ?></a>
          <div class="name"><?= $fetch_products['name']; ?></div>
          <div class="flex">
-            <div class="price"><span>$</span><?= $fetch_products['price']; ?></div>
+            <div class="price"><span></span><?= number_format($fetch_products['price']) . " VNĐ"; ?></div>
             <!-- <input type="number" name="qty" class="qty" min="1" max="99" value="1" maxlength="2"> -->
          </div>
       </form>
+   
       <?php
             }
          }else{
@@ -81,9 +83,8 @@ include 'components/add_cart.php';
          }
       }
       ?>
-
    </div>
-
+   
 </section>
 
 

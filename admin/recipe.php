@@ -85,7 +85,7 @@ if(isset($_GET['delete'])){
 
    <!-- custom css file link  -->
    <link rel="stylesheet" href="../css/admin_style.css">
-	<script type = "text/javascript" src= "ckeditor/ckeditor.js"></script>
+	<script type = "text/javascript" src= "ckeditor_4.21.0_full/ckeditor/ckeditor.js"></script>
 
 
 </head>
@@ -108,9 +108,38 @@ if(isset($_GET['delete'])){
          <option value="Ăn vặt">Ăn vặt</option>
       </select>
       <input type="file" name="image" class="box" accept="image/jpg, image/jpeg, image/png, image/webp" required>
-      <textarea id="post_content" required placeholder="Nhập cách làm" name="making" class="form-control"></textarea>
-      <input type="text" required placeholder="Nhập link video" name="video" maxlength="100" class="box">
-      <input type="text" required placeholder="Nhập thời gian nấu" name="time" maxlength="100" class="box">
+      <textarea id="post_content" required placeholder="Nhập nguyên liệu" name="ingre" class="form-control"></textarea>
+      <script>
+         // Thay thế <textarea id="post_content"> với CKEditor
+         CKEDITOR.replace( 'post_content', {
+            // Khai báo encoding cho CKEditor
+            entities: false,
+            basicEntities: false,
+            entities_greek: false,
+            entities_latin: false,
+            entities_additional: '',
+            entities: '',
+            encoding: 'utf-8',
+            entities_processNumerical: true,
+            entities_apos: true
+});      </script>
+      <textarea id="post_content1" required placeholder="Nhập cách làm" name="making" class="form-control"></textarea>
+      <script>
+         // Thay thế <textarea id="post_content"> với CKEditor
+         CKEDITOR.replace( 'post_content1', {
+            // Khai báo encoding cho CKEditor
+            entities: false,
+            basicEntities: false,
+            entities_greek: false,
+            entities_latin: false,
+            entities_additional: '',
+            entities: '',
+            encoding: 'utf-8',
+            entities_processNumerical: true,
+            entities_apos: true
+});      </script>
+      <input type="text" required placeholder="Nhập link video" name="time" maxlength="100" class="box">
+      <input type="text" required placeholder="Nhập thời gian nấu" name="video" maxlength="100" class="box">
       <input type="submit" value="Thêm công thức" name="add_product" class="btn">
    </form>
 
@@ -166,10 +195,5 @@ if(isset($_GET['delete'])){
 
 <!-- custom js file link  -->
 <script src="../js/admin_script.js"></script>
-<script src="https://localhost/food_website_backend/admin/ckeditor/ckeditor.js"></script>
-<script>
-    // Thay thế <textarea id="post_content"> với CKEditor
-    CKEDITOR.replace( 'post_content' );// tham số là biến name của textarea
-</script>
 </body>
 </html>

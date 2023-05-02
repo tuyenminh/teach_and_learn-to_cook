@@ -88,9 +88,10 @@ if(isset($_POST['update'])){
 
    <!-- custom css file link  -->
    <link rel="stylesheet" href="../css/admin_style.css">
-   <script type = "text/javascript" src= "ckeditor/ckeditor.js"></script>
-   <script type = "text/javascript" src= "ckfinder/ckfinder.js"></script>
-
+   <link rel="stylesheet" href="ckeditor_4.21.0_full/ckeditor/contents.css">
+  <link rel="stylesheet" href="ckeditor_4.21.0_full/ckeditor/ckeditor.css">
+  <script src="ckeditor_4.21.0_full/ckeditor/ckeditor.js"></script>
+  <script src="ckeditor_4.21.0_full/ckeditor/config.js"></script>
 
 </head>
 <body>
@@ -131,16 +132,33 @@ if(isset($_POST['update'])){
       <!-- <span>Cập nhật video</span>
       <input type="file" name="video" class="box" accept="video/mp3, video/mp4"> -->
       <span>Mô tả</span>
-      <textarea type="text" required placeholder="Nhập mô tả" id="post_content" name="description" maxlength="100" class="box" ><?php echo  $fetch_products['description']; ?></textarea>
-      <script type="text/javascript">
-	var editor = CKEDITOR.replace('post_content',{
-		language:'vi',
-		filebrowserImageBrowseUrl : '../admin/ckfinder/ckfinder.html?Type=Images',
-		filebrowserFlashBrowseUrl : '../admin/ckfinder/ckfinder.html?Type=Flash',
-		filebrowserImageUploadUrl : '../admin/ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Images',
-		filebrowserFlashUploadUrl : '../admin/ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Flash',
-	});
-</script>
+      
+      <textarea name="description" id="post_content"> <?= htmlspecialchars_decode($fetch_products['description']); ?></textarea>
+      <script>
+         // Thay thế <textarea id="post_content"> với CKEditor
+         CKEDITOR.replace( 'post_content', {
+  // Khai báo encoding cho CKEditor
+  entities: false,
+  basicEntities: false,
+  entities_greek: false,
+  entities_latin: false,
+  entities_additional: '',
+  entities: '',
+  encoding: 'utf-8',
+  entities_processNumerical: true,
+  entities_apos: true
+});      </script>
+
+      <!-- <script type="text/javascript">
+	      var editor = CKEDITOR.replace('post_content',{
+            language:'vi',
+            filebrowserImageBrowseUrl : '../admin/ckfinder/ckfinder.html?Type=Images',
+		      filebrowserFlashBrowseUrl : '../admin/ckfinder/ckfinder.html?Type=Flash',
+		      filebrowserImageUploadUrl : '../admin/ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Images',
+		      filebrowserFlashUploadUrl : '../admin/ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Flash',
+	      });
+      </script> -->
+
       <span>Ngày khai giảng</span>
       <input type="text" required placeholder="Nhập ngày khai giảng" name="opening_day" maxlength="100" class="box" value="<?= $fetch_products['opening_day']; ?>">
       <span>Thời gian học</span>
@@ -168,7 +186,11 @@ if(isset($_POST['update'])){
 
 <!-- custom js file link  -->
 <script src="../js/admin_script.js"></script>
-<script src="https://localhost/teach_and_learn-to_cook/admin/ckeditor/ckeditor.js"></script>
+<script src="js/jquery-1.11.1.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/bootstrap-table.js"></script>
+<script src="https://localhost/food_website_backend/admin/ckeditor/ckeditor.js"></script>
+<!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script> -->
 
 
 

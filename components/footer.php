@@ -1,39 +1,69 @@
-<footer class="footer">
+<footer class="bg-light text-center text-white">
+  <!-- Grid container -->
+  <div class="container p-4 pb-0">
+    <!-- Section: Social media -->
+    <section class="mb-4">
+      <!-- Facebook -->
+      <a
+        class="btn text-white btn-floating m-1"
+        style="background-color: #3b5998;"
+        href="#!"
+        role="button"
+        ><i class="fab fa-facebook-f"></i
+      ></a>
 
-   <section class="grid">
+      <!-- Twitter -->
+      <a
+        class="btn text-white btn-floating m-1"
+        style="background-color: #55acee;"
+        href="#!"
+        role="button"
+        ><i class="fab fa-twitter"></i
+      ></a>
 
-      <div class="box">
-         <img src="images/email-icon.png" alt="">
-         <h3>Email</h3>
-         <a href="mailto:tuyenct2001@gmail.com">tuyenct2001@gmail.com</a>
-         <a href="mailto:mt@gmail.com">mt@gmail.com</a>
-      </div>
+      <!-- Google -->
+      <a
+        class="btn text-white btn-floating m-1"
+        style="background-color: #dd4b39;"
+        href="#!"
+        role="button"
+        ><i class="fab fa-google"></i
+      ></a>
 
-      <div class="box">
-         <img src="images/clock-icon.png" alt="">
-         <h3>Giờ hoạt động</h3>
-         <p>7:00 đến 17:00 sáng</p>
-      </div>
+      <!-- Instagram -->
+      <a
+        class="btn text-white btn-floating m-1"
+        style="background-color: #ac2bac;"
+        href="#!"
+        role="button"
+        ><i class="fab fa-instagram"></i
+      ></a>
 
-      <div class="box">
-         <img src="images/map-icon.png" alt="">
-         <h3>Địa chỉ</h3>
-         <a href="#">Ninh Kiều, TP Cần Thơ</a>
-      </div>
+      <!-- Linkedin -->
+      <a
+        class="btn text-white btn-floating m-1"
+        style="background-color: #0082ca;"
+        href="#!"
+        role="button"
+        ><i class="fab fa-linkedin-in"></i
+      ></a>
+      <!-- Github -->
+      <a
+        class="btn text-white btn-floating m-1"
+        style="background-color: #333333;"
+        href="#!"
+        role="button"
+        ><i class="fab fa-github"></i
+      ></a>
+    </section>
+    <!-- Section: Social media -->
+  </div>
+  <!-- Grid container -->
 
-      <div class="box">
-         <img src="images/phone-icon.png" alt="">
-         <h3>Số điện thoại</h3>
-         <a href="tel:0582268858">0582268858</a>
-         <a href="tel:0931848422">0931848422</a>
-      </div>
-
-   </section>
-
-   <div class="credit">&copy; copyright @ <?= date('Y'); ?> by <span>mr. web designer</span> | all rights reserved!</div>
-
+  <!-- Copyright -->
+  <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.2);">
+    © 2020 Copyright:
+    <a class="text-white" href="https://mdbootstrap.com/">MDBootstrap.com</a>
+  </div>
+  <!-- Copyright -->
 </footer>
-
-<div class="loader">
-   <img src="images/loader.gif" alt="">
-</div>

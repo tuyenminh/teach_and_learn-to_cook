@@ -84,7 +84,7 @@ if(isset($_POST['update'])){
 
    <!-- custom css file link  -->
    <link rel="stylesheet" href="../css/admin_style.css">
-   <script type = "text/javascript" src= "ckeditor/ckeditor.js"></script>
+	<script type = "text/javascript" src= "ckeditor_4.21.0_full/ckeditor/ckeditor.js"></script>
 
 
 </head>
@@ -121,12 +121,42 @@ if(isset($_POST['update'])){
       </select>
       <span>Cập nhật hình ảnh</span>
       <input type="file" name="image" class="box" accept="image/jpg, image/jpeg, image/png, image/webp">
+      <span>Nguyên liệu</span>
+      <textarea type="text" id="post_content" name="ingre" class="form-control"><?= $fetch_recipe['ingre']; ?></textarea>
+      <script>
+         // Thay thế <textarea id="post_content"> với CKEditor
+         CKEDITOR.replace( 'post_content',{
+  // Khai báo encoding cho CKEditor
+  entities: false,
+  basicEntities: false,
+  entities_greek: false,
+  entities_latin: false,
+  entities_additional: '',
+  entities: '',
+  encoding: 'utf-8',
+  entities_processNumerical: true,
+  entities_apos: true
+});      </script>
       <span>Cách làm</span>
-      <textarea type="text" id="post_content" name="making" class="form-control" value="<?= $fetch_recipe['making']; ?>"></textarea>
+      <textarea type="text" id="post_content1" name="making" class="form-control" ><?= $fetch_recipe['making']; ?></textarea>
+      <script>
+         // Thay thế <textarea id="post_content"> với CKEditor
+         CKEDITOR.replace( 'post_content1',{
+  // Khai báo encoding cho CKEditor
+  entities: false,
+  basicEntities: false,
+  entities_greek: false,
+  entities_latin: false,
+  entities_additional: '',
+  entities: '',
+  encoding: 'utf-8',
+  entities_processNumerical: true,
+  entities_apos: true
+});      </script>
+      <span>Thời gian nấu</span>
+      <input type="text" required placeholder="Nhập thời gian nấu " name="time" maxlength="100" class="box" value="<?= $fetch_recipe['time']; ?>">
       <span>Link video</span>
       <input type="text" required placeholder="Nhập link video" name="video" maxlength="100" class="box" value="<?= $fetch_recipe['video']; ?>">
-      <span>Thời gian nấu</span>
-      <input type="text" required placeholder="Nhập thời gian nấu" name="time" maxlength="100" class="box" value="<?= $fetch_recipe['time']; ?>">
       <div class="flex-btn">
          <input type="submit" value="Cập nhật" class="btn" name="update">
          <a href="recipe.php" class="option-btn">Trở về</a>
@@ -154,11 +184,6 @@ if(isset($_POST['update'])){
 
 <!-- custom js file link  -->
 <script src="../js/admin_script.js"></script>
-<script src="https://localhost/food_website_backend/admin/ckeditor/ckeditor.js"></script>
-<script>
-    // Thay thế <textarea id="post_content"> với CKEditor
-    CKEDITOR.replace( 'post_content' );// tham số là biến name của textarea
-</script>
 
 </body>
 </html>

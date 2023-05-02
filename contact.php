@@ -49,7 +49,8 @@ if(isset($_POST['send'])){
 
    <!-- font awesome cdn link  -->
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
-
+   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
    <!-- custom css file link  -->
    <link rel="stylesheet" href="css/style.css">
 
@@ -78,10 +79,10 @@ if(isset($_POST['send'])){
       <form action="" method="post">
          <h3>Hãy gửi tin nhắn cho chúng tôi!</h3>
          <input type="text" name="name" maxlength="50" class="box" placeholder="Tên của bạn" required>
-         <input type="number" name="number" min="0" max="9999999999" class="box" placeholder="enter your number" required maxlength="10">
+         <input type="text" name="number" min="0" max="9999999999" class="box" placeholder="Số điện thoại của bạn" required maxlength="10">
          <input type="email" name="email" maxlength="50" class="box" placeholder="Email của bạn" required>
          <textarea name="msg" class="box" required placeholder="Tin nhắn của bạn" maxlength="500" cols="30" rows="10"></textarea>
-         <input type="submit" value="send message" name="send" class="btn">
+         <input type="submit" value="Gửi" name="send" class="btn">
       </form>
 
    </div>
