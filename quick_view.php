@@ -55,6 +55,8 @@ include 'components/add_cart.php';
       <img src="uploaded_img/<?= $fetch_products['image']; ?>" alt="">
       <a href="category.php?category=<?= $fetch_products['category']; ?>" class="cat"><?= $fetch_products['category']; ?></a>
          <div class="name"><?= $fetch_products['name']; ?></div>
+         <div class="name">Khai giảng: <?= $fetch_products['opening_day']; ?></div>
+
       <div class="flex">
          <div class="price"><?= number_format($fetch_products['price']) . " VNĐ"; ?>
 </div>

@@ -108,7 +108,7 @@ if(isset($_GET['delete'])){
          <option value="Ăn vặt">Ăn vặt</option>
       </select>
       <input type="file" name="image" class="box" accept="image/jpg, image/jpeg, image/png, image/webp" required>
-      <textarea id="post_content" required placeholder="Nhập nguyên liệu" name="ingre" class="form-control"></textarea>
+      <textarea name="ingre" id="post_content" class="box"></textarea>
       <script>
          // Thay thế <textarea id="post_content"> với CKEditor
          CKEDITOR.replace( 'post_content', {
@@ -123,7 +123,7 @@ if(isset($_GET['delete'])){
             entities_processNumerical: true,
             entities_apos: true
 });      </script>
-      <textarea id="post_content1" required placeholder="Nhập cách làm" name="making" class="form-control"></textarea>
+      <textarea name="making" id="post_content1" class="box"></textarea>
       <script>
          // Thay thế <textarea id="post_content"> với CKEditor
          CKEDITOR.replace( 'post_content1', {

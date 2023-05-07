@@ -22,9 +22,7 @@ if(isset($message)){
          <a href="products.php">Khóa học</a>
          <a href="recipe.php">Công thức</a>
          <a href="placed_orders.php">Đăng kí</a>
-         <a href="admin_accounts.php">Admin</a>
-         <a href="users_accounts.php">Khách hàng</a>
-         <a href="messages.php">Tin nhắn</a>
+         <a href="messages.php">Liên hệ</a>
       </nav>
 
       <div class="icons">

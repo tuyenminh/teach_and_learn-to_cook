@@ -43,7 +43,47 @@ if(!isset($admin_id)){
       <p><?= $fetch_profile['name']; ?></p>
       <a href="update_profile.php" class="btn">Chi tiết</a>
    </div>
+   <div class="box">
+      <?php
+         $select_users = $conn->prepare("SELECT * FROM `users`");
+         $select_users->execute();
+         $numbers_of_users = $select_users->rowCount();
+      ?>
+      <h3><?= $numbers_of_users; ?></h3>
+      <p>Khách hàng</p>
+      <a href="users_accounts.php" class="btn">Chi tiết</a>
+   </div>
+   <div class="box">
+      <?php
+         $select_products = $conn->prepare("SELECT * FROM `courses`");
+         $select_products->execute();
+         $numbers_of_products = $select_products->rowCount();
+      ?>
+      <h3><?= $numbers_of_products; ?></h3>
+      <p>Khóa học</p>
+      <a href="products.php" class="btn">Chi tiết</a>
+   </div>
 
+   <div class="box">
+      <?php
+         $select_recipe = $conn->prepare("SELECT * FROM `recipe`");
+         $select_recipe->execute();
+         $numbers_of_recipe = $select_recipe->rowCount();
+      ?>
+      <h3><?= $numbers_of_recipe; ?></h3>
+      <p>Công thức</p>
+      <a href="recipe.php" class="btn">Chi tiết</a>
+   </div>
+   <div class="box">
+      <?php
+         $select_orders = $conn->prepare("SELECT * FROM `receipt`");
+         $select_orders->execute();
+         $numbers_of_orders = $select_orders->rowCount();
+      ?>
+      <h3><?= $numbers_of_orders; ?></h3>
+      <p>Đăng kí</p>
+      <a href="placed_orders.php" class="btn">Chi tiết</a>
+   </div>
    <div class="box">
       <?php
          $total_pendings = 0;
@@ -72,51 +112,13 @@ if(!isset($admin_id)){
       <a href="placed_orders.php" class="btn">Chi tiết</a>
    </div>
 
-   <div class="box">
-      <?php
-         $select_orders = $conn->prepare("SELECT * FROM `receipt`");
-         $select_orders->execute();
-         $numbers_of_orders = $select_orders->rowCount();
-      ?>
-      <h3><?= $numbers_of_orders; ?></h3>
-      <p>Đăng kí</p>
-      <a href="placed_orders.php" class="btn">Chi tiết</a>
-   </div>
+   
 
-   <div class="box">
-      <?php
-         $select_products = $conn->prepare("SELECT * FROM `courses`");
-         $select_products->execute();
-         $numbers_of_products = $select_products->rowCount();
-      ?>
-      <h3><?= $numbers_of_products; ?></h3>
-      <p>Khóa học</p>
-      <a href="products.php" class="btn">Chi tiết</a>
-   </div>
+  
 
-   <div class="box">
-      <?php
-         $select_recipe = $conn->prepare("SELECT * FROM `recipe`");
-         $select_recipe->execute();
-         $numbers_of_recipe = $select_recipe->rowCount();
-      ?>
-      <h3><?= $numbers_of_recipe; ?></h3>
-      <p>Công thức</p>
-      <a href="recipe.php" class="btn">Chi tiết</a>
-   </div>
+   
 
-   <div class="box">
-      <?php
-         $select_users = $conn->prepare("SELECT * FROM `users`");
-         $select_users->execute();
-         $numbers_of_users = $select_users->rowCount();
-      ?>
-      <h3><?= $numbers_of_users; ?></h3>
-      <p>Tài khoản</p>
-      <a href="users_accounts.php" class="btn">Chi tiết</a>
-   </div>
-
-   <div class="box">
+   <!-- <div class="box">
       <?php
          $select_admins = $conn->prepare("SELECT * FROM `admin`");
          $select_admins->execute();
@@ -125,7 +127,7 @@ if(!isset($admin_id)){
       <h3><?= $numbers_of_admins; ?></h3>
       <p>Quản trị viên</p>
       <a href="admin_accounts.php" class="btn">Chi tiết</a>
-   </div>
+   </div> -->
 
    <div class="box">
       <?php

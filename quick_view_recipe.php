@@ -36,7 +36,7 @@ include 'components/add_cart.php';
 
 <section class="quick-view-recipe">
 
-   <h1 class="title">Chi tiết công thức</h1>
+   <h1 class="title">Công thức</h1>
 
    <?php
       $pid = $_GET['pid'];
@@ -53,7 +53,8 @@ include 'components/add_cart.php';
       <!-- <input type="hidden" name="ingre" value="<?= $fetch_products['ingre']; ?>"> -->
 
       <div class="name"><h1 style="font-size:2vw;   margin-bottom: 20px;"><?= $fetch_products['name']; ?></h1></div>
-      <img src="uploaded_img/<?= $fetch_products['image']; ?>" width="768" height="432"  style = "display: block; margin-left: auto; margin-right: auto;" alt="">
+      <div class="name"><h1 style="font-size:1.5vw;   margin-bottom: 20px;">Thời gian nấu: <?= $fetch_products['time']; ?></h1></div>
+      <img src="uploaded_img/<?= $fetch_products['image']; ?>" width="500" height="300"  style = "display: block; margin-left: auto; margin-right: auto;" alt="">
       <!-- <a href="category.php?category=<?= $fetch_products['category']; ?>" class="cat"><?= $fetch_products['category']; ?></a> -->
       <div class="flex">
          <!-- <input type="number" name="qty" class="qty" min="1" max="99" value="1" maxlength="2"> -->

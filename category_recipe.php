@@ -36,7 +36,7 @@ include 'components/add_cart.php';
 
 <section class="products">
 
-   <h1 class="title">Chi tiết khóa học</h1>
+   <h1 class="title">Công thức</h1>
 
    <div class="box-container">
 
