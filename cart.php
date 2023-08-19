@@ -105,7 +105,7 @@ if(isset($_POST['delete_all'])){
 
    <div class="cart-total">
       <p>Tổng tiền: <span><?php echo number_format($grand_total). " VNĐ"; ?></span></p>
-      <a href="checkout.php" class="btn <?= ($grand_total > 1)?'':'disabled'; ?>">Tiến hành kiểm tra</a>
+      <a href="checkout.php" class="btn <?= ($grand_total > 1)?'':'disabled'; ?>">Tiến hành thanh toán</a>
    </div>
 
    <div class="more-btn">

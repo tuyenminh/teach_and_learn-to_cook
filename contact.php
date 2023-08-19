@@ -31,7 +31,7 @@ if(isset($_POST['send'])){
       $insert_message = $conn->prepare("INSERT INTO `messages`(user_id, name, email, number, message) VALUES(?,?,?,?,?)");
       $insert_message->execute([$user_id, $name, $email, $number, $msg]);
 
-      $message[] = 'Gửi tin nhắn thành công!';
+      $message[] = 'Tin nhắn đã được gửi!';
 
    }
 

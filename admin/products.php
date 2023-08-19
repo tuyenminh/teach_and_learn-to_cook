@@ -94,7 +94,7 @@ if(isset($_GET['delete'])){
 	<script type = "text/javascript" src= "ckeditor_4.21.0_full/ckeditor/ckeditor.js"></script>
 
    <!-- custom css file link  -->
-   <link rel="stylesheet" href="../css/admin_style.css">
+   <link rel="stylesheet" href="../css/admin.css">
 
 
 
@@ -145,8 +145,8 @@ if(isset($_GET['delete'])){
 	      });
       </script> -->
 
-      <input type="text" required placeholder="Nhập ngày khai giảng" name="opening_day" maxlength="100" class="box">
-      <input type="text" required placeholder="Nhập thời gian học" name="study_time" maxlength="100" class="box">
+      <input type="date" required placeholder="Nhập ngày khai giảng" name="opening_day" maxlength="100" class="box">
+      <input type="number" required placeholder="Nhập thời gian học" name="study_time" maxlength="100" class="box">
       <input type="submit" value="Thêm khóa học" name="add_product" class="btn">
    </form>
 </section>
@@ -168,7 +168,7 @@ if(isset($_GET['delete'])){
    <div class="box">
       <img src="../uploaded_img/<?= $fetch_products['image']; ?>" alt="">
       <div class="flex">
-         <div class="price" ><span></span><?= $fetch_products['price']; ?><span>/-</span></div>
+         <div class="price" ><span></span><?= number_format($fetch_products['price']) . " VNĐ";  ?><span></span></div>
          <!-- currency_format() -->
          <div class="category"><?= $fetch_products['category']; ?></div>
       </div>

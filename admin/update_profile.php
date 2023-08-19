@@ -47,7 +47,7 @@ if(isset($_POST['submit'])){
          if($new_pass != $empty_pass){
             $update_pass = $conn->prepare("UPDATE `admin` SET password = ? WHERE id = ?");
             $update_pass->execute([$confirm_pass, $admin_id]);
-            $message[] = 'Cập nhật mật khẩu thành công!';
+            $message[] = 'Cập nhật hồ sơ thành công!';
          }else{
             $message[] = 'Vui lòng nhập mật khẩu mới!';
          }

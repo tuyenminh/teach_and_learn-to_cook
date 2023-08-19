@@ -36,8 +36,8 @@ if(isset($_SESSION['user_id'])){
 <!-- header section ends -->
 
 <div class="heading">
-   <h3>Mua khóa học</h3>
-   <p><a href="html.php">Trang chủ</a> <span> / Mua khóa học</span></p>
+   <h3>Khóa học của bạn</h3>
+   <p><a href="html.php">Trang chủ</a> <span> / Khóa học của bạn</span></p>
 </div>
 
 <section class="orders">

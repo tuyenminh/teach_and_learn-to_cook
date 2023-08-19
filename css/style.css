@@ -14,7 +14,7 @@
    margin:0; padding:0;
    box-sizing: border-box;
    outline: none; border: none;
-   text-decoration: none;
+   /* text-decoration: none; */
 }
 
 *::selection{
@@ -54,7 +54,7 @@ section{
    font-size: 4rem;
    color:var(--black);
    text-transform: uppercase;
-   text-decoration: underline;
+   /* text-decoration: underline; */
    text-underline-offset: 1rem;
 }
 
@@ -84,7 +84,7 @@ section{
 }
 
 .heading p a:hover{
-   text-decoration: underline;
+   /* text-decoration: underline; */
    color:var(--white);
 }
 
@@ -191,7 +191,7 @@ section{
 
 .header .flex .navbar a:hover{
    color:var(--yellow);
-   text-decoration: underline;
+   text-decoration: none;
 }
 
 .header .flex .icons > *{
@@ -253,7 +253,7 @@ section{
 
 .header .flex .profile .account a:hover{
    color:var(--yellow);
-   text-decoration: underline;
+   /* text-decoration: underline; */
 }
 
 .hero .slide{

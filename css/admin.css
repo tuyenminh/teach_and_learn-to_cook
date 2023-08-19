@@ -307,7 +307,7 @@ section{
 
 .add-products form{
    margin:0 auto;
-   max-width: 100rem;
+   max-width: 102rem;
    background-color: var(--white);
    border-radius: .5rem;
    box-shadow: var(--box-shadow);
