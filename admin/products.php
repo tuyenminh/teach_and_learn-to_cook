@@ -95,7 +95,8 @@ if(isset($_GET['delete'])){
 
    <!-- custom css file link  -->
    <link rel="stylesheet" href="../css/admin.css">
-
+   <!-- <script src="js/jquery-1.11.1.min.js"></script>
+   <script src="js/bootstrap.min.js"></script> -->
 
 
 
@@ -105,11 +106,22 @@ if(isset($_GET['delete'])){
 <?php include '../components/admin_header.php' ?>
 
 <!-- add products section starts  -->
-
+<div class="col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main">
 <section class="add-products">
+   <?php include '../components/sidebar.php' ?>
+   <div class="row">
+		<ol class="breadcrumb">
+			<li><a href="#"><svg class="glyph stroked home">
+						<use xlink:href="#stroked-home"></use>
+					</svg></a></li>
+			<li class="active">Trang Khóa học</li>
+		</ol>
+	</div>
+   <?php include '../components/message.php' ?>
 
    <form action="" method="POST" enctype="multipart/form-data">
       <h3>Thêm khóa học</h3>
+      
       <input type="text" required placeholder="Nhập tên khóa học" name="name" maxlength="100" class="box">
       <input type="number" min="0" max="9999999999" required placeholder="Nhập giá khóa học" name="price" onkeypress="if(this.value.length == 10) return false;" class="box">
       <select name="category" class="box" required>
@@ -146,7 +158,7 @@ if(isset($_GET['delete'])){
       </script> -->
 
       <input type="date" required placeholder="Nhập ngày khai giảng" name="opening_day" maxlength="100" class="box">
-      <input type="number" required placeholder="Nhập thời gian học" name="study_time" maxlength="100" class="box">
+      <input type="text" required placeholder="Nhập thời gian học" name="study_time" maxlength="100" class="box">
       <input type="submit" value="Thêm khóa học" name="add_product" class="btn">
    </form>
 </section>
@@ -190,7 +202,7 @@ if(isset($_GET['delete'])){
    </div>
 
 </section>
-
+</div>
 <!-- show products section ends -->
 
 

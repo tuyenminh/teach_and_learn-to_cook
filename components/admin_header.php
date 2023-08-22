@@ -1,50 +1,67 @@
-<?php
-if(isset($message)){
-   foreach($message as $message){
-      echo '
-      <div class="message">
-         <span>'.$message.'</span>
-         <i class="fas fa-times" onclick="this.parentElement.remove();"></i>
-      </div>
-      ';
-   }
-}
-?>
 
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title></title>
+	<link href="css/bootstrap.min.css" rel="stylesheet">
+	<link href="css/datepicker3.css" rel="stylesheet">
+	<link href="css/bootstrap-table.css" rel="stylesheet">
+	<link href="css/styles.css" rel="stylesheet">
+	<!--Icons-->
+	<script src="./js/lumino.glyphs.js"></script>
+	<script type = "text/javascript" src= "ckeditor/ckeditor.js"></script>
+   <script src="js/jquery-1.11.1.min.js"></script>
+   <script src="js/bootstrap.min.js"></script>
+   <script src="js/bootstrap-table.js"></script>
+
+</head>
 <header class="header">
 
-   <section class="flex">
-
-      <a href="dashboard.php" class="logo">Admin<span></span></a>
-
-      <nav class="navbar">
-         <a href="dashboard.php">Trang chủ</a>
-         <a href="products.php">Khóa học</a>
-         <a href="recipe.php">Công thức</a>
-         <a href="placed_orders.php">Đăng kí</a>
-         <a href="messages.php">Liên hệ</a>
-      </nav>
-
-      <div class="icons">
-         <div id="menu-btn" class="fas fa-bars"></div>
-         <div id="user-btn" class="fas fa-user"></div>
-      </div>
-
-      <div class="profile">
-         <?php
-            $select_profile = $conn->prepare("SELECT * FROM `admin` WHERE id = ?");
-            $select_profile->execute([$admin_id]);
-            $fetch_profile = $select_profile->fetch(PDO::FETCH_ASSOC);
-         ?>
-         <p><?= $fetch_profile['name']; ?></p>
-         <a href="update_profile.php" class="btn">Cập nhật hồ sơ</a>
-         <div class="flex-btn">
-            <a href="admin_login.php" class="option-btn">Đăng nhập</a>
-            <a href="register_admin.php" class="option-btn">Đăng kí</a>
-         </div>
-         <a href="../components/admin_logout.php" onclick="return confirm('Đăng xuất khỏi trang web này?');" class="delete-btn">Đăng xuất</a>
-      </div>
-
-   </section>
-
+<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#sidebar-collapse">
+					<span class="sr-only"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="index.php"><span></span></a>
+				<ul class="user-menu">
+					<li class="dropdown pull-right">
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+							<svg class="glyph stroked male-user">
+								<use xlink:href="#stroked-male-user"></use>
+							</svg>
+                     <?php
+                        $select_profile = $conn->prepare("SELECT * FROM `admin` WHERE id = ?");
+                        $select_profile->execute([$admin_id]);
+                        $fetch_profile = $select_profile->fetch(PDO::FETCH_ASSOC);
+                        echo  $fetch_profile['name'];
+                     ?>
+							<span class="caret"></span>
+						</a>
+						<ul class="dropdown-menu" role="menu">
+							<li>
+								<a href="admin_accounts.php">
+									<svg class="glyph stroked male-user">
+										<use xlink:href="#stroked-male-user"></use>
+									</svg> Hồ sơ
+								</a>
+							</li>
+							<li>
+								<a href="admin_logout.php">
+									<svg class="glyph stroked cancel">
+										<use xlink:href="#stroked-cancel"></use>
+									</svg> Đăng xuất
+								</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</div>
+		</div><!-- /.container-fluid -->
+	</nav>
 </header>
+</html>

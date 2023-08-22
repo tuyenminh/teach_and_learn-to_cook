@@ -25,13 +25,13 @@ if(isset($_GET['delete'])){
    <meta charset="UTF-8">
    <meta http-equiv="X-UA-Compatible" content="IE=edge">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>Tài khoản admin</title>
+   <title>Tài khoản quản trị</title>
 
    <!-- font awesome cdn link  -->
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
 
    <!-- custom css file link  -->
-   <link rel="stylesheet" href="../css/admin_style.css">
+   <link rel="stylesheet" href="../css/admin.css">
 
 </head>
 <body>
@@ -39,10 +39,19 @@ if(isset($_GET['delete'])){
 <?php include '../components/admin_header.php' ?>
 
 <!-- admins accounts section starts  -->
+<div class="col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main">
+<?php include '../components/sidebar.php' ?>
 
 <section class="accounts">
-
-   <h1 class="heading">Tài khoản admin</h1>
+   <div class="row">
+		<ol class="breadcrumb">
+			<li><a href="#"><svg class="glyph stroked home">
+						<use xlink:href="#stroked-home"></use>
+					</svg></a></li>
+			<li class="active">Trang tài khoản quản trị</li>
+		</ol>
+	</div>
+   <h1 class="heading">Tài khoản quản trị</h1>
 
    <div class="box-container">
 
@@ -60,6 +69,10 @@ if(isset($_GET['delete'])){
    <div class="box">
       <!-- <p> admin id : <span><?= $fetch_accounts['id']; ?></span> </p> -->
       <p> Tên tài khoản : <span><?= $fetch_accounts['name']; ?></span> </p>
+      <p> Email : <span><?= $fetch_accounts['email']; ?></span> </p>
+      <p> Số điện thoại : <span><?= $fetch_accounts['number']; ?></span> </p>
+      <p> Địa chỉ : <span><?= $fetch_accounts['address']; ?></span> </p>
+
       <div class="flex-btn">
          <a href="admin_accounts.php?delete=<?= $fetch_accounts['id']; ?>" class="delete-btn" onclick="return confirm('Xóa tài khoản?');">Xóa</a>
          <?php
@@ -79,7 +92,7 @@ if(isset($_GET['delete'])){
    </div>
 
 </section>
-
+</div>
 <!-- admins accounts section ends -->
 
 

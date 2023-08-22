@@ -96,20 +96,6 @@ $total_comments = $select_comments->rowCount();
 
 </section>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <?php include '../components/footer.php'; ?>
 
 <script src="../js/admin_script.js"></script>

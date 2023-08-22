@@ -9,7 +9,6 @@ $admin_id = $_SESSION['admin_id'];
 if(!isset($admin_id)){
    header('location:admin_login.php');
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -43,7 +42,8 @@ if(!isset($admin_id)){
 							<svg class="glyph stroked male-user">
 								<use xlink:href="#stroked-male-user"></use>
 							</svg>
-							Admin							<span class="caret"></span>
+							Admin
+							<span class="caret"></span>
 						</a>
 						<ul class="dropdown-menu" role="menu">
 							<li>
@@ -161,9 +161,14 @@ if(!isset($admin_id)){
 						</svg>
 					</div>
 					<div class="col-sm-9 col-lg-7 widget-right">
-						<div class="large"><br />
-<b>Warning</b>:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in <b>C:\xampp\htdocs\Web_teach_cookingFood\admin\dashboard.php</b> on line <b>35</b><br />
-</div>
+						<div class="large">
+						<?php
+							$select_users = $conn->prepare("SELECT * FROM `courses`");
+							$select_users->execute();
+							$numbers_of_users = $select_users->rowCount();
+							echo $numbers_of_users;
+      					?>
+					</div>
 						<div class="text-muted">Khóa học</div>
 					</div>
 				</div>
@@ -178,10 +183,15 @@ if(!isset($admin_id)){
 						</svg>
 					</div>
 					<div class="col-sm-9 col-lg-7 widget-right">
-						<div class="large"><br />
-<b>Warning</b>:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in <b>C:\xampp\htdocs\Web_teach_cookingFood\admin\dashboard.php</b> on line <b>50</b><br />
-</div>
-						<div class="text-muted">Bình Luận</div>
+						<div class="large">
+							<?php
+								$select_users = $conn->prepare("SELECT * FROM `recipe`");
+								$select_users->execute();
+								$numbers_of_users = $select_users->rowCount();
+								echo $numbers_of_users;
+							?>					
+						</div>
+						<div class="text-muted">Công thức</div>
 					</div>
 				</div>
 			</div>
@@ -195,8 +205,15 @@ if(!isset($admin_id)){
 						</svg>
 					</div>
 					<div class="col-sm-9 col-lg-7 widget-right">
-						<div class="large">1</div>
-						<div class="text-muted">Thành Viên</div>
+					<div class="large">
+							<?php
+								$select_users = $conn->prepare("SELECT * FROM `users`");
+								$select_users->execute();
+								$numbers_of_users = $select_users->rowCount();
+								echo $numbers_of_users;
+							?>					
+						</div>
+						<div class="text-muted">Tài khoản</div>
 					</div>
 				</div>
 			</div>

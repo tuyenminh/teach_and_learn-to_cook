@@ -9,155 +9,137 @@ $admin_id = $_SESSION['admin_id'];
 if(!isset($admin_id)){
    header('location:admin_login.php');
 }
-
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-   <meta charset="UTF-8">
-   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>Trang Admin</title>
-
-   <!-- font awesome cdn link  -->
-   <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"> -->
-
-   <!-- custom css file link  -->
-   <link rel="stylesheet" href="../css/admin_style.css">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title></title>
+	<link href="css/bootstrap.min.css" rel="stylesheet">
+	<link href="css/datepicker3.css" rel="stylesheet">
+	<link href="css/bootstrap-table.css" rel="stylesheet">
+	<link href="css/styles.css" rel="stylesheet">
+	<!--Icons-->
+	<script src="./js/lumino.glyphs.js"></script>
+	<script type = "text/javascript" src= "ckeditor/ckeditor.js"></script>
 </head>
 <body>
-
 <?php include '../components/admin_header.php' ?>
 
-<!-- admin dashboard section starts  -->
+<?php include '../components/sidebar.php' ?>
 
-<section class="thongke">
+	<!--/.sidebar-->
+	<!-- master page -->
+	<div class="col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main">
+	<div class="row">
+		<ol class="breadcrumb">
+			<li><a href="#"><svg class="glyph stroked home">
+						<use xlink:href="#stroked-home"></use>
+					</svg></a></li>
+			<li class="active">Trang chủ quản trị</li>
+		</ol>
+	</div>
+	<!--/.row-->
 
-   <h1 class="heading">Dashboard</h1>
+	<div class="row">
+		<div class="col-lg-12">
+			<h1 class="page-header">Trang quản trị</h1>
+		</div>
+	</div>
+	<!--/.row-->
 
-   <div class="box-container">
+	<div class="row">
+		<div class="col-xs-12 col-md-6 col-lg-3">
+			<div class="panel panel-blue panel-widget ">
+				<div class="row no-padding">
+					<div class="col-sm-3 col-lg-5 widget-left">
+						<svg class="glyph stroked bag">
+							<use xlink:href="#stroked-bag"></use>
+						</svg>
+					</div>
+					<div class="col-sm-9 col-lg-7 widget-right">
+						<div class="large">
+						<?php
+							$select_users = $conn->prepare("SELECT * FROM `courses`");
+							$select_users->execute();
+							$numbers_of_users = $select_users->rowCount();
+							echo $numbers_of_users;
+      					?>
+					</div>
+						<div class="text-muted">Khóa học</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-xs-12 col-md-6 col-lg-3">
+			<div class="panel panel-orange panel-widget">
+				<div class="row no-padding">
+					<div class="col-sm-3 col-lg-5 widget-left">
+						<svg class="glyph stroked empty-message">
+							<use xlink:href="#stroked-empty-message"></use>
+						</svg>
+					</div>
+					<div class="col-sm-9 col-lg-7 widget-right">
+						<div class="large">
+							<?php
+								$select_users = $conn->prepare("SELECT * FROM `recipe`");
+								$select_users->execute();
+								$numbers_of_users = $select_users->rowCount();
+								echo $numbers_of_users;
+							?>					
+						</div>
+						<div class="text-muted">Công thức</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-xs-12 col-md-6 col-lg-3">
+			<div class="panel panel-teal panel-widget">
+				<div class="row no-padding">
+					<div class="col-sm-3 col-lg-5 widget-left">
+						<svg class="glyph stroked male-user">
+							<use xlink:href="#stroked-male-user"></use>
+						</svg>
+					</div>
+					<div class="col-sm-9 col-lg-7 widget-right">
+					<div class="large">
+							<?php
+								$select_users = $conn->prepare("SELECT * FROM `users`");
+								$select_users->execute();
+								$numbers_of_users = $select_users->rowCount();
+								echo $numbers_of_users;
+							?>					
+						</div>
+						<div class="text-muted">Tài khoản</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-xs-12 col-md-6 col-lg-3">
+			<div class="panel panel-red panel-widget">
+				<div class="row no-padding">
+					<div class="col-sm-3 col-lg-5 widget-left">
+						<svg class="glyph stroked app-window-with-content">
+							<use xlink:href="#stroked-app-window-with-content"></use>
+						</svg>
+					</div>
+					<div class="col-sm-9 col-lg-7 widget-right">
+						<div class="large">25.2k</div>
+						<div class="text-muted">Quảng Cáo</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--/.row-->
+</div>
+<!--/.main-->
 
-   <div class="box">
-      <h3>Hồ sơ</h3>
-      <p><?= $fetch_profile['name']; ?></p>
-      <a href="update_profile.php" class="btn">Chi tiết</a>
-   </div>
-   <div class="box">
-      <?php
-         $select_users = $conn->prepare("SELECT * FROM `users`");
-         $select_users->execute();
-         $numbers_of_users = $select_users->rowCount();
-      ?>
-      <h3><?= $numbers_of_users; ?></h3>
-      <p>Khách hàng</p>
-      <a href="users_accounts.php" class="btn">Chi tiết</a>
-   </div>
-   <div class="box">
-      <?php
-         $select_products = $conn->prepare("SELECT * FROM `courses`");
-         $select_products->execute();
-         $numbers_of_products = $select_products->rowCount();
-      ?>
-      <h3><?= $numbers_of_products; ?></h3>
-      <p>Khóa học</p>
-      <a href="products.php" class="btn">Chi tiết</a>
-   </div>
-
-   <div class="box">
-      <?php
-         $select_recipe = $conn->prepare("SELECT * FROM `recipe`");
-         $select_recipe->execute();
-         $numbers_of_recipe = $select_recipe->rowCount();
-      ?>
-      <h3><?= $numbers_of_recipe; ?></h3>
-      <p>Công thức</p>
-      <a href="recipe.php" class="btn">Chi tiết</a>
-   </div>
-   <div class="box">
-      <?php
-         $select_orders = $conn->prepare("SELECT * FROM `receipt`");
-         $select_orders->execute();
-         $numbers_of_orders = $select_orders->rowCount();
-      ?>
-      <h3><?= $numbers_of_orders; ?></h3>
-      <p>Đăng kí</p>
-      <a href="placed_orders.php" class="btn">Chi tiết</a>
-   </div>
-   <div class="box">
-      <?php
-         $total_pendings = 0;
-         $select_pendings = $conn->prepare("SELECT * FROM `receipt` WHERE pay_status = ?");
-         $select_pendings->execute(['Đang xử lý']);
-         while($fetch_pendings = $select_pendings->fetch(PDO::FETCH_ASSOC)){
-            $total_pendings += $fetch_pendings['total_price'];
-         }
-      ?>
-      <h3><span></span><?= number_format($total_pendings). " VNĐ"; ?><span></span></h3>
-      <p>Đang xử lý</p>
-      <a href="placed_orders.php" class="btn">Chi tiết</a>
-   </div>
-
-   <div class="box">
-      <?php
-         $total_completes = 0;
-         $select_completes = $conn->prepare("SELECT * FROM `receipt` WHERE pay_status = ?");
-         $select_completes->execute(['Đã hoàn thành']);
-         while($fetch_completes = $select_completes->fetch(PDO::FETCH_ASSOC)){
-            $total_completes += $fetch_completes['total_price'];
-         }
-      ?>
-      <h3><span></span><?= number_format($total_completes). " VNĐ"; ?><span></span></h3>
-      <p>Đã thanh toán</p>
-      <a href="placed_orders.php" class="btn">Chi tiết</a>
-   </div>
-
-   
-
-  
-
-   
-
-   <!-- <div class="box">
-      <?php
-         $select_admins = $conn->prepare("SELECT * FROM `admin`");
-         $select_admins->execute();
-         $numbers_of_admins = $select_admins->rowCount();
-      ?>
-      <h3><?= $numbers_of_admins; ?></h3>
-      <p>Quản trị viên</p>
-      <a href="admin_accounts.php" class="btn">Chi tiết</a>
-   </div> -->
-
-   <div class="box">
-      <?php
-         $select_messages = $conn->prepare("SELECT * FROM `messages`");
-         $select_messages->execute();
-         $numbers_of_messages = $select_messages->rowCount();
-      ?>
-      <h3><?= $numbers_of_messages; ?></h3>
-      <p>Liên hệ</p>
-      <a href="messages.php" class="btn">Chi tiết</a>
-   </div>
-
-   </div>
-
-</section>
-
-<!-- admin dashboard section ends -->
-
-
-
-
-
-
-
-
-
-<!-- custom js file link  -->
-<script src="../js/admin_script.js"></script>
-
-<script src="https://localhost/food_website_backend/admin/ckeditor/ckeditor.js"></script>
+<script src="js/jquery-1.11.1.min.js"></script>
+<script src="js/bootstrap-table.js"></script>
 
 </body>
+
 </html>

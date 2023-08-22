@@ -31,7 +31,7 @@ if(isset($_GET['delete'])){
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
 
    <!-- custom css file link  -->
-   <link rel="stylesheet" href="../css/admin_style.css">
+   <link rel="stylesheet" href="../css/admin.css">
 
 </head>
 <body>
@@ -39,9 +39,23 @@ if(isset($_GET['delete'])){
 <?php include '../components/admin_header.php' ?>
 
 <!-- messages section starts  -->
+<div class="col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main">
 
 <section class="messages">
-
+<?php include '../components/sidebar.php' ?>
+   <div class="row">
+		<ol class="breadcrumb">
+			<li><a href="#"><svg class="glyph stroked home">
+						<use xlink:href="#stroked-home"></use>
+					</svg></a></li>
+			<li class="active">Trang Liên hệ</li>
+		</ol>
+	</div>
+   <!-- <div class="row">
+		<div class="col-lg-12">
+			<h1 class="page-header">Trang tài khoản Admin</h1>
+		</div>
+	</div> -->
    <h1 class="heading">Liên hệ</h1>
 
    <div class="box-container">
@@ -69,7 +83,7 @@ if(isset($_GET['delete'])){
    </div>
 
 </section>
-
+   </div>
 <!-- messages section ends -->
 
 

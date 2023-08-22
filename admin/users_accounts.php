@@ -35,7 +35,9 @@ if(isset($_GET['delete'])){
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
 
    <!-- custom css file link  -->
-   <link rel="stylesheet" href="../css/admin_style.css">
+   <link rel="stylesheet" href="../css/admin.css">
+
+	<script src="js/bootstrap-table.js"></script>
 
 </head>
 <body>
@@ -43,11 +45,18 @@ if(isset($_GET['delete'])){
 <?php include '../components/admin_header.php' ?>
 
 <!-- user accounts section starts  -->
-
+<div class="col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main">
 <section class="accounts">
-
-   <h1 class="heading">Tài khoản người dùng</h1>
-
+<?php include '../components/sidebar.php' ?>
+<div class="row">
+		<ol class="breadcrumb">
+			<li><a href="#"><svg class="glyph stroked home">
+						<use xlink:href="#stroked-home"></use>
+					</svg></a></li>
+			<li class="active">Trang Tài khoản</li>
+		</ol>
+	</div>
+	<h1 class="heading">Tài khoản khách hàng</h1>
    <div class="box-container">
 
    <?php
@@ -57,8 +66,10 @@ if(isset($_GET['delete'])){
          while($fetch_accounts = $select_account->fetch(PDO::FETCH_ASSOC)){  
    ?>
    <div class="box">
-      <p> STT : <span><?= $fetch_accounts['id']; ?></span> </p>
       <p> Tên tài khoản : <span><?= $fetch_accounts['name']; ?></span> </p>
+	  <p> Email : <span><?= $fetch_accounts['email']; ?></span> </p>
+	  <p> Số điện thoại : <span><?= $fetch_accounts['number']; ?></span> </p>
+	  <p> Địa chỉ : <span><?= $fetch_accounts['address']; ?></span> </p>
       <a href="users_accounts.php?delete=<?= $fetch_accounts['id']; ?>" class="delete-btn" onclick="return confirm('Xóa tài khoản');">Xóa</a>
    </div>
    <?php
@@ -69,9 +80,10 @@ if(isset($_GET['delete'])){
    ?>
 
    </div>
+  
 
 </section>
-
+</div>
 <!-- user accounts section ends -->
 
 

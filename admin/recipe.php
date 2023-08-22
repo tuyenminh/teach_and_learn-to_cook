@@ -84,7 +84,7 @@ if(isset($_GET['delete'])){
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
 
    <!-- custom css file link  -->
-   <link rel="stylesheet" href="../css/admin_style.css">
+   <link rel="stylesheet" href="../css/admin.css">
 	<script type = "text/javascript" src= "ckeditor_4.21.0_full/ckeditor/ckeditor.js"></script>
 
 
@@ -94,9 +94,17 @@ if(isset($_GET['delete'])){
 <?php include '../components/admin_header.php' ?>
 
 <!-- add products section starts  -->
-
+<div class="col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main">
 <section class="add-products">
-
+<?php include '../components/sidebar.php' ?>
+   <div class="row">
+		<ol class="breadcrumb">
+			<li><a href="#"><svg class="glyph stroked home">
+						<use xlink:href="#stroked-home"></use>
+					</svg></a></li>
+			<li class="active">Trang Công thức</li>
+		</ol>
+	</div>
    <form action="" method="POST" enctype="multipart/form-data">
       <h3>Thêm công thức</h3>
       <input type="text" required placeholder="Nhập tên món" name="name" maxlength="100" class="box">
@@ -181,7 +189,7 @@ if(isset($_GET['delete'])){
    </div>
 
 </section>
-
+   </div>
 <!-- show products section ends -->
 
 
@@ -195,5 +203,7 @@ if(isset($_GET['delete'])){
 
 <!-- custom js file link  -->
 <script src="../js/admin_script.js"></script>
+<!-- <script src="../js/jquery-1.11.1.min.js"></script>
+<script src="../js/bootstrap.min.js"></script> -->
 </body>
 </html>

@@ -60,7 +60,6 @@ section{
    margin-top: 1rem;
    border-radius: .5rem;
    cursor: pointer;
-   height: 50px;
    width: 100%;
    font-size: 1.8rem;
    color:var(--white);
@@ -98,7 +97,6 @@ section{
    max-width: 1200px;
    margin-left:40px;
    margin-right:40px;
-   padding-top: 2rem;
    background-color: var(--light-bg);
    display: flex;
    align-items: center;
@@ -152,10 +150,11 @@ section{
 .form-container form{
    background-color: var(--white);
    border-radius: .5rem;
+   border:var(--border);
    box-shadow: var(--box-shadow);
    padding:2rem;
    text-align: center;
-   width: 102rem;
+   width: 50rem;
 }
 
 .form-container form h3{
@@ -182,6 +181,7 @@ section{
    font-size: 1.4rem;
    color:var(--black);
    margin:1rem 0;
+   border:var(--border);
    font-size: 1.8rem;
    border-radius: .5rem;
 }
@@ -247,6 +247,7 @@ section{
 
 .add-products form .box{
    background-color: var(--light-bg);
+   border:var(--border);
    width: 100%;
    padding:1.4rem;
    font-size: 1.8rem;

@@ -6,12 +6,12 @@ session_start();
 
 if(isset($_POST['submit'])){
 
-   $name = $_POST['name'];
-   $name = filter_var($name, FILTER_SANITIZE_STRING);
+   $email = $_POST['email'];
+   $name = filter_var($email, FILTER_SANITIZE_STRING);
    $pass = sha1($_POST['pass']);
    $pass = filter_var($pass, FILTER_SANITIZE_STRING);
 
-   $select_admin = $conn->prepare("SELECT * FROM `admin` WHERE name = ? AND password = ?");
+   $select_admin = $conn->prepare("SELECT * FROM `admin` WHERE email = ? AND password = ?");
    $select_admin->execute([$name, $pass]);
    
    if($select_admin->rowCount() > 0){
@@ -38,7 +38,7 @@ if(isset($_POST['submit'])){
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
 
    <!-- custom css file link  -->
-   <link rel="stylesheet" href="../css/admin_style.css">
+   <link rel="stylesheet" href="../css/admin.css">
 
 </head>
 <body>
@@ -60,11 +60,11 @@ if(isset($message)){
 
 <section class="form-container">
 
-   <form action="" method="POST">
+   <form style = "width: 50rem;" action="" method="POST">
       <h3>Đăng nhập</h3>
       <!-- <p>default username = <span>admin</span> & password = <span>111</span></p> -->
-      <input type="text" name="name" maxlength="20" required placeholder="Nhập tên tài khoản" class="box" oninput="this.value = this.value.replace(/\s/g, '')">
-      <input type="password" name="pass" maxlength="20" required placeholder="Nhập mật khẩu" class="box" oninput="this.value = this.value.replace(/\s/g, '')">
+      <input type="email" name="email" maxlength="20" required placeholder="Nhập email" class="box" >
+      <input type="password" name="pass" maxlength="20" required placeholder="Nhập mật khẩu" class="box" >
       <input type="submit" value="Đăng nhập" name="submit" class="btn">
    </form>
 
