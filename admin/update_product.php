@@ -46,12 +46,6 @@ if(isset($_POST['update'])){
    $image_tmp_name = $_FILES['image']['tmp_name'];
    $image_folder = '../uploaded_img/'.$image;
 
-   // $old_video = $_POST['old_video'];
-   // $video = $_FILES['video']['name'];
-   // $video = filter_var($image, FILTER_SANITIZE_STRING);
-   // $video_tmp_name = $_FILES['video']['tmp_name'];
-   // $video_folder = '../uploaded_video/'.$video;
-
    if(!empty($image)){
       if($image_size > 2000000){
          $message[] = 'Kích thước hình ảnh quá lớn!';

@@ -53,21 +53,20 @@ section{
    margin:0 auto;
 }
 
-.btn,
+/* .btn,
 .delete-btn,
 .option-btn{
    display: block;
    margin-top: 1rem;
    border-radius: .5rem;
    cursor: pointer;
-   height: 50px;
    width: 100%;
    font-size: 1.8rem;
    color:var(--white);
    padding:1.2rem 3rem;
    text-transform: capitalize;
    text-align: center;
-}
+} */
 
 .btn{
    background-color: var(--main-color);

@@ -13,6 +13,7 @@
 						</svg> Dashboard
 					</a>
 				</li>
+				
 				<li>
 						<a href="users_accounts.php">
 							<svg class="glyph stroked male user ">
@@ -54,20 +55,7 @@
 						</svg> Đăng kí
 					</a>
 				</li>
-				<li>
-					<a href="placed_orders.php">
-						<svg class="glyph stroked gear">
-							<use xlink:href="#stroked-gear" />
-						</svg> Đang xử lý
-					</a>
-				</li>
-                <li>
-					<a href="placed_orders.php">
-						<svg class="glyph stroked chain">
-							<use xlink:href="#stroked-chain" />
-						</svg> Thanh toán
-					</a>
-				</li>
+				
 					</ul>
 
 	</div>

@@ -24,6 +24,10 @@ if(!isset($admin_id)){
 	<!--Icons-->
 	<script src="./js/lumino.glyphs.js"></script>
 	<script type = "text/javascript" src= "ckeditor/ckeditor.js"></script>
+	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.css">
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.min.js"></script>
 </head>
 <body>
 <?php include '../components/admin_header.php' ?>
@@ -62,13 +66,13 @@ if(!isset($admin_id)){
 					<div class="col-sm-9 col-lg-7 widget-right">
 						<div class="large">
 						<?php
-							$select_users = $conn->prepare("SELECT * FROM `courses`");
+							$select_users = $conn->prepare("SELECT * FROM `receipt`");
 							$select_users->execute();
 							$numbers_of_users = $select_users->rowCount();
 							echo $numbers_of_users;
       					?>
 					</div>
-						<div class="text-muted">Khóa học</div>
+						<div class="text-muted">Đăng kí</div>
 					</div>
 				</div>
 			</div>
@@ -84,13 +88,13 @@ if(!isset($admin_id)){
 					<div class="col-sm-9 col-lg-7 widget-right">
 						<div class="large">
 							<?php
-								$select_users = $conn->prepare("SELECT * FROM `recipe`");
+								$select_users = $conn->prepare("SELECT * FROM `messages`");
 								$select_users->execute();
 								$numbers_of_users = $select_users->rowCount();
 								echo $numbers_of_users;
 							?>					
 						</div>
-						<div class="text-muted">Công thức</div>
+						<div class="text-muted">Liên hệ</div>
 					</div>
 				</div>
 			</div>
@@ -112,7 +116,7 @@ if(!isset($admin_id)){
 								echo $numbers_of_users;
 							?>					
 						</div>
-						<div class="text-muted">Tài khoản</div>
+						<div class="text-muted">Khách hàng</div>
 					</div>
 				</div>
 			</div>
@@ -126,12 +130,23 @@ if(!isset($admin_id)){
 						</svg>
 					</div>
 					<div class="col-sm-9 col-lg-7 widget-right">
-						<div class="large">25.2k</div>
-						<div class="text-muted">Quảng Cáo</div>
+						<div class="large">
+						<?php
+								$select_admin = $conn->prepare("SELECT * FROM `admin`");
+								$select_admin->execute();
+								$numbers_of_admin = $select_admin->rowCount();
+								echo $numbers_of_admin;
+							?>
+						</div>
+						<div class="text-muted">Quản trị viên</div>
 					</div>
 				</div>
 			</div>
 		</div>
+	</div>
+	<div class = "row" >
+		<div id="chart" style="height: 250px;"></div>
+
 	</div>
 	<!--/.row-->
 </div>
@@ -139,7 +154,28 @@ if(!isset($admin_id)){
 
 <script src="js/jquery-1.11.1.min.js"></script>
 <script src="js/bootstrap-table.js"></script>
-
+<script> 
+new Morris.Line({
+  // ID of the element in which to draw the chart.
+  element: 'chart',
+  // Chart data records -- each entry in this array corresponds to a point on
+  // the chart.
+  data: [
+    { year: '2008', price: 20 },
+    { year: '2009', price: 10 },
+    { year: '2010', price: 5 },
+    { year: '2011', price: 5 },
+    { year: '2012', price: 20 }
+  ],
+  // The name of the data record attribute that contains x-values.
+  xkey: 'year',
+  // A list of names of data record attributes that contain y-values.
+  ykeys: ['price'],
+  // Labels for the ykeys -- will be displayed when you hover over the
+  // chart.
+  labels: ['Value']
+});
+</script>
 </body>
 
 </html>
