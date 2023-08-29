@@ -99,7 +99,7 @@ if(isset($_GET['delete'])){
 	</div>
    <?php include '../components/message.php' ?>
 
-   <form action="" method="POST" enctype="multipart/form-data">
+   <form action="" method="POST" enctype="multipart/form-data" style = "border: var(--border);">
       <h3>Thêm tài khoản khách hàng</h3>
       
       <input type="text" required placeholder="Nhập tên tài khoản" name="name" maxlength="100" class="box">

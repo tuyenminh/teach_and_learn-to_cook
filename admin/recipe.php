@@ -95,100 +95,138 @@ if(isset($_GET['delete'])){
 
 <!-- add products section starts  -->
 <div class="col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main">
-<section class="add-products">
 <?php include '../components/sidebar.php' ?>
-   <div class="row">
-		<ol class="breadcrumb">
-			<li><a href="#"><svg class="glyph stroked home">
-						<use xlink:href="#stroked-home"></use>
-					</svg></a></li>
-			<li class="active">Trang Công thức</li>
-		</ol>
-	</div>
-   <form action="" method="POST" enctype="multipart/form-data">
-      <h3>Thêm công thức</h3>
-      <input type="text" required placeholder="Nhập tên món" name="name" maxlength="100" class="box">
-      <select name="category" class="box" required>
-         <option value="" disabled selected>Chọn danh mục --</option>
-         <option value="Gia đình">Gia đình</option>
-         <option value="Tiệc">Tiệc</option>
-         <option value="Đồ uống">Đồ uống</option>
-         <option value="Ăn vặt">Ăn vặt</option>
-      </select>
-      <input type="file" name="image" class="box" accept="image/jpg, image/jpeg, image/png, image/webp" required>
-      <textarea name="ingre" id="post_content" class="box"></textarea>
-      <script>
-         // Thay thế <textarea id="post_content"> với CKEditor
-         CKEDITOR.replace( 'post_content', {
-            // Khai báo encoding cho CKEditor
-            entities: false,
-            basicEntities: false,
-            entities_greek: false,
-            entities_latin: false,
-            entities_additional: '',
-            entities: '',
-            encoding: 'utf-8',
-            entities_processNumerical: true,
-            entities_apos: true
-});      </script>
-      <textarea name="making" id="post_content1" class="box"></textarea>
-      <script>
-         // Thay thế <textarea id="post_content"> với CKEditor
-         CKEDITOR.replace( 'post_content1', {
-            // Khai báo encoding cho CKEditor
-            entities: false,
-            basicEntities: false,
-            entities_greek: false,
-            entities_latin: false,
-            entities_additional: '',
-            entities: '',
-            encoding: 'utf-8',
-            entities_processNumerical: true,
-            entities_apos: true
-});      </script>
-      <input type="text" required placeholder="Nhập link video" name="time" maxlength="100" class="box">
-      <input type="text" required placeholder="Nhập thời gian nấu" name="video" maxlength="100" class="box">
-      <input type="submit" value="Thêm công thức" name="add_product" class="btn">
-   </form>
 
-</section>
+<div class = "row">
+            <div id="toolbar" class="btn-group">
+                  <a href="add_recipe.php" class="btn btn-success" style = "height: 3.5rem;">
+                     <i class="glyphicon glyphicon-plus"></i> Thêm danh mục
+                  </a>
+            </div>
+         </div>
+         <div class="row">
+               <ol class="breadcrumb">
+                  <li><a href="#"><svg class="glyph stroked home">
+                           <use xlink:href="#stroked-home"></use>
+                           </svg></a></li>
+                  <li class="active">Trang Công thức</li>
+               </ol>
+         </div>
+         <h1 class="heading">Công thức</h1>
 
-<!-- add products section ends -->
+         <div class="box-container">
+            <div class="row">
+               <div class="col-md-12">
+                  <div class="panel panel-default">
+                     <div class="panel-body">
+                        <table data-toolbar="#toolbar" data-toggle="table">
+                           <thead>
+                              <tr>
+                                 <th data-field="id" data-sortable="true">STT</th>
+                                 <th>Tên Công thức </th>
+                                 <th>Danh mục</th>
+                                 <th>Cách làm</th>
+                                 <th>Hình ảnh</th>
+                                 <th>Hành động</th>
+                              </tr>
+                           </thead>
+                           <tbody>
+                              <?php
+                              //
+                              if(isset($_GET['page'])){
+                                 $page=$_GET['page'];
+                              }else{$page=1;}
+                              $row_per_page = 10;
+                              $per_page = $page * $row_per_page - $row_per_page;
 
-<!-- show products section starts  -->
+                              // Thay thế cách tính $total_row bằng PDO
+                              $select_account = $conn->prepare("SELECT * FROM `recipe`");
+                              $select_account->execute();
+                              $total_row = $select_account->rowCount();
 
-<section class="show-products" style="padding-top: 0;">
+                              $total_page = ceil($total_row / $row_per_page);
+                              $list_page = " ";
 
-   <div class="box-container">
+                              //// previous page
+                              $prv_page=$page-1;
+                              if($prv_page<1){
+                                 $prv_page=1;
+                              }
+                              $list_page.='<li class="page-item"><a class="page-link" href="recipe.php?page='.$prv_page.'">&laquo;</a></li>';
+                              // for($i=1;$i<=$total_page;$i++){
+                              // 	$list_page.='<li class="page-item"><a class="page-link" href="index.php?page_layout=category&page='.$i.'">'.$i.'</a></li>';
+                              // }
+                              // in dam so trang hien tai
+                              if (!isset($_GET['page'])) {
+                                 for ($i = 1; $i <= $total_page; $i++) {
+                                    if ($i == 1) {
+                                       $list_page .= '<li class="active"><a class="page-link" href="recipe.php?page='.$i.'">'.$i.'</a></li>';
+                                    }
+                                    for ($i = 2; $i <= $total_page; $i++) {
+                                       $list_page .= '<li class="page-item"><a class="page-link" href="recipe.php?page='.$i.'">'.$i.'</a></li>';
+                                    }
+                                 }
+                              } else {
+                                 for ($i = 1; $i <= $total_page; $i++) {
+                                          if ($i == $_GET['page']) {
+                                             $list_page .= '<li class="active"><a class="page-link" href="recipe.php?page='.$i.'">'.$i.'</a></li>';
+                                          }
+                                          if ($i != $_GET['page']) {
+                                             $list_page .= '<li class="page-item"><a class="page-link" href="recipe.php?page='.$i.'">'.$i.'</a></li>';
+                                          }
+                                       }
+                                    }
+                                    //page next
+                                    $next_page=$page+1;
+                                    if($next_page>$total_page){
+                                       $next_page=$total_page;
+                                    }
+                                    $list_page.='<li class="page-item"><a class="page-link" href="recipe.php?page='.$next_page.'">&raquo;</a></li>';
+                                    // Thay thế truy vấn SELECT từ MySQLi sang PDO
+                                    $select_account = $conn->prepare("SELECT * FROM `recipe` LIMIT :per_page OFFSET :offset");
+                                    $select_account->bindValue(':per_page', $row_per_page, PDO::PARAM_INT);
+                                    $select_account->bindValue(':offset', $per_page, PDO::PARAM_INT);
+                                    $select_account->execute();
 
-   <?php
-      $show_recipe = $conn->prepare("SELECT * FROM `recipe`");
-      $show_recipe->execute();
-      if($show_recipe->rowCount() > 0){
-         while($fetch_recipe = $show_recipe->fetch(PDO::FETCH_ASSOC)){  
-   ?>
-   <div class="box">
-      <img src="../uploaded_img/<?= $fetch_recipe['image']; ?>" alt="">
-      <div class="flex">
-         <!-- currency_format() -->
-         <div class="category"><?= $fetch_recipe['category']; ?></div>
-      </div>
-      <div class="name"><?= $fetch_recipe['name']; ?></div>
-      <div class="flex-btn">
-         <a href="update_recipe.php?update=<?= $fetch_recipe['id']; ?>" class="option-btn">Cập nhật</a>
-         <a href="recipe.php?delete=<?= $fetch_recipe['id']; ?>" class="delete-btn" onclick="return confirm('Xóa công thức này?');">Xóa</a>
-      </div>
-   </div>
-   <?php
-         }
-      }else{
-         echo '<p class="empty">Không có công thức nào!</p>';
-      }
-   ?>
+                                    // Kiểm tra nếu có dữ liệu trả về
+                                    if ($select_account->rowCount() > 0) {
+                                       // Duyệt và xử lý dữ liệu
+                                       while ($fetch_products = $select_account->fetch(PDO::FETCH_ASSOC)) {
+                                    ?>
+                                    <tr>
+                                       <td style=""><?php echo $fetch_products['id'];?></td>
+                                       <td style=""><?php echo $fetch_products['name'];?></td>
+                                       <td style=""><?php echo $fetch_products['category'];?></td>
+                                       <td style="overflow-wrap: break-word;"><?php echo $fetch_products['making'];?></td>
+                                       <td>
+                                          <img style = "heigth: 20rem; width: 20rem;" 
+                                          src="../uploaded_img/<?= $fetch_products['image']; ?>" alt="">
+                                       </td>
+                                       <td class="form-group">
 
-   </div>
-
-</section>
+                                             <a href="update_recipe.php?update=<?= $fetch_products['id']; ?>" class="btn btn-primary" style = "height: 3.5rem; width: 10rem;">Cập nhật</a>
+                                             <a href="recipe.php?delete=<?= $fetch_products['id']; ?>" class="btn btn-danger"style = "height: 3.5rem; width: 10rem;" onclick="return confirm('Xóa tài khoản');">Xóa</a>
+                                             </td>
+                                    </tr>
+                                    <?php
+                                    }
+                                 }
+                                    ?>
+                           </tbody>
+                        </table>
+                     </div>
+                     <div class="panel-footer">
+                        <nav aria-label="Page navigation example">
+                           <ul class="pagination">
+                              
+                              <?php echo $list_page;?>
+                              
+                           </ul>
+                        </nav>
+                     </div>
+               </div>
+            </div>
+         </div>
    </div>
 <!-- show products section ends -->
 

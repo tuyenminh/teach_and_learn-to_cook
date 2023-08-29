@@ -47,12 +47,12 @@ if(isset($_GET['delete'])){
 <section class="accounts">
 <?php include '../components/sidebar.php' ?>
 <div class = "row">
-<div id="toolbar" class="btn-group">
-		<a href="add_users.php" class="btn btn-success" style = "height: 3.5rem;">
-			<i class="glyphicon glyphicon-plus"></i> Thêm danh mục
-		</a>
+	<div id="toolbar" class="btn-group">
+			<a href="add_users.php" class="btn btn-success" style = "height: 3.5rem;">
+				<i class="glyphicon glyphicon-plus"></i> Thêm danh mục
+			</a>
+		</div>
 	</div>
-</div>
 <div class="row">
 		<ol class="breadcrumb">
 			<li><a href="#"><svg class="glyph stroked home">
@@ -101,7 +101,7 @@ if(isset($_GET['delete'])){
 							if($prv_page<1){
 								$prv_page=1;
 							}
-							$list_page.='<li class="page-item"><a class="page-link" href="users_accounts&page='.$prv_page.'">&laquo;</a></li>';
+							$list_page.='<li class="page-item"><a class="page-link" href="users_accounts.php?page='.$prv_page.'">&laquo;</a></li>';
 							// for($i=1;$i<=$total_page;$i++){
 							// 	$list_page.='<li class="page-item"><a class="page-link" href="index.php?page_layout=category&page='.$i.'">'.$i.'</a></li>';
 							// }
@@ -109,19 +109,19 @@ if(isset($_GET['delete'])){
 							if (!isset($_GET['page'])) {
 								for ($i = 1; $i <= $total_page; $i++) {
 									if ($i == 1) {
-										$list_page .= '<li class="active"><a class="page-link" href="users_accounts&page='.$i.'">'.$i.'</a></li>';
+										$list_page .= '<li class="active"><a class="page-link" href="users_accounts.php?page='.$i.'">'.$i.'</a></li>';
 									}
 									for ($i = 2; $i <= $total_page; $i++) {
-										$list_page .= '<li class="page-item"><a class="page-link" href="users_accounts&page='.$i.'">'.$i.'</a></li>';
+										$list_page .= '<li class="page-item"><a class="page-link" href="users_accounts.php?page='.$i.'">'.$i.'</a></li>';
 									}
 								}
 							} else {
 								for ($i = 1; $i <= $total_page; $i++) {
 									if ($i == $_GET['page']) {
-										$list_page .= '<li class="active"><a class="page-link" href="users_accounts&page='.$i.'">'.$i.'</a></li>';
+										$list_page .= '<li class="active"><a class="page-link" href="users_accounts.php?page='.$i.'">'.$i.'</a></li>';
 									}
 									if ($i != $_GET['page']) {
-										$list_page .= '<li class="page-item"><a class="page-link" href="users_accounts&page='.$i.'">'.$i.'</a></li>';
+										$list_page .= '<li class="page-item"><a class="page-link" href="users_accounts.php?page='.$i.'">'.$i.'</a></li>';
 									}
 								}
 							}
@@ -130,7 +130,7 @@ if(isset($_GET['delete'])){
 							if($next_page>$total_page){
 								$next_page=$total_page;
 							}
-							$list_page.='<li class="page-item"><a class="page-link" href="users_accounts&page='.$next_page.'">&raquo;</a></li>';
+							$list_page.='<li class="page-item"><a class="page-link" href="users_accounts.php?page='.$next_page.'">&raquo;</a></li>';
 // Thay thế truy vấn SELECT từ MySQLi sang PDO
 $select_account = $conn->prepare("SELECT * FROM `users` LIMIT :per_page OFFSET :offset");
 $select_account->bindValue(':per_page', $row_per_page, PDO::PARAM_INT);

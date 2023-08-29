@@ -179,6 +179,7 @@ section{
    background-color: var(--light-bg);
    padding:1.4rem;
    font-size: 1.4rem;
+   border: var(--border);
    color:var(--black);
    margin:1rem 0;
    font-size: 1.8rem;
@@ -244,10 +245,12 @@ section{
    text-transform: capitalize;
 }
 
+
 .add-products form .box{
    background-color: var(--light-bg);
    width: 100%;
    padding:1.4rem;
+   border: var(--border);
    font-size: 1.8rem;
    color:var(--black);
    border-radius: .5rem;
@@ -307,7 +310,7 @@ section{
 
 .update-product form{
    margin:0 auto;
-   max-width: 50rem;
+   max-width: 102rem;
    background-color: var(--white);
    border-radius: .5rem;
    box-shadow: var(--box-shadow);

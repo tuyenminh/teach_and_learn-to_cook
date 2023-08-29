@@ -41,55 +41,24 @@ if(isset($_GET['delete'])){
 <!-- admins accounts section starts  -->
 <div class="col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main">
 <?php include '../components/sidebar.php' ?>
-
 <section class="accounts">
-   <div class="row">
+<div class = "row">
+            <div id="toolbar" class="btn-group">
+                  <a href="register_admin.php" class="btn btn-success" style = "height: 3.5rem;">
+                     <i class="glyphicon glyphicon-plus"></i> Thêm danh mục
+                  </a>
+            </div>
+         </div>
+<div class="row">
 		<ol class="breadcrumb">
 			<li><a href="#"><svg class="glyph stroked home">
 						<use xlink:href="#stroked-home"></use>
 					</svg></a></li>
-			<li class="active">Trang tài khoản quản trị</li>
+			<li class="active">Trang tài khoản quản trị </li>
 		</ol>
 	</div>
    <h1 class="heading">Tài khoản quản trị</h1>
 
-   <div class="box-container">
-
-   <div class="box">
-      <p>Đăng kí tài khoản</p>
-      <a href="register_admin.php" class="option-btn">Đăng kí</a>
-   </div>
-
-   <?php
-      $select_account = $conn->prepare("SELECT * FROM `admin`");
-      $select_account->execute();
-      if($select_account->rowCount() > 0){
-         while($fetch_accounts = $select_account->fetch(PDO::FETCH_ASSOC)){  
-   ?>
-   <div class="box">
-      <!-- <p> admin id : <span><?= $fetch_accounts['id']; ?></span> </p> -->
-      <p> Tên tài khoản : <span><?= $fetch_accounts['name']; ?></span> </p>
-      <p> Email : <span><?= $fetch_accounts['email']; ?></span> </p>
-      <p> Số điện thoại : <span><?= $fetch_accounts['number']; ?></span> </p>
-      <p> Địa chỉ : <span><?= $fetch_accounts['address']; ?></span> </p>
-
-      <div class="flex-btn">
-         <a href="admin_accounts.php?delete=<?= $fetch_accounts['id']; ?>" class="delete-btn" onclick="return confirm('Xóa tài khoản?');">Xóa</a>
-         <?php
-            if($fetch_accounts['id'] == $admin_id){
-               echo '<a href="update_profile.php" class="option-btn">Cập nhật</a>';
-            }
-         ?>
-      </div>
-   </div>
-   <?php
-      }
-   }else{
-      echo '<p class="empty">Không có tài khoản Admin</p></p>';
-   }
-   ?>
-
-   </div>
    <div class="row">
 		<div class="col-md-12">
 			<div class="panel panel-default">
@@ -106,80 +75,80 @@ if(isset($_GET['delete'])){
 							</tr>
 						</thead>
 						<tbody>
-							<?php
-							//
-							if(isset($_GET['page'])){
-								$page=$_GET['page'];
-							}else{$page=1;}
-							$row_per_page = 10;
-                     $per_page = $page * $row_per_page - $row_per_page;
+                  <?php
+                              //
+                              if(isset($_GET['page'])){
+                                 $page=$_GET['page'];
+                              }else{$page=1;}
+                              $row_per_page = 10;
+                              $per_page = $page * $row_per_page - $row_per_page;
 
-                     // Thay thế cách tính $total_row bằng PDO
-                     $select_account = $conn->prepare("SELECT * FROM `admin`");
-                     $select_account->execute();
-                     $total_row = $select_account->rowCount();
+                              // Thay thế cách tính $total_row bằng PDO
+                              $select_account = $conn->prepare("SELECT * FROM `admin`");
+                              $select_account->execute();
+                              $total_row = $select_account->rowCount();
 
-                     $total_page = ceil($total_row / $row_per_page);
-                     $list_page = " ";
+                              $total_page = ceil($total_row / $row_per_page);
+                              $list_page = " ";
 
-							//// previous page
-							$prv_page=$page-1;
-							if($prv_page<1){
-								$prv_page=1;
-							}
-							$list_page.='<li class="page-item"><a class="page-link" href="users_accounts&page='.$prv_page.'">&laquo;</a></li>';
-							// for($i=1;$i<=$total_page;$i++){
-							// 	$list_page.='<li class="page-item"><a class="page-link" href="index.php?page_layout=category&page='.$i.'">'.$i.'</a></li>';
-							// }
-							// in dam so trang hien tai
-							if (!isset($_GET['page'])) {
-								for ($i = 1; $i <= $total_page; $i++) {
-									if ($i == 1) {
-										$list_page .= '<li class="active"><a class="page-link" href="users_accounts&page='.$i.'">'.$i.'</a></li>';
-									}
-									for ($i = 2; $i <= $total_page; $i++) {
-										$list_page .= '<li class="page-item"><a class="page-link" href="users_accounts&page='.$i.'">'.$i.'</a></li>';
-									}
-								}
-							} else {
-								for ($i = 1; $i <= $total_page; $i++) {
-									if ($i == $_GET['page']) {
-										$list_page .= '<li class="active"><a class="page-link" href="users_accounts&page='.$i.'">'.$i.'</a></li>';
-									}
-									if ($i != $_GET['page']) {
-										$list_page .= '<li class="page-item"><a class="page-link" href="users_accounts&page='.$i.'">'.$i.'</a></li>';
-									}
-								}
-							}
-							//page next
-							$next_page=$page+1;
-							if($next_page>$total_page){
-								$next_page=$total_page;
-							}
-							$list_page.='<li class="page-item"><a class="page-link" href="users_accounts&page='.$next_page.'">&raquo;</a></li>';
-// Thay thế truy vấn SELECT từ MySQLi sang PDO
-$select_account = $conn->prepare("SELECT * FROM `admin` LIMIT :per_page OFFSET :offset");
-$select_account->bindValue(':per_page', $row_per_page, PDO::PARAM_INT);
-$select_account->bindValue(':offset', $per_page, PDO::PARAM_INT);
-$select_account->execute();
+                              //// previous page
+                              $prv_page=$page-1;
+                              if($prv_page<1){
+                                 $prv_page=1;
+                              }
+                              $list_page.='<li class="page-item"><a class="page-link" href="admin_accounts.php?page='.$prv_page.'">&laquo;</a></li>';
+                              // for($i=1;$i<=$total_page;$i++){
+                              // 	$list_page.='<li class="page-item"><a class="page-link" href="index.php?page_layout=category&page='.$i.'">'.$i.'</a></li>';
+                              // }
+                              // in dam so trang hien tai
+                              if (!isset($_GET['page'])) {
+                                 for ($i = 1; $i <= $total_page; $i++) {
+                                    if ($i == 1) {
+                                       $list_page .= '<li class="active"><a class="page-link" href="admin_accounts.php?page='.$i.'">'.$i.'</a></li>';
+                                    }
+                                    for ($i = 2; $i <= $total_page; $i++) {
+                                       $list_page .= '<li class="page-item"><a class="page-link" href="admin_accounts.php?page='.$i.'">'.$i.'</a></li>';
+                                    }
+                                 }
+                              } else {
+                                 for ($i = 1; $i <= $total_page; $i++) {
+                                          if ($i == $_GET['page']) {
+                                             $list_page .= '<li class="active"><a class="page-link" href="admin_accounts.php?page='.$i.'">'.$i.'</a></li>';
+                                          }
+                                          if ($i != $_GET['page']) {
+                                             $list_page .= '<li class="page-item"><a class="page-link" href="admin_accounts.php?page='.$i.'">'.$i.'</a></li>';
+                                          }
+                                       }
+                                    }
+                                    //page next
+                                    $next_page=$page+1;
+                                    if($next_page>$total_page){
+                                       $next_page=$total_page;
+                                    }
+                                    $list_page.='<li class="page-item"><a class="page-link" href="admin_accounts.php?page='.$next_page.'">&raquo;</a></li>';
+                                    // Thay thế truy vấn SELECT từ MySQLi sang PDO
+                                    $select_account = $conn->prepare("SELECT * FROM `admin` LIMIT :per_page OFFSET :offset");
+                                    $select_account->bindValue(':per_page', $row_per_page, PDO::PARAM_INT);
+                                    $select_account->bindValue(':offset', $per_page, PDO::PARAM_INT);
+                                    $select_account->execute();
 
-// Kiểm tra nếu có dữ liệu trả về
-if ($select_account->rowCount() > 0) {
-    // Duyệt và xử lý dữ liệu
-    while ($fetch_accounts = $select_account->fetch(PDO::FETCH_ASSOC)) {
-      ?>
+                                    // Kiểm tra nếu có dữ liệu trả về
+                                    if ($select_account->rowCount() > 0) {
+                                       // Duyệt và xử lý dữ liệu
+                                       while ($fetch_admin = $select_account->fetch(PDO::FETCH_ASSOC)) {
+                                    ?>
       <tr>
-         <td style=""><?php echo $fetch_accounts['id'];?></td>
-         <td style=""><?php echo $fetch_accounts['name'];?></td>
-         <td style=""><?php echo $fetch_accounts['email'];?></td>
-         <td style=""><?php echo $fetch_accounts['number'];?></td>
-         <td style=""><?php echo $fetch_accounts['address'];?></td>
+         <td style=""><?php echo $fetch_admin['id'];?></td>
+         <td style=""><?php echo $fetch_admin['name'];?></td>
+         <td style=""><?php echo $fetch_admin['email'];?></td>
+         <td style=""><?php echo $fetch_admin['number'];?></td>
+         <td style=""><?php echo $fetch_admin['address'];?></td>
          <td class="form-group">
 
          <div class="flex-btn">
-         <a href="admin_accounts.php?delete=<?= $fetch_accounts['id']; ?>" class="delete-btn" onclick="return confirm('Xóa tài khoản?');">Xóa</a>
+         <a href="admin_accounts.php?delete=<?= $fetch_admin['id']; ?>" class="delete-btn" onclick="return confirm('Xóa tài khoản?');">Xóa</a>
          <?php
-            if($fetch_accounts['id'] == $admin_id){
+            if($fetch_admin['id'] == $admin_id){
                echo '<a href="update_profile.php" class="option-btn">Cập nhật</a>';
             }
          ?>

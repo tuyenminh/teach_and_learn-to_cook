@@ -12,23 +12,27 @@ if(!isset($admin_id)){
 
 if(isset($_POST['update_user'])){
 
-    $pid = $_POST['pid'];
-    $pid = filter_var($pid, FILTER_SANITIZE_STRING);
+    $uid = $_POST['user_id'];
+    $uid = filter_var($uid, FILTER_SANITIZE_STRING);
 
    $name = $_POST['name'];
    $name = filter_var($name, FILTER_SANITIZE_STRING);
+
    $email = $_POST['email'];
    $email = filter_var($email, FILTER_SANITIZE_STRING);
+
    $number = $_POST['number'];
    $number = filter_var($number, FILTER_SANITIZE_STRING);
+
    $password = sha1($_POST['password']);
    $password = filter_var($password, FILTER_SANITIZE_STRING);
+
    $address = $_POST['address'];
    $address = filter_var($address, FILTER_SANITIZE_STRING);
 
 
    $update_users = $conn->prepare("UPDATE `users` SET name = ?, email = ?, number = ?, password = ?, address = ? WHERE id = ?");
-   $update_users->execute([$name, $email, $number,  $password, $address]);
+   $update_users->execute([$name, $email, $number,  $password, $address, $uid]);
 
    $message[] = 'Cập nhật thành công!';
 }
@@ -61,23 +65,24 @@ if(isset($_POST['update_user'])){
    <h1 class="heading">Cập nhật tài khoản</h1>
 
    <?php
-      $update_id = $_GET['update'];
+      $update_id = $_GET['update_user'];
       $show_users = $conn->prepare("SELECT * FROM `users` WHERE id = ?");
       $show_users->execute([$update_id]);
       if($show_users->rowCount() > 0){
-         while($fetch_users = $show_users->fetch(PDO::FETCH_ASSOC)){  
+         while($fetch_accounts = $show_users->fetch(PDO::FETCH_ASSOC)){  
    ?>
    <form action="" method="POST" enctype="multipart/form-data">
+   <input type="hidden" name="uid" value="<?= $fetch_accounts['id']; ?>">
       <span>Tên tài khoản</span>
-      <input type="text" required placeholder="Nhập tên tài khoản" name="name" maxlength="100" class="box" value="<?= $fetch_users['name']; ?>">
+      <input type="text" required placeholder="Nhập tên tài khoản" name="name" maxlength="100" class="box" value="<?= $fetch_accounts['name']; ?>">
       <span>Email</span>
-      <input type="email" required placeholder="Nhập email" name="email" maxlength="100" class="box" value="<?= $fetch_users['email']; ?>">
+      <input type="email" required placeholder="Nhập email" name="email" maxlength="100" class="box" value="<?= $fetch_accounts['email']; ?>">
       <span>Số điện thoại</span>
-      <input type="text" required placeholder="Nhập số điện thoại" name="number" maxlength="100" class="box" value="<?= $fetch_users['number']; ?>">
+      <input type="text" required placeholder="Nhập số điện thoại" name="number" maxlength="100" class="box" value="<?= $fetch_accounts['number']; ?>">
       <span>Cập nhật mật khẩu</span>
-      <input type="password" required placeholder="Nhập tên tài khoản" name="password" maxlength="100" class="box" value="<?= $fetch_users['password']; ?>">
+      <input type="password" required placeholder="Nhập tên tài khoản" name="password" maxlength="100" class="box" value="<?= $fetch_accounts['password']; ?>">
       <span>Cập nhật địac chỉ</span>
-      <input type="text" required placeholder="Nhập địa chỉ" name="address" maxlength="100" class="box" value="<?= $fetch_users['address']; ?>">
+      <input type="text" required placeholder="Nhập địa chỉ" name="address" maxlength="100" class="box" value="<?= $fetch_accounts['address']; ?>">
       <div class="flex-btn">
          <input type="submit" value="Cập nhật" class="btn" name="update_user">
          <a href="users_accounts.php" class="option-btn">Trở về</a>

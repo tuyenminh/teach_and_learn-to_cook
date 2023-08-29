@@ -83,7 +83,7 @@ if(isset($_POST['update'])){
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
 
    <!-- custom css file link  -->
-   <link rel="stylesheet" href="../css/admin_style.css">
+   <link rel="stylesheet" href="../css/admin.css">
 	<script type = "text/javascript" src= "ckeditor_4.21.0_full/ckeditor/ckeditor.js"></script>
 
 
@@ -93,7 +93,16 @@ if(isset($_POST['update'])){
 <?php include '../components/admin_header.php' ?>
 
 <!-- update product section starts  -->
-
+<div class="col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main">
+<?php include '../components/sidebar.php' ?>
+<div class="row">
+		<ol class="breadcrumb">
+			<li><a href="#"><svg class="glyph stroked home">
+						<use xlink:href="#stroked-home"></use>
+					</svg></a></li>
+			<li class="active">Trang Công thức</li>
+		</ol>
+	</div>
 <section class="update-product">
 
    <h1 class="heading">Cập nhật công thức</h1>
@@ -170,7 +179,7 @@ if(isset($_POST['update'])){
    ?>
 
 </section>
-
+   </div>
 <!-- update product section ends -->
 
 
