@@ -9,96 +9,638 @@ $admin_id = $_SESSION['admin_id'];
 if(!isset($admin_id)){
    header('location:admin_login.php');
 }
-
-$select_contents = $conn->prepare("SELECT * FROM `content` WHERE tutor_id = ?");
-$select_contents->execute([$admin_id]);
-$total_contents = $select_contents->rowCount();
-
-$select_playlists = $conn->prepare("SELECT * FROM `playlist` WHERE tutor_id = ?");
-$select_playlists->execute([$admin_id]);
-$total_playlists = $select_playlists->rowCount();
-
-$select_likes = $conn->prepare("SELECT * FROM `likes` WHERE tutor_id = ?");
-$select_likes->execute([$admin_id]);
-$total_likes = $select_likes->rowCount();
-
-$select_comments = $conn->prepare("SELECT * FROM `comments` WHERE tutor_id = ?");
-$select_comments->execute([$admin_id]);
-$total_comments = $select_comments->rowCount();
-
 ?>
+<?php
+// thống kê biểu đồ tròn khóa học
+$select_courses = $conn->prepare("SELECT `category`.*, COUNT(courses.id_cate) AS 'number_courses' 
+FROM courses INNER JOIN `category` ON courses.id_cate = category.id_cate GROUP BY courses.id_cate");
+$select_courses->execute();
+$data = [];
 
+while ($fetch_courses = $select_courses->fetch(PDO::FETCH_ASSOC)){ 
+    $data[] = $fetch_courses; 
+}
+
+$select_courses = $conn->prepare("SELECT `category`.*, COUNT(recipe.id_cate) AS 'number_recipes' 
+FROM recipe INNER JOIN `category` ON recipe.id_cate = category.id_cate GROUP BY recipe.id_cate");
+$select_courses->execute();
+$data1 = [];
+
+while ($fetch_courses = $select_courses->fetch(PDO::FETCH_ASSOC)){ 
+    $data1[] = $fetch_courses; 
+}
+   		?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-   <meta charset="UTF-8">
-   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CookingFood Admin</title>
 
-   <!-- font awesome cdn link  -->
-   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
-
-   <!-- custom css file link  -->
-   <link rel="stylesheet" href="../css/admin_style.css">
-
+  <!-- Google Font: Source Sans Pro -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="../plugins/fontawesome-free/css/all.min.css">
+  <!-- overlayScrollbars -->
+  <link rel="stylesheet" href="../plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="../dist/css/adminlte.min.css"></head>
+<body class="sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
 </head>
-<body>
+<body class="hold-transition dark-mode sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
+<div class="wrapper">
 
-<?php include '../components/admin_header.php'; ?>
-   
-<section class="dashboard">
+  <!-- Preloader -->
+  <div class="preloader flex-column justify-content-center align-items-center">
+    <img class="animation__wobble" src="dist/img/AdminLTELogo.png" alt="AdminLTELogo" height="60" width="60">
+  </div>
 
-   <h1 class="heading">dashboard</h1>
+  <!-- Navbar -->
+  <nav class="main-header navbar navbar-expand navbar-dark">
+    <!-- Left navbar links -->
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+      </li>
+      <li class="nav-item d-none d-sm-inline-block">
+        <a href="index3.html" class="nav-link">Trang chủ</a>
+      </li>
+    </ul>
 
-   <div class="box-container">
+    <!-- Right navbar links -->
+    <ul class="navbar-nav ml-auto">
+      <!-- Navbar Search -->
+      <li class="nav-item">
+        <a class="nav-link" data-widget="navbar-search" href="#" role="button">
+          <i class="fas fa-search"></i>
+        </a>
+        <div class="navbar-search-block">
+          <form class="form-inline">
+            <div class="input-group input-group-sm">
+              <input class="form-control form-control-navbar" type="search" placeholder="Search" aria-label="Search">
+              <div class="input-group-append">
+                <button class="btn btn-navbar" type="submit">
+                  <i class="fas fa-search"></i>
+                </button>
+                <button class="btn btn-navbar" type="button" data-widget="navbar-search">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-widget="fullscreen" href="#" role="button">
+          <i class="fas fa-expand-arrows-alt"></i>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button">
+          <i class="fas fa-th-large"></i>
+        </a>
+      </li>
+    </ul>
+  </nav>
+  <!-- /.navbar -->
 
-      <div class="box">
-         <h3>welcome!</h3>
-         <p><?= $fetch_profile['name']; ?></p>
-         <a href="profile.php" class="btn">view profile</a>
+
+  <!-- Main Sidebar Container -->
+  <aside class="main-sidebar sidebar-dark-primary elevation-4">
+    <!-- Brand Logo -->
+    <a href="index3.html" class="brand-link">
+      <span class="brand-text font-weight-light">CookingFood ADMIN</span>
+    </a>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <!-- Sidebar user panel (optional) -->
+      <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+        <div class="image">
+          <img src="../dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
+        </div>
+        <div class="info">
+        <?php
+									$select_profile = $conn->prepare("SELECT * FROM `admin` WHERE id = ?");
+									$select_profile->execute([$admin_id]);
+									$fetch_profile = $select_profile->fetch(PDO::FETCH_ASSOC);
+									
+								?>
+                <p style = "color: white;"> <?php echo  $fetch_profile['name'];?></p>
+        </div>
       </div>
 
-      <div class="box">
-         <h3><?= $total_contents; ?></h3>
-         <p>total contents</p>
-         <a href="add_content.php" class="btn">add new content</a>
+      <!-- SidebarSearch Form -->
+      <div class="form-inline">
+        <div class="input-group" data-widget="sidebar-search">
+          <input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search">
+          <div class="input-group-append">
+            <button class="btn btn-sidebar">
+              <i class="fas fa-search fa-fw"></i>
+            </button>
+          </div>
+        </div>
       </div>
 
-      <div class="box">
-         <h3><?= $total_playlists; ?></h3>
-         <p>total playlists</p>
-         <a href="add_playlist.php" class="btn">add new playlist</a>
-      </div>
+      <!-- Sidebar Menu -->
+      <nav class="mt-2">
+        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+          <!-- Add icons to the links using the .nav-icon class
+               with font-awesome or any other icon font library -->
+          <li class="nav-item menu-open">
+            <a href="http://localhost/teach_and_learn-to_cook/admin/admin.php" class="nav-link active">
+              <i class="nav-icon fas fa-tachometer-alt"></i>
+              <p>
+                Dashboard
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="" class="nav-link">
+              <i class="nav-icon fas fa-copy"></i>
+              <p>
+                Tài khoản
+                <i class="fas fa-angle-left right"></i>
+                <span class="badge badge-info right">2</span>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Quản trị</p>
+                  <i class="right fas fa-angle-left"></i>
+                </a>
+                <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="http://localhost/teach_and_learn-to_cook/admin/accounts/add_admin.php" class="nav-link">
+                  <p>Thêm quản trị</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="http://localhost/teach_and_learn-to_cook/admin/accounts/list_admin.php" class="nav-link">
+                  <p>Danh sách quản trị</p>
+                </a>
+              </li>
+            </ul>
+            </li>
+            </ul>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="#" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Khách hàng</p>
+                  <i class="right fas fa-angle-left"></i>
+                </a>
+                <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="http://localhost/teach_and_learn-to_cook/admin/accounts/add_customer.php" class="nav-link">
+                  <p>Thêm khách hàng</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="http://localhost/teach_and_learn-to_cook/admin/accounts/list_customer.php" class="nav-link">
+                  <p>Danh sách khách hàng</p>
+                </a>
+              </li>
+            </ul>
+            </li>
+            </ul>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-chart-pie"></i>
+              <p>
+                Danh mục
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="http://localhost/teach_and_learn-to_cook/admin/category/add_category.php" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Thêm danh mục</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="http://localhost/teach_and_learn-to_cook/admin/category/list_category.php" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Danh sách danh mục</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-tree"></i>
+              <p>
+                Khóa học
+                <i class="fas fa-angle-left right"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="pages/UI/general.html" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Thêm khóa học</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="pages/UI/icons.html" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Danh sách khóa học</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-edit"></i>
+              <p>
+                Công thức
+                <i class="fas fa-angle-left right"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="pages/forms/general.html" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Thêm công thức</p>
+                </a>
+              </li>
+            </ul>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="pages/forms/general.html" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Danh sách công thức</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-table"></i>
+              <p>
+                Liên hệ
+                <i class="fas fa-angle-left right"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="pages/tables/simple.html" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Danh sách liên hệ</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+        
+        </ul>
+      </nav>      <!-- /.sidebar-menu -->
+    </div>
+    <!-- /.sidebar -->
+  </aside>
 
-      <div class="box">
-         <h3><?= $total_likes; ?></h3>
-         <p>total likes</p>
-         <a href="contents.php" class="btn">view contents</a>
-      </div>
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1 class="m-0">Dashboard </h1>
+          </div><!-- /.col -->
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="#">Trang chủ</a></li>
+            </ol>
+          </div><!-- /.col -->
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content-header -->
 
-      <div class="box">
-         <h3><?= $total_comments; ?></h3>
-         <p>total comments</p>
-         <a href="comments.php" class="btn">view comments</a>
-      </div>
+    <!-- Main content -->
+    <section class="content">
+    <div class="container-fluid">
+        <!-- Small boxes (Stat box) -->
+        <div class="row">
+          <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box bg-info">
+              <div class="inner">
+			  	<?php
+                	$select_users = $conn->prepare("SELECT * FROM `users`");
+                    $select_users->execute();
+                    $numbers_of_users = $select_users->rowCount();
+                ?>	
+                <h3><?php echo $numbers_of_users;?></h3>
 
-      <div class="box">
-         <h3>quick select</h3>
-         <p>login or register</p>
-         <div class="flex-btn">
-            <a href="login.php" class="option-btn">login</a>
-            <a href="register.php" class="option-btn">register</a>
-         </div>
-      </div>
+                <p>Khách hàng</p>
+              </div>
+              <div class="icon">
+                <i class="ion ion-bag"></i>
+              </div>
+              <a href="" class="small-box-footer">Chi tiết <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+          </div>
+          <!-- ./col -->
+          <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box bg-success">
+              <div class="inner">
+			  <?php
+                              $select_users = $conn->prepare("SELECT * FROM `receipt`");
+                              $select_users->execute();
+                              $numbers_of_users = $select_users->rowCount();
+                           ?>
+                <h3><?php echo $numbers_of_users;?><sup style="font-size: 20px"></sup></h3>
 
-   </div>
+                <p>Đơn hàng</p>
+              </div>
+              <div class="icon">
+                <i class="ion ion-stats-bars"></i>
+              </div>
+              <a href="#" class="small-box-footer">Chi tiết<i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+          </div>
+          <!-- ./col -->
+          <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box bg-warning">
+              <div class="inner">
+			  <?php
+                           $select_users = $conn->prepare("SELECT * FROM `messages`");
+                           $select_users->execute();
+                           $numbers_of_users = $select_users->rowCount();
+							   ?>	
+                <h3><?php echo $numbers_of_users;?></h3>
 
-</section>
+                <p>Tin nhắn</p>
+              </div>
+              <div class="icon">
+                <i class="ion ion-person-add"></i>
+              </div>
+              <a href="#" class="small-box-footer">Chi tiếttiết<i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+          </div>
+          <!-- ./col -->
+          <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box bg-danger">
+              <div class="inner">
+			  <?php
+                              $total_completes = 0;
+                              $select_completes = $conn->prepare("SELECT * FROM `receipt` WHERE pay_status = ?");
+                              $select_completes->execute(['Đã hoàn thành']);
+                              while($fetch_completes = $select_completes->fetch(PDO::FETCH_ASSOC)){
+                                 $total_completes += $fetch_completes['total_price'];
+                              }
+                           ?>
+                <h3><?php echo number_format(($total_completes)). " VNĐ";
+                           ?></h3>
 
-<?php include '../components/footer.php'; ?>
+                <p>Doanh thu</p>
+              </div>
+              <div class="icon">
+                <i class="ion ion-pie-graph"></i>
+              </div>
+              <a href="#" class="small-box-footer">Chi tiết<i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+          </div>
+          <!-- ./col -->
+        </div>
+        <!-- /.row -->
+        <!-- Main row -->
+        <div class="row">
+          <!-- Left col -->
+          <section class="col-lg-7 connectedSortable">
+            <!-- Custom tabs (Charts with tabs)-->
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">
+                  <i class="fas fa-chart-pie mr-1"></i>
+                  Đơn hàng
+                </h3>
+              </div><!-- /.card-header -->
+              <div class="card-body">
+                <div class="tab-content p-0">
+                  <!-- Morris chart - Sales -->
+                  <div class="chart tab-pane active" id="revenue-chart"
+                       style="position: relative; height: 300px;">
+					   <div class="card-body">
+                <table class="table table-bordered">
+                  <thead>
+                    <tr>
+                      <th style="width: 10px">Mã</th>
+                      <th>Khóa học</th>
+                      <th>Giá</th>
+                      <th>Trạng thái</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+				  <?php
+                              $select_orders = $conn->prepare("SELECT * FROM `receipt` ORDER BY id ASC LIMIT 3");
+                              $select_orders->execute();
+                              if($select_orders->rowCount() > 0){
+                                 while($fetch_orders = $select_orders->fetch(PDO::FETCH_ASSOC)){
+                           ?>
+                            <tr>
+								<td><?php echo $fetch_orders['id'];?></td>
+                                <td style = "width: 200px; "><?php echo $fetch_orders['total_course'];?></td>
+                                <td><?php echo number_format($fetch_orders['total_price'], 0, ',', '.') . " VNĐ" ;?></td>
+                                <td>
+                                    <?php if ($fetch_orders['pay_status'] == "Đã hoàn thành"){ ?>
+                                          <span class = "badge bg-success"> Đẫ hoàn thành</span>  
+                                       <?php            
+                                          } if ($fetch_orders['pay_status'] == "Đang xử lý") {
+                                             ?> <span class="badge bg-warning">Đang xử lý</span>
+                                          <?php }
+                                          ?>
+                                </td>
+                            </tr>
+                            <?php
+                                 }
+                              }
+                              ?>    
+                  </tbody>
+                </table>
+              </div>
+              <!-- /.card-body -->
 
-<script src="../js/admin_script.js"></script>
+            </div>
+            <!-- /.card -->
 
-</body>
+                </div>
+              </div><!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+
+          </section>
+          <!-- /.Left col -->
+          <!-- right col (We are only adding the ID to make the widgets sortable)-->
+          <section class="col-lg-5 connectedSortable">
+
+            <!-- Map card -->
+            <div class="card bg-gradient-primary">
+              <div class="card-header border-0">
+                <h3 class="card-title">
+                  <i class="fas fa-map-marker-alt mr-1"></i>
+                  Biểu đồ số lượng
+                </h3>
+              </div>
+              <div class="card-body" style = "background: #fff;">
+					<div id="piechart" style = "
+											width: 400px; 
+											height: 300px;">
+					</div> 
+					<!-- <div id="piechart_recipe" style = "width: 200px; height: 200px;"> -->
+                </div> 
+			</div>
+					
+              </div>
+            </div>
+            <!-- /.card -->
+          </section>
+          <!-- right col -->
+          <div id="curve_chart" style="width: 100%; height: 500px"></div>
+
+        </div>
+        <!-- /.row (main row) -->
+
+      </div><!-- /.container-fluid -->
+    </section>
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+
+  <!-- Control Sidebar -->
+  <aside class="control-sidebar control-sidebar-dark">
+    <!-- Control sidebar content goes here -->
+  </aside>
+  <!-- /.control-sidebar -->
+
+  <!-- Main Footer -->
+  <footer class="main-footer">
+    <strong>Copyright &copy; 2014-2021 <a href="https://adminlte.io">AdminLTE.io</a>.</strong>
+    All rights reserved.
+    <div class="float-right d-none d-sm-inline-block">
+      <b>Version</b> 3.2.0
+    </div>
+  </footer>
+</div>
+<!-- ./wrapper -->
+
+<!-- REQUIRED SCRIPTS -->
+<!-- jQuery -->
+<script src="../plugins/jquery/jquery.min.js"></script>
+<!-- Bootstrap -->
+<script src="../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- overlayScrollbars -->
+<script src="../plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
+<!-- AdminLTE App -->
+<script src="../dist/js/adminlte.js"></script>
+
+<!-- PAGE PLUGINS -->
+<!-- jQuery Mapael -->
+<script src="../plugins/jquery-mousewheel/jquery.mousewheel.js"></script>
+<script src="../plugins/raphael/raphael.min.js"></script>
+<script src="../plugins/jquery-mapael/jquery.mapael.min.js"></script>
+<script src="../plugins/jquery-mapael/maps/usa_states.min.js"></script>
+<!-- ChartJS -->
+<script src="../plugins/chart.js/Chart.min.js"></script>
+
+<!-- AdminLTE for demo purposes -->
+<script src="../dist/js/demo.js"></script>
+<!-- AdminLTE dashboard demo (This is only for demo purposes) -->
+<script src="../dist/js/pages/dashboard2.js"></script>
+
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+<script type="text/javascript">
+      google.charts.load("current", {packages:["corechart"]});
+      google.charts.setOnLoadCallback(drawChart);
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+          ['name_cate', 'number_courses'],
+
+         <?php
+		 	foreach ($data as $key){
+			echo "['".$key['name_cate']."', ".$key['number_courses']."],";
+			} 
+		 ?>
+        ]);
+
+      var options = {
+        colors: ['#608da2', '#1dadc0', '#779eb2', '#446879'],
+        legend: 'none',
+        pieSliceText: 'label',
+        // title: 'Thống kê khóa học',
+        pieStartAngle: 100,
+		pieHole: 0.4,
+		chartArea: {
+			left: 10, // Điều chỉnh khoảng cách từ lề trái
+			top: 10, // Điều chỉnh khoảng cách từ lề trên
+			right: 10, // Điều chỉnh khoảng cách từ lề phải
+			bottom: 10, // Điều chỉnh khoảng cách từ lề dưới
+		},
+
+        
+      };
+
+        var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+        chart.draw(data, options);
+      }
+    </script>
+    <script type="text/javascript">
+      google.charts.load("current", {packages:["corechart"]});
+      google.charts.setOnLoadCallback(drawChart);
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+          ['name_cate', 'number_courses'],
+
+         <?php
+		 	foreach ($data1 as $key){
+			echo "['".$key['name_cate']."', ".$key['number_recipes']."],";
+			} 
+		 ?>
+        ]);
+
+      var options = {
+        colors: ['#608da2', '#1dadc0', '#779eb2', '#446879'],
+        legend: 'none',
+        pieSliceText: 'label',
+        title: 'Thống kê công thức',
+        pieStartAngle: 100,
+      };
+
+        var chart = new google.visualization.PieChart(document.getElementById('piechart_recipe'));
+    
+        chart.draw(data, options);
+      }
+    </script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+          ['Year', 'Sales', 'Expenses'],
+          ['2004',  1000,      400],
+          ['2005',  1170,      460],
+          ['2006',  660,       1120],
+          ['2007',  1030,      540]
+        ]);
+
+        var options = {
+          title: 'Company Performance',
+          curveType: 'function',
+          legend: { position: 'bottom' }
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+
+        chart.draw(data, options);
+      }
+    </script></body>
 </html>

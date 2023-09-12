@@ -42,10 +42,10 @@
 							</a>
 							<ul class="dropdown-menu" role="menu">
 								<li>
-									<a href="register_admin.php">
+									<a href="update_profile.php">
 										<svg class="glyph stroked male-user">
 											<use xlink:href="#stroked-male-user"></use>
-										</svg> Đăng kí
+										</svg> Cập nhật hồ sơ
 									</a>
 								</li>
 								<li>

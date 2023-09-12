@@ -145,13 +145,8 @@ if(isset($_GET['delete'])){
          <td style=""><?php echo $fetch_admin['address'];?></td>
          <td class="form-group">
 
-         <div class="flex-btn">
-         <a href="admin_accounts.php?delete=<?= $fetch_admin['id']; ?>" class="delete-btn" onclick="return confirm('Xóa tài khoản?');">Xóa</a>
-         <?php
-            if($fetch_admin['id'] == $admin_id){
-               echo '<a href="update_profile.php" class="option-btn">Cập nhật</a>';
-            }
-         ?>
+         <a href="update_admin.php?update_admin=<?= $fetch_admin['id']; ?>" class="btn btn-primary" style = "height: 3.5rem; width: 10rem;">Cập nhật</a>
+         <a href="users_accounts.php?delete=<?= $fetch_admin['id']; ?>" class="btn btn-danger"style = "height: 3.5rem; width: 10rem;" onclick="return confirm('Xóa tài khoản');">Xóa</a>
       </div>
          </td>
       </tr>
@@ -199,6 +194,7 @@ if(isset($_GET['delete'])){
 
 <!-- custom js file link  -->
 <script src="../js/admin_script.js"></script>
+<script src="js/bootstrap-table.js"></script>
 
 </body>
 </html>

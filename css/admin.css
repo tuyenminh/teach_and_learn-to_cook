@@ -256,7 +256,10 @@ section{
    border-radius: .5rem;
    margin: 1rem 0;
 }
-
+/* .add-products form span{
+   font-size: 1.7rem;
+   color:var(--black);
+} */
 .show-products .box-container{
    display: grid;
    grid-template-columns: repeat(auto-fit, 33rem);

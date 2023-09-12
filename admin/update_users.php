@@ -10,10 +10,11 @@ if(!isset($admin_id)){
    header('location:admin_login.php');
 };
 
-if(isset($_POST['update_user'])){
 
-    $uid = $_POST['user_id'];
-    $uid = filter_var($uid, FILTER_SANITIZE_STRING);
+   if(isset($_POST['update_user'])){
+
+   $uid = $_POST['uid'];
+   $uid = filter_var($uid, FILTER_SANITIZE_STRING);
 
    $name = $_POST['name'];
    $name = filter_var($name, FILTER_SANITIZE_STRING);
@@ -59,6 +60,17 @@ if(isset($_POST['update_user'])){
 <?php include '../components/admin_header.php' ?>
 
 <!-- update product section starts  -->
+<div class="col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main">
+<?php include '../components/sidebar.php' ?>
+<div class="row">
+		<ol class="breadcrumb">
+			<li><a href="#"><svg class="glyph stroked home">
+						<use xlink:href="#stroked-home"></use>
+					</svg></a></li>
+			<li class="active">Trang tài khoản khách hàng</li>
+		</ol>
+	</div>
+   <?php include '../components/message.php' ?>
 
 <section class="update-product">
 
@@ -80,8 +92,8 @@ if(isset($_POST['update_user'])){
       <span>Số điện thoại</span>
       <input type="text" required placeholder="Nhập số điện thoại" name="number" maxlength="100" class="box" value="<?= $fetch_accounts['number']; ?>">
       <span>Cập nhật mật khẩu</span>
-      <input type="password" required placeholder="Nhập tên tài khoản" name="password" maxlength="100" class="box" value="<?= $fetch_accounts['password']; ?>">
-      <span>Cập nhật địac chỉ</span>
+      <input type="password" required placeholder="Nhập mật khẩu" name="password" maxlength="100" class="box">
+      <span>Cập nhật địa chỉ</span>
       <input type="text" required placeholder="Nhập địa chỉ" name="address" maxlength="100" class="box" value="<?= $fetch_accounts['address']; ?>">
       <div class="flex-btn">
          <input type="submit" value="Cập nhật" class="btn" name="update_user">
@@ -96,21 +108,13 @@ if(isset($_POST['update_user'])){
    ?>
 
 </section>
-
+   </div>
 <!-- update product section ends -->
-
-
-
-
-
 
 <!-- custom js file link  -->
 <script src="../js/admin_script.js"></script>
-<script src="js/jquery-1.11.1.min.js"></script>
-<script src="js/bootstrap.min.js"></script>
 <script src="js/bootstrap-table.js"></script>
 <script src="https://localhost/food_website_backend/admin/ckeditor/ckeditor.js"></script>
-<!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script> -->
 
 
 

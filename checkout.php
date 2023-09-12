@@ -1,7 +1,10 @@
 <?php
-
+use Carbon\Carbon;
+use Carbon\CarbonInterval;
 include 'components/connect.php';
+require('carbon/autoload.php');
 
+$now = Carbon::now('Asia/Ho_Chi_Minh')->toDateString();
 session_start();
 
 if(isset($_SESSION['user_id'])){
@@ -36,8 +39,8 @@ if(isset($_POST['submit'])){
       //    $message[] = 'please add your address!';
       // }else{
          
-         $insert_order = $conn->prepare("INSERT INTO `receipt`(user_id, name, number, method, total_course, total_price, email) VALUES(?,?,?,?,?,?,?)");
-         $insert_order->execute([$user_id, $name, $number, $method, $total_course, $total_price, $email]);
+         $insert_order = $conn->prepare("INSERT INTO `receipt`(user_id, name, number, method, total_course, total_price, email, regis_date) VALUES(?,?,?,?,?,?,?,?)");
+         $insert_order->execute([$user_id, $name, $number, $method, $total_course, $total_price, $email, $now]);
 
          $delete_cart = $conn->prepare("DELETE FROM `cart` WHERE user_id = ?");
          $delete_cart->execute([$user_id]);

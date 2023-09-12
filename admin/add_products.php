@@ -14,10 +14,13 @@ if(isset($_POST['add_product'])){
 
    $name = $_POST['name'];
    $name = filter_var($name, FILTER_SANITIZE_STRING);
+   
+   $id_cate = $_POST['id_cate'];
+   $id_cate = filter_var($id_cate, FILTER_SANITIZE_STRING);
+
    $price = $_POST['price'];
    $price = filter_var($price, FILTER_SANITIZE_STRING);
-   $category = $_POST['category'];
-   $category = filter_var($category, FILTER_SANITIZE_STRING);
+
 
    $image = $_FILES['image']['name'];
    $image = filter_var($image, FILTER_SANITIZE_STRING);
@@ -47,8 +50,8 @@ if(isset($_POST['add_product'])){
          move_uploaded_file($image_tmp_name, $image_folder);
          // move_uploaded_file($video_tmp_name, $video_folder);
 
-         $insert_product = $conn->prepare("INSERT INTO `courses`(name, category, price, image, description, opening_day, study_time ) VALUES(?,?,?,?,?,?,?)");
-         $insert_product->execute([$name, $category, $price, $image, $description, $opening_day, $study_time ]);
+         $insert_product = $conn->prepare("INSERT INTO `courses`(name, price, image, description, opening_day, study_time,  id_cate ) VALUES(?,?,?,?,?,?,?)");
+         $insert_product->execute([$name, $price, $image, $description, $opening_day, $study_time, $id_cate]);
 
          $message[] = 'Thêm khóa học mới thành công!';
       }
@@ -100,12 +103,16 @@ if(isset($_POST['add_product'])){
       
       <input type="text" required placeholder="Nhập tên khóa học" name="name" maxlength="100" class="box">
       <input type="number" min="0" max="9999999999" required placeholder="Nhập giá khóa học" name="price" onkeypress="if(this.value.length == 10) return false;" class="box">
-      <select name="category" class="box" required>
+      <select name="id_cate" class="box" required>
          <option value="" disabled selected>Chọn danh mục --</option>
-         <option value="Gia đình">Gia đình</option>
-         <option value="Tiệc">Tiệc</option>
-         <option value="Đồ uống">Đồ uống</option>
-         <option value="Ăn vặt">Ăn vặt</option>
+
+    <?php
+                                // $query=mysqli_query($conn, "SELECT*FROM category ORDER BY cat_id ASC");
+                                $select_courses = $conn->prepare("SELECT * FROM `category` ORDER BY id_cate ASC");
+                                $select_courses->execute();
+                                while($fetch_courses = $select_courses->fetch(PDO::FETCH_ASSOC)){ ?>
+                                    <option value=<?php echo $fetch_courses['id_cate'] ?>><?php echo $fetch_courses['name_cate']; ?></option>
+                                <?php } ?>
       </select>
       <input type="file" name="image" class="box" accept="image/jpg, image/jpeg, image/png, image/webp" required>
       <textarea name="description" id="post_content" class="box"></textarea>

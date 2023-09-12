@@ -75,10 +75,6 @@ if(isset($_GET['delete'])){
 
    <!-- custom css file link  -->
    <link rel="stylesheet" href="../css/admin.css">
-   <!-- <script src="js/jquery-1.11.1.min.js"></script>
-   <script src="js/bootstrap.min.js"></script> -->
-
-
 
 </head>
 <body>
@@ -101,13 +97,19 @@ if(isset($_GET['delete'])){
 
    <form action="" method="POST" enctype="multipart/form-data" style = "border: var(--border);">
       <h3>Thêm tài khoản khách hàng</h3>
-      
+      <span>Tên tài khoản</span>
       <input type="text" required placeholder="Nhập tên tài khoản" name="name" maxlength="100" class="box">
+      <span>Email</span>
       <input type="email" required placeholder="Nhập email" name="email" maxlength="100" class="box">
+      <span>Số điện thoại</span>
       <input type="text" required placeholder="Nhập số điện thoại" name="number" maxlength="100" class="box">
+      <span>Mật khẩu</span>
       <input type="password" required placeholder="Nhập mật khẩu" name="password" maxlength="100" class="box">
+      <span>Địa chỉ</span>
       <input type="text" required placeholder="Nhập địa chỉ" name="address" maxlength="100" class="box">
       <input type="submit" value="Thêm tài khoản" name="add_users" class="btn">
+      <a href="users_accounts.php" class="option-btn">Trở về</a>
+
    </form>
 </section>
         </div>
@@ -121,13 +123,9 @@ if(isset($_GET['delete'])){
 
 
 
-<!-- custom js file link  -->
 <script src="../js/admin_script.js"></script>
-<!-- <script src="js/jquery-1.11.1.min.js"></script>
-<script src="js/bootstrap.min.js"></script>
-<script src="js/bootstrap-table.js"></script> -->
-<!-- <script src="https://localhost/food_website_backend/admin/ckeditor/ckeditor.js"></script> -->
-
+<script src="js/bootstrap-table.js"></script>
+<script src="https://localhost/food_website_backend/admin/ckeditor/ckeditor.js"></script>
 
 </body>
 </html>

@@ -9,52 +9,6 @@
    if(!isset($admin_id)){
       header('location:admin_login.php');
    };
-
-   if(isset($_POST['add_product'])){
-
-      $name = $_POST['name'];
-      $name = filter_var($name, FILTER_SANITIZE_STRING);
-
-      $price = $_POST['price'];
-      $price = filter_var($price, FILTER_SANITIZE_STRING);
-
-      $category = $_POST['category'];
-      $category = filter_var($category, FILTER_SANITIZE_STRING);
-
-      $image = $_FILES['image']['name'];
-      $image = filter_var($image, FILTER_SANITIZE_STRING);
-      $image_size = $_FILES['image']['size'];
-      $image_tmp_name = $_FILES['image']['tmp_name'];
-      $image_folder = '../uploaded_img/'.$image;
-
-
-      $description = $_POST['description'];
-      $description = filter_var($description, FILTER_SANITIZE_STRING);
-
-      $opening_day = $_POST['opening_day'];
-      $opening_day = filter_var($opening_day, FILTER_SANITIZE_STRING); 
-
-      $study_time = $_POST['study_time'];
-      $study_time = filter_var($study_time, FILTER_SANITIZE_STRING);
-
-      $select_products = $conn->prepare("SELECT * FROM `courses` WHERE name = ?");
-      $select_products->execute([$name]);
-
-      if($select_products->rowCount() > 0){
-         $message[] = 'Khóa học đã tồn tại!';
-      }else{
-         if($image_size > 2000000){
-            $message[] = 'Kích thước ảnh không thích hợp';
-         }else{
-            move_uploaded_file($image_tmp_name, $image_folder);
-            $insert_product = $conn->prepare("INSERT INTO `courses`(name, category, price, image, description, opening_day, study_time ) VALUES(?,?,?,?,?,?,?)");
-            $insert_product->execute([$name, $category, $price, $image, $description, $opening_day, $study_time ]);
-
-            $message[] = 'Thêm khóa học mới thành công!';
-         }
-      }
-   }
-
    if(isset($_GET['delete'])){
       
       $delete_id = $_GET['delete'];
@@ -183,7 +137,9 @@
                                     }
                                     $list_page.='<li class="page-item"><a class="page-link" href="products.php?page='.$next_page.'">&raquo;</a></li>';
                                     // Thay thế truy vấn SELECT từ MySQLi sang PDO
-                                    $select_account = $conn->prepare("SELECT * FROM `courses` LIMIT :per_page OFFSET :offset");
+                                    // $sql = "SELECT * FROM khoahoc INNER JOIN loaikhoahoc ON khoahoc.ma_loaikhoahoc=loaikhoahoc.ma_loaikhoahoc ORDER BY ma_khoahoc DESC LIMIT $per_rows, $row_per_page ";
+
+                                    $select_account = $conn->prepare("SELECT * FROM `courses` INNER JOIN category ON courses.id_cate =category.id_cate ORDER BY courses.id DESC LIMIT :per_page OFFSET :offset");
                                     $select_account->bindValue(':per_page', $row_per_page, PDO::PARAM_INT);
                                     $select_account->bindValue(':offset', $per_page, PDO::PARAM_INT);
                                     $select_account->execute();
@@ -196,8 +152,8 @@
                                     <tr>
                                        <td style=""><?php echo $fetch_products['id'];?></td>
                                        <td style=""><?php echo $fetch_products['name'];?></td>
-                                       <td style=""><?php echo $fetch_products['category'];?></td>
-                                       <td style=""><?php echo $fetch_products['price'];?></td>
+                                       <td style=""><?php echo $fetch_products['name_cate'];?></td>
+                                       <td style=""><?php echo number_format($fetch_products['price'], 0, ',', '.') . " VNĐ" ?></td>
                                        <td>
                                           <img style = "heigth: 20rem; width: 20rem;" 
                                           src="../uploaded_img/<?= $fetch_products['image']; ?>" alt="">

@@ -49,63 +49,123 @@ if(isset($_POST['submit'])){
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
    <title>Tài khoản quản trị</title>
 
-   <!-- font awesome cdn link  -->
-   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
-
-   <!-- custom css file link  -->
-   <link rel="stylesheet" href="../css/admin.css">
-
 </head>
-<body>
+<style>
+@import url(https://fonts.googleapis.com/css?family=Roboto:300);
 
-<?php include '../components/admin_header.php' ?>
-
-<!-- register admin section starts  -->
-<div class="col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main">
-<?php include '../components/sidebar.php' ?>
-<div class="row">
-		<ol class="breadcrumb">
-			<li><a href="#"><svg class="glyph stroked home">
-						<use xlink:href="#stroked-home"></use>
-					</svg></a></li>
-			<li class="active" >Trang tài khoản quản trị</li>
-		</ol>
-	</div>
-   <?php include '../components/message.php' ?>
-   <section class="form-container" >
-      <form action="" method="POST" style = "border: var(--border);" >
-         <h3>Thêm tài khoản quản trị</h3>
-         <input type="text" name="name" maxlength="50" required placeholder="Nhập tên tài khoản" class="box" >
-         <input type="text" name="email" maxlength="50" required placeholder="Nhập email" class="box">
-         <input type="text" name="number" maxlength="20" required placeholder="Nhập số điện thoại" class="box">
-         <input type="text" name="address" maxlength="20" required placeholder="Nhập địa chỉ" class="box">
-         <input type="password" name="pass" maxlength="20" required placeholder="Nhập mật khẩu" class="box" >
-         <input type="password" name="cpass" maxlength="20" required placeholder="Xác nhận mật khẩu" class="box">
-         <input style = "width: 50rem;" type="submit" value="Đăng kí" name="submit" class="btn">
-         
-      </form>
-
-   </section>
+.login-page {
+  width: 360px;
+  padding: 8% 0 0;
+  margin: auto;
+}
+.form {
+  position: relative;
+  z-index: 1;
+  background: #FFFFFF;
+  max-width: 360px;
+  margin: 0 auto 100px;
+  padding: 45px;
+  text-align: center;
+  box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
+}
+.form input {
+  font-family: "Roboto", sans-serif;
+  outline: 0;
+  background: #f2f2f2;
+  width: 100%;
+  border: 0;
+  margin: 0 0 15px;
+  padding: 15px;
+  box-sizing: border-box;
+  font-size: 14px;
+}
+.form button {
+  font-family: "Roboto", sans-serif;
+  text-transform: uppercase;
+  outline: 0;
+  background: #4CAF50;
+  width: 100%;
+  border: 0;
+  padding: 15px;
+  color: #FFFFFF;
+  font-size: 14px;
+  -webkit-transition: all 0.3 ease;
+  transition: all 0.3 ease;
+  cursor: pointer;
+}
+.form button:hover,.form button:active,.form button:focus {
+  background: #43A047;
+}
+.form .message {
+  margin: 15px 0 0;
+  color: #b3b3b3;
+  font-size: 12px;
+}
+.form .message a {
+  color: #4CAF50;
+  text-decoration: none;
+}
+.form .register-form {
+  display: none;
+}
+.container {
+  position: relative;
+  z-index: 1;
+  max-width: 300px;
+  margin: 0 auto;
+}
+.container:before, .container:after {
+  content: "";
+  display: block;
+  clear: both;
+}
+.container .info {
+  margin: 50px auto;
+  text-align: center;
+}
+.container .info h1 {
+  margin: 0 0 15px;
+  padding: 0;
+  font-size: 36px;
+  font-weight: 300;
+  color: #1a1a1a;
+}
+.container .info span {
+  color: #4d4d4d;
+  font-size: 12px;
+}
+.container .info span a {
+  color: #000000;
+  text-decoration: none;
+}
+.container .info span .fa {
+  color: #EF3B3A;
+}
+body {
+  background: #76b852; /* fallback for old browsers */
+  background: rgb(141,194,111);
+  background: linear-gradient(90deg, rgba(141,194,111,1) 0%, rgba(118,184,82,1) 50%);
+  font-family: "Roboto", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;      
+}
+</style>
+<body>     
+      <form class="register-form"  action="" method="POST" required>
+      <input type="text" name = "name" placeholder="Tên tài khoản" required/>
+      <input type="text" name = "email" placeholder="Email"/>
+      <input type="text" name = "number" placeholder="Số điện thoại" required/>
+      <input type="text" name = "address" placeholder="Địa chỉ" required/>
+      <input type="password" name = "pass" placeholder="Mật khẩu" required/>
+      <input type="password" name = "cpass" placeholder="Xác nhân mật khẩu" required/>
+      <button type="submit" name="submit">Đăng kí</button>
+      <p class="message">Đã đăng kí? <a href="admin_login.php">Đăng nhập</a></p>
+    </form>
 </div>
-<!-- register admin section ends -->
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!-- custom js file link  -->
-<script src="../js/admin_script.js"></script>
-
+<script>
+$('.message a').click(function(){
+   $('form').animate({height: "toggle", opacity: "toggle"}, "slow");
+});
+</script>
 </body>
 </html>

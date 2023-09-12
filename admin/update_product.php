@@ -18,11 +18,11 @@ if(isset($_POST['update'])){
    $name = $_POST['name'];
    $name = filter_var($name, FILTER_SANITIZE_STRING);
 
+   $id_cate = $_POST['id_cate'];
+   $id_cate = filter_var($id_cate, FILTER_SANITIZE_STRING);
+
    $price = $_POST['price'];
    $price = filter_var($price, FILTER_SANITIZE_STRING);
-
-   $category = $_POST['category'];
-   $category = filter_var($category, FILTER_SANITIZE_STRING);
 
    $description = $_POST['description'];
    $description = filter_var($description, FILTER_SANITIZE_STRING);
@@ -34,8 +34,8 @@ if(isset($_POST['update'])){
    $study_time = filter_var($study_time, FILTER_SANITIZE_STRING);
 
 
-   $update_product = $conn->prepare("UPDATE `courses` SET name = ?, category = ?, price = ?, description = ?, opening_day = ?, study_time = ?  WHERE id = ?");
-   $update_product->execute([$name, $category, $price,  $description, $opening_day, $study_time, $pid, ]);
+   $update_product = $conn->prepare("UPDATE `courses` SET name = ?,  id_cate = ?, price = ?, description = ?, opening_day = ?, study_time = ? WHERE id = ?");
+   $update_product->execute([$name,  $id_cate, $price,  $description, $opening_day, $study_time, $pid, ]);
 
    $message[] = 'Cập nhật thành công!';
 
@@ -103,6 +103,8 @@ if(isset($_POST['update'])){
 			<li class="active">Trang Khóa học</li>
 		</ol>
 	</div>
+   <?php include '../components/message.php' ?>
+
 <section class="update-product">
 
    <h1 class="heading">Cập nhật khóa học</h1>
@@ -123,13 +125,30 @@ if(isset($_POST['update'])){
       <span>Giá</span>
       <input type="number" min="0" max="9999999999" required placeholder="Giá" name="price" onkeypress="if(this.value.length == 10) return false;" class="box" value="<?= $fetch_products['price']; ?>">
       <span>Danh mục</span>
-      <select name="category" class="box" required>
-         <option selected value="<?= $fetch_products['category']; ?>"><?= $fetch_products['category']; ?></option>
-         <option value="Gia đình">Gia đình</option>
-         <option value="Tiệc">Tiệc</option>
-         <option value="Đồ uống">Đồ uống</option>
-         <option value="Ăn vặt">Ăn vặt</option>
-      </select>
+      <select name="id_cate" class="box" required>
+    <?php
+    $select_courses = $conn->prepare("SELECT * FROM `category`");
+    $select_courses->execute();
+    
+    $selected_id_cate = ''; // Khởi tạo biến để lưu id_cate của đối tượng đã được chọn.
+
+    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["id_cate"])) {
+        $selected_id_cate = $_POST["id_cate"]; // Lấy giá trị đã được chọn từ biểu mẫu nếu có.
+    }
+
+    while ($fetch_courses = $select_courses->fetch(PDO::FETCH_ASSOC)) {  
+        $id_cate = $fetch_courses['id_cate'];
+        $name_cate = $fetch_courses['name_cate'];
+        
+        // Kiểm tra nếu id_cate của dòng dữ liệu trùng với id_cate đã được chọn.
+        $selected = ($id_cate == $selected_id_cate) ? 'selected' : '';
+        echo "<option value='$id_cate' $selected>$name_cate</option>";
+    }
+    ?>
+</select>
+
+
+
       <span>Cập nhật hình ảnh</span>
       <input type="file" name="image" class="box" accept="image/jpg, image/jpeg, image/png, image/webp">
       <!-- <span>Cập nhật video</span>
@@ -163,7 +182,7 @@ if(isset($_POST['update'])){
       </script> -->
 
       <span>Ngày khai giảng</span>
-      <input type="text" required placeholder="Nhập ngày khai giảng" name="opening_day" maxlength="100" class="box" value="<?= $fetch_products['opening_day']; ?>">
+      <input type="date" required placeholder="Nhập ngày khai giảng" name="opening_day" maxlength="100" class="box" value="<?= $fetch_products['opening_day']; ?>">
       <span>Thời gian học</span>
       <input type="text" required placeholder="Nhập thời gian học" name="study_time" maxlength="100" class="box" value="<?= $fetch_products['study_time']; ?>">
       <div class="flex-btn">

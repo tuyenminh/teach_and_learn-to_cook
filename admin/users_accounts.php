@@ -176,14 +176,6 @@ if ($select_account->rowCount() > 0) {
 </section>
 
 </div>
-<!-- user accounts section ends -->
-
-
-
-
-
-
-
 <!-- custom js file link  -->
 <script src="../js/admin_script.js"></script>
 <script src="js/bootstrap-table.js"></script>

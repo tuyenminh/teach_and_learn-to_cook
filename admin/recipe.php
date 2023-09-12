@@ -9,52 +9,6 @@ $admin_id = $_SESSION['admin_id'];
 if(!isset($admin_id)){
    header('location:admin_login.php');
 };
-
-if(isset($_POST['add_product'])){
-
-   $name = $_POST['name'];
-   $name = filter_var($name, FILTER_SANITIZE_STRING);
-
-   $category = $_POST['category'];
-   $category = filter_var($category, FILTER_SANITIZE_STRING);
-
-   $video = $_POST['video'];
-   $video = filter_var($video, FILTER_SANITIZE_STRING);
-
-   $image = $_FILES['image']['name'];
-   $image = filter_var($image, FILTER_SANITIZE_STRING);
-   $image_size = $_FILES['image']['size'];
-   $image_tmp_name = $_FILES['image']['tmp_name'];
-   $image_folder = '../uploaded_img/'.$image;
-
-   $making = $_POST['making'];
-   $making = filter_var($making, FILTER_SANITIZE_STRING);
-
-   $time = $_POST['time'];
-   $time = filter_var($time, FILTER_SANITIZE_STRING); 
-
-   $select_recipes = $conn->prepare("SELECT * FROM `recipe` WHERE name = ?");
-   $select_recipes->execute([$name]);
-
-   if($select_recipes->rowCount() > 0){
-      $message[] = 'Công thức đã tồn tại!';
-   }else{
-      if($image_size > 2000000){
-         $message[] = 'Kích thước ảnh không thích hợp';
-      }else{
-         move_uploaded_file($image_tmp_name, $image_folder);
-
-         $insert_recipe = $conn->prepare("INSERT INTO `recipe`(name, category, image, making, time, video ) VALUES(?,?,?,?,?,?)");
-         $insert_recipe->execute([$name, $category, $image, $making, $video, $time, ]);
-
-         $message[] = 'Thêm công thức mới thành công!';
-      }
-
-   }
-
-
-}
-
 if(isset($_GET['delete'])){
 
    $delete_id = $_GET['delete'];
@@ -183,7 +137,7 @@ if(isset($_GET['delete'])){
                                     }
                                     $list_page.='<li class="page-item"><a class="page-link" href="recipe.php?page='.$next_page.'">&raquo;</a></li>';
                                     // Thay thế truy vấn SELECT từ MySQLi sang PDO
-                                    $select_account = $conn->prepare("SELECT * FROM `recipe` LIMIT :per_page OFFSET :offset");
+                                    $select_account = $conn->prepare("SELECT * FROM `recipe` INNER JOIN category ON recipe.id_cate = category.id_cate ORDER BY recipe.id DESC LIMIT :per_page OFFSET :offset");
                                     $select_account->bindValue(':per_page', $row_per_page, PDO::PARAM_INT);
                                     $select_account->bindValue(':offset', $per_page, PDO::PARAM_INT);
                                     $select_account->execute();
@@ -196,7 +150,7 @@ if(isset($_GET['delete'])){
                                     <tr>
                                        <td style=""><?php echo $fetch_products['id'];?></td>
                                        <td style=""><?php echo $fetch_products['name'];?></td>
-                                       <td style=""><?php echo $fetch_products['category'];?></td>
+                                       <td style=""><?php echo $fetch_products['name_cate'];?></td>
                                        <td style="overflow-wrap: break-word;"><?php echo $fetch_products['making'];?></td>
                                        <td>
                                           <img style = "heigth: 20rem; width: 20rem;" 

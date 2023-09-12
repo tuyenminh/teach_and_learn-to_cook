@@ -70,14 +70,25 @@ if(isset($_POST['submit'])){
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
 
    <!-- custom css file link  -->
-   <link rel="stylesheet" href="../css/admin_style.css">
+   <link rel="stylesheet" href="../css/admin.css">
 
 </head>
 <body>
 
 <?php include '../components/admin_header.php' ?>
-
+<div class="col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main">
+<?php include '../components/sidebar.php' ?>
+<div class="row">
+		<ol class="breadcrumb">
+			<li><a href="#"><svg class="glyph stroked home">
+						<use xlink:href="#stroked-home"></use>
+					</svg></a></li>
+			<li class="active">Cập nhật hồ sơ</li>
+		</ol>
+	</div>
 <!-- admin profile update section starts  -->
+<?php include '../components/message.php' ?>
+
 
 <section class="form-container">
 
@@ -91,6 +102,7 @@ if(isset($_POST['submit'])){
    </form>
 
 </section>
+</div>
 
 <!-- admin profile update section ends -->
 
