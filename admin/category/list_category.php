@@ -55,7 +55,7 @@ if(isset($_GET['delete'])){
     <!-- Main content -->
     <section class="content">
       <div class="container-fluid">
-        <div class="row">
+      <div class="row">
           <div class="col-md-12">
             <div class="card">
               <!-- <div class="card-header">
@@ -67,8 +67,8 @@ if(isset($_GET['delete'])){
                   <thead>
                     <tr>
                         <th style = "width: 3rem; " data-field="id_cate" data-sortable="true">STT</th>
-						            <th style = "width: 15rem;">Tên danh mục </th>
-						<th style = " width: 6.5rem;">Hành động</th>
+						            <th style = "width: 10rem;">Tên danh mục</th>
+						            <th style = " width: 6.5rem;">Hành động</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -91,7 +91,6 @@ if(isset($_GET['delete'])){
                     $select_account->bindValue(':offset', $offset, PDO::PARAM_INT);
                     $select_account->bindValue(':rows_per_page', $rows_per_page, PDO::PARAM_INT);
                     $select_account->execute();
-
                     // Kiểm tra nếu có dữ liệu trả về
                     if ($select_account->rowCount() > 0) {
                         // Duyệt và xử lý dữ liệu
@@ -106,7 +105,7 @@ if(isset($_GET['delete'])){
                                             <a href="update_category.php?update_category=<?= $fetch_admin['id_cate']; ?>"><button class="btn btn-success btn-sm rounded-0" type="button" data-toggle="tooltip" data-placement="top" title="Edit"><i class="fa fa-edit"></i> </button></a>
                                         </li>
                                         <li class="list-inline-item">
-                                            <a href="list_category.php?delete=<?= $fetch_admin['id_cate']; ?>" type="button" onclick="return confirm('Xóa tài khoản');"><button class="btn btn-danger btn-sm rounded-0" type="button" data-toggle="tooltip" data-placement="top" title="Delete"><i class="fa fa-trash"></i></button></a>
+                                            <a href="list_category.php?delete=<?= $fetch_admin['id_cate']; ?>" type="button" onclick="return confirm('Bạn có chắn xóa khóa học này? ');"><button class="btn btn-danger btn-sm rounded-0" type="button" data-toggle="tooltip" data-placement="top" title="Delete"><i class="fa fa-trash"></i></button></a>
                                         </li>
                                     </ul>
                                 </td>
@@ -116,7 +115,7 @@ if(isset($_GET['delete'])){
                     }
 
                     // Tính toán và hiển thị phân trang
-                    $total_rows = $conn->query("SELECT count(*) FROM `category`")->fetchColumn();
+                    $total_rows = $conn->query("SELECT count(*) FROM `courses`")->fetchColumn();
                     $total_pages = ceil($total_rows / $rows_per_page);
 
                     $list_page = "";
@@ -158,7 +157,5 @@ if(isset($_GET['delete'])){
 <!-- REQUIRED SCRIPTS -->
 <!-- jQuery -->
 <?php include ('../../components/footer.php');?>
-<script src="../js/admin_script.js"></script>
-<script src="js/bootstrap-table.js"></script>
 </body>
 </html>

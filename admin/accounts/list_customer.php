@@ -77,7 +77,7 @@ if(isset($_GET['delete'])){
                   <tbody>
                     <?php
                     // Số dòng trên mỗi trang
-                    $rows_per_page = 5;
+                    $rows_per_page = 10;
 
                     // Trang hiện tại
                     if (isset($_GET['page'])) {

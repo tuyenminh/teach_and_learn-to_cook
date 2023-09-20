@@ -239,13 +239,13 @@ while ($fetch_courses = $select_courses->fetch(PDO::FETCH_ASSOC)){
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="pages/UI/general.html" class="nav-link">
+                <a href="http://localhost/teach_and_learn-to_cook/admin/course/add_course.php" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Thêm khóa học</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="pages/UI/icons.html" class="nav-link">
+                <a href="http://localhost/teach_and_learn-to_cook/admin/course/list_course.php" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Danh sách khóa học</p>
                 </a>
@@ -262,7 +262,7 @@ while ($fetch_courses = $select_courses->fetch(PDO::FETCH_ASSOC)){
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="pages/forms/general.html" class="nav-link">
+                <a href="http://localhost/teach_and_learn-to_cook/admin/recipe/add_recipe.php" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Thêm công thức</p>
                 </a>
@@ -270,7 +270,7 @@ while ($fetch_courses = $select_courses->fetch(PDO::FETCH_ASSOC)){
             </ul>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="pages/forms/general.html" class="nav-link">
+                <a href="http://localhost/teach_and_learn-to_cook/admin/recipe/list_recipe.php" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Danh sách công thức</p>
                 </a>

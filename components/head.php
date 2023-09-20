@@ -11,3 +11,6 @@
   <!-- Theme style -->
   <link rel="stylesheet" href="../../dist/css/adminlte.min.css">
   <link rel="stylesheet" href="https://unpkg.com/ionicons@5.0.0/dist/css/ionicons.min.css">
+  <script type = "text/javascript" src= "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+	<script type = "text/javascript" src= "../ckeditor_4.21.0_full/ckeditor/ckeditor.js"></script>
+

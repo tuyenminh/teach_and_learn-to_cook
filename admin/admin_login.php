@@ -1,8 +1,10 @@
 <?php
 
-include '../components/connect.php';
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
 
-session_start();
+include '../components/connect.php';
 
 if(isset($_POST['submit'])){
 
@@ -18,13 +20,14 @@ if(isset($_POST['submit'])){
       $fetch_admin_id = $select_admin->fetch(PDO::FETCH_ASSOC);
       $_SESSION['admin_id'] = $fetch_admin_id['id'];
       header('location:admin.php');
-   }else{
+   } else {
       $message[] = 'Tên tài khoản hoặc mật khẩu sai!';
    }
 
 }
 
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
