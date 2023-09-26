@@ -11,7 +11,7 @@ if(isset($_SESSION['user_id'])){
    $user_id = $_SESSION['user_id'];
 }else{
    $user_id = '';
-   header('location:home.php');
+   header('location:index.php');
 };
 
 if(isset($_POST['submit'])){
@@ -45,11 +45,11 @@ if(isset($_POST['submit'])){
          $delete_cart = $conn->prepare("DELETE FROM `cart` WHERE user_id = ?");
          $delete_cart->execute([$user_id]);
 
-         $message[] = 'Mua khóa học thành công!';
-      // }
+         echo '<script>alert("Đăng kí khóa học thành công");</script>';   
+         // }
       
    }else{
-      $message[] = 'Giỏ hàng trống';
+      echo '<script>alert("Gior hàng trống");</script>';   
    }
 
 }
@@ -69,7 +69,7 @@ if(isset($_POST['submit'])){
    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
    <!-- custom css file link  -->
-   <link rel="stylesheet" href="css/style.css">
+   <link rel="stylesheet" href="home-/css/style.css">
 
 </head>
 <body>
