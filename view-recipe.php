@@ -10,35 +10,10 @@ if(isset($_SESSION['user_id'])){
    $user_id = '';
 };
 
-if(isset($_POST['send'])){
-
-   $name = $_POST['name'];
-   $name = filter_var($name, FILTER_SANITIZE_STRING);
-   $email = $_POST['email'];
-   $email = filter_var($email, FILTER_SANITIZE_STRING);
-   $number = $_POST['number'];
-   $number = filter_var($number, FILTER_SANITIZE_STRING);
-   $msg = $_POST['message'];
-   $msg = filter_var($msg, FILTER_SANITIZE_STRING);
-   $subject = $_POST['subject'];
-   $subject = filter_var($subject, FILTER_SANITIZE_STRING);
-   $select_message = $conn->prepare("SELECT * FROM `messages` WHERE name = ? AND email = ? AND number = ? AND message = ? AND subject = ?");
-   $select_message->execute([$name, $email, $number, $msg, $subject]);
-
-   if($select_message->rowCount() > 0){
-    echo '<script>alert("Tin nhắn đã được gửi");</script>';   
-}else{
-
-      $insert_message = $conn->prepare("INSERT INTO `messages`(user_id, name, email, number, message, subject) VALUES(?,?,?,?,?,?)");
-      $insert_message->execute([$user_id, $name, $email, $number, $msg, $subject]);
-
-      echo '<script>alert("Tin nhắn đã được gửi!");</script>';   
-
-   }
-
-}
+include 'components/add_cart.php';
 
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -128,7 +103,7 @@ if(isset($_POST['send'])){
 											font-size: 14px; 
 											}
 									</style>
-										<a class="shopping-cart" href="giohang.php"><i class="fas fa-shopping-cart"></i><?php if ($user_id) { ?><span>(<?= $total_cart_items; ?>)</span><?php } ?></a>
+										<a class="shopping-cart" href="cart.php"><i class="fas fa-shopping-cart"></i><?php if ($user_id) { ?><span>(<?= $total_cart_items; ?>)</span><?php } ?></a>
 										<a class="mobile-hide search-bar-icon" href="#"><i class="fas fa-search"></i></a>
 										<?php
 										$select_profile = $conn->prepare("SELECT * FROM `users` WHERE id = ?");
@@ -151,6 +126,7 @@ if(isset($_POST['send'])){
 														echo '<a href="profile.php" class="btn"><i class="fas fa-user"></i></a>';
 													}
 													?>
+
 												</a>
 												<a style = "font-size: 15px; "href="components/user_logout.php" onclick="return confirm('Đăng xuất khỏi trang web này?');" class="delete-btn">| Đăng xuất</a>
 											<?php
@@ -201,80 +177,158 @@ if(isset($_POST['send'])){
 			<div class="row">
 				<div class="col-lg-8 offset-lg-2 text-center">
 					<div class="breadcrumb-text">
-						<p>Hỗ trợ 24/7</p>
-						<h1>Liên hệ với chúng tôi</h1>
+						<p>Cùng chúng tôi xem</p>
+						<h1>Chi tiết công thức</h1>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
 	<!-- end breadcrumb section -->
+	<?php
+		$pid = $_GET['pid'];
+		// Truy vấn để lấy thông tin sản phẩm hiện tại và danh mục của nó
+		$select_products = $conn->prepare("SELECT * FROM `recipe` INNER JOIN category ON category.id_cate=recipe.id_cate WHERE id = ?");
+		$select_products->execute([$pid]);
 
-	<!-- contact form -->
-	<div class="contact-from-section mt-150 mb-150">
+		if ($select_products->rowCount() > 0) {
+		$fetch_products = $select_products->fetch(PDO::FETCH_ASSOC);
+		$productName = $fetch_products['name'];
+		$categoryID = $fetch_products['id_cate'];
+
+		// Truy vấn để lấy tất cả các sản phẩm cùng danh mục
+		$related_products = $conn->prepare("SELECT * FROM `recipe` WHERE id_cate = :category AND id != :pid LIMIT 3");
+		$related_products->bindValue(':category', $categoryID, PDO::PARAM_INT);
+		$related_products->bindValue(':pid', $pid, PDO::PARAM_INT);
+		$related_products->execute();
+
+	?>
+	<!-- single product -->
+	<div class="single-product mt-150 mb-150" style= "margin-top: 50px;
+													margin-bottom: 50px;">
 		<div class="container">
-			<div class="row">
-				<div class="col-lg-8 mb-5 mb-lg-0">
-					<div class="form-title">
-						<h2>Câu hỏi của bạn?</h2>
-						<p>Hãy để lại lời nhắn khi có bất cứ câu hỏi nào liên quan đến thắc mắc về các khóa học. Chúng tôi sẽ trả lời ngay cho bạn thông qua email!</p>
+			<div class="row" >
+				<div class="col-md-8" style="border: 0.2px solid #ccc; 
+											padding: 30px; 
+											margin-bottom: 20px; 
+											box-shadow: -4px 0 4px rgba(0, 0, 0, 0.1);
+											max-width: 70.333333%;">
+					<div class="row" >
+						<div class="col-md-10">
+							<div class="single-product-img">
+								<h3><?= $fetch_products['name']; ?></h3>
+								<p class="product-price"><span>Danh mục: <?= $fetch_products['name_cate']; ?></span></p>
+								<p>Thời gian nấu: <?= $fetch_products['time']; ?></p>
+								<ul class="product-share">
+										<li><a href=""><i class="fab fa-facebook-f"></i></a></li>
+										<li><a href=""><i class="fab fa-twitter"></i></a></li>
+										<li><a href=""><i class="fab fa-google-plus-g"></i></a></li>
+										<li><a href=""><i class="fab fa-linkedin"></i></a></li>
+									</ul>
+								<iframe width="100%" height="332" src="<?= $fetch_products['video']; ?>" frameborder="0" allowfullscreen></iframe>
+
+							</div>
+						</div>
+						
 					</div>
-				 	<div id="form_status"></div>
-					<div class="contact-form">
-						<form type="POST" id="fruitkha-contact" action="" method="POST" onSubmit="return valid_datas( this );">
-							<p>
-								<input type="text" placeholder="Tên của bạn" name="name" id="name">
-								<input type="email" placeholder="Email" name="email" id="email">
-							</p>
-							<p>
-								<input type="tel" placeholder="Số điện thoại" name="number" id="phone">
-								<input type="text" placeholder="Tiêu đề" name="subject" id="subject">
-							</p>
-							<p><textarea name="message" id="message" cols="30" rows="10" placeholder="Lời nhắn"></textarea></p>
-							<input type="hidden" name="token" value="FsWga4&@f6aw" />
-							<p><input type="submit" name="send" value="Gửi"></p>
-						</form>
+					<div class="row" >
+						<div class="col-md-12">
+							<p><?= $fetch_products['ingre']; ?></p>
+						</div>
+						<div class="col-md-12">
+							<p><?= $fetch_products['making']; ?></p>
+						</div>
 					</div>
 				</div>
-				<div class="col-lg-4">
-					<div class="contact-form-wrap">
-						<div class="contact-form-box">
-							<h4><i class="fas fa-map"></i> Địa chỉ CookingFood</h4>
-							<p>34/8, Phường Phú Hưng <br> TP Bến Tre, Bến Tre. <br> Việt Nam</p>
-						</div>
-						<div class="contact-form-box">
-							<h4><i class="far fa-clock"></i> Giờ hoạt động</h4>
-							<p>Thứ 2 - Thứ 6: 8 sáng đến 17 giờ chiều  <br> Thứ 7- Chủ nhật: 10 sáng đến 16 chiều </p>
-						</div>
-						<div class="contact-form-box">
-							<h4><i class="fas fa-address-book"></i> Liên hệ</h4>
-							<p>Số điện thoại: +84 582268858 <br> Email: cookingfood@gmail.com</p>
-						</div>
+				<div class="col-md-4" style="border: 0.2px solid #ccc; 
+											padding: 10px; 
+											margin-bottom: 20px; 
+											box-shadow: 4px 0 4px rgba(0, 0, 0, 0.1); 
+											">
+					<div class="frame">
+    					<p>Tham khảo các khóa học</p>
 					</div>
+					<style>
+						.frame {
+						background-color: #F28123;
+						padding: 10px; 
+						border: 1px solid #ccc;
+						text-align: center; 
+						margin-bottom:20px;
+					}
+
+					.frame p {
+						font-size: 20px;
+						color: #fff; 
+					}
+					</style>
+							<?php
+								$select_random_products = $conn->prepare("SELECT * FROM `recipe` INNER JOIN category ON category.id_cate=recipe.id_cate ORDER BY RAND() LIMIT 10");
+								$select_random_products->execute();
+
+								if ($select_random_products->rowCount() > 0) {
+									while ($fetch_random_products = $select_random_products->fetch(PDO::FETCH_ASSOC)) {
+										?>
+										<div class="row" style="padding: 10px;">
+											<div class="col-md-6">
+												<a href="view-courses.php?pid=<?= $fetch_random_products['id']; ?>"><img style="width: 150px; height:80px;" src="uploaded_img/<?= $fetch_random_products['image']; ?>" alt=""></a>
+											</div>
+											<div class="col-md-6">
+												<a href="view-recipe.php?pid=<?= $fetch_random_products['id']; ?>">
+													<p style="font-size: 15px;"><?= $fetch_random_products['name']; ?></p>
+												</a>
+												<p class="product-price"><span><?= $fetch_random_products['time']; ?></span></p>
+											</div>
+										</div>
+										<?php
+									}
+								} else {
+									echo "Không có dữ liệu";
+								}
+							?>
+
 				</div>
 			</div>
 		</div>
 	</div>
-	<!-- end contact form -->
+	<!-- end single product -->
 
-	<!-- find our location -->
-	<div class="find-location blue-bg">
+	<!-- more products -->
+	<div class="more-products mb-150">
 		<div class="container">
 			<div class="row">
-				<div class="col-lg-12 text-center">
-					<p> <i class="fas fa-map-marker-alt"></i> Vị trí CookingFood</p>
+				<div class="col-lg-8 offset-lg-2 text-center">
+					<div class="section-title">	
+						<h3><span class="orange-text">Khóa học</span> Liên quan</h3>
+						<p>Những khóa học bổ ích, mới mẻ được cập nhật giúp học viên muốn học thêm liên quan đến khóa học ở trên.</p>
+					</div>
 				</div>
+			</div>
+			
+			<div class="row">
+				<?php
+					while ($related_product = $related_products->fetch(PDO::FETCH_ASSOC)) {
+				?>
+				<div class="col-lg-4 col-md-6 text-center">
+					<div class="single-product-item">
+                        <div class="product-image">
+                            <img src="uploaded_img/<?= $related_product['image']; ?>" alt="">
+						</div>
+                        <h3><?= $related_product['name']; ?></h3>
+                        <p class="product-price"><span><?= $fetch_products['name_cate']; ?></span></p>
+                        <a href="view-recipe.php?pid=<?= $related_product['id']; ?>" class="cart-btn">Xem chi tiết</a>
+                    </div>
+				</div>
+				<?php
+					}
+					}else{
+					echo '<p class="empty">Không có dữ liệu nào!</p>';
+					}
+				?>
 			</div>
 		</div>
 	</div>
-	<!-- end find our location -->
-
-	<!-- google map section -->
-	<div class="embed-responsive embed-responsive-21by9">
-		<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d26432.42324808999!2d-118.34398767954286!3d34.09378509738966!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80c2bf07045279bf%3A0xf67a9a6797bdfae4!2sHollywood%2C%20Los%20Angeles%2C%20CA%2C%20USA!5e0!3m2!1sen!2sbd!4v1576846473265!5m2!1sen!2sbd" width="600" height="450" frameborder="0" style="border:0;" allowfullscreen="" class="embed-responsive-item"></iframe>
-	</div>
-	<!-- end google map section -->
-
+	<!-- end more products -->
 
 	<!-- footer -->
 	<div class="footer-area">
@@ -282,38 +336,36 @@ if(isset($_POST['send'])){
 			<div class="row">
 				<div class="col-lg-3 col-md-6">
 					<div class="footer-box about-widget">
-						<h2 class="widget-title">Thông tin</h2>
-						<p>Tổng đài tư vấn: 1800 6148 hoặc 1800 2027 08h00 - 20h00 (Miễn phí cước gọi)</p>
-							<p>Góp ý phản ánh: 028 7109 9232</p>
-							<p>Liên hệ Quản Lý Học Viên: 028 7300 2672</p>
-							<p>08h00 - 20h00</p>
+						<h2 class="widget-title">About us</h2>
+						<p>Ut enim ad minim veniam perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae.</p>
 					</div>
 				</div>
 				<div class="col-lg-3 col-md-6">
 					<div class="footer-box get-in-touch">
-						<h2 class="widget-title">Thời gian hoạt động</h2>
+						<h2 class="widget-title">Get in Touch</h2>
 						<ul>
-							<li>34/8, Phường Phú Hưng, Tp Bến Tre, Tỉnh Bến Tre</li>
-							<li>cookingfood@gmail.com</li>
-							<li>+84 582268858</li>
+							<li>34/8, East Hukupara, Gifirtok, Sadan.</li>
+							<li>support@fruitkha.com</li>
+							<li>+00 111 222 3333</li>
 						</ul>
 					</div>
 				</div>
 				<div class="col-lg-3 col-md-6">
 					<div class="footer-box pages">
-						<h2 class="widget-title">Trang chính</h2>
+						<h2 class="widget-title">Pages</h2>
 						<ul>
-							<li><a href="index.php">Trang chủ</a></li>
-							<li><a href="recipe.php">Công thức</a></li>
-							<li><a href="news.php">Tin tức</a></li>
-							<li><a href="contacts.php">Liên hệ</a></li>
+							<li><a href="index.html">Home</a></li>
+							<li><a href="about.html">About</a></li>
+							<li><a href="services.html">Shop</a></li>
+							<li><a href="news.html">News</a></li>
+							<li><a href="contact.html">Contact</a></li>
 						</ul>
 					</div>
 				</div>
 				<div class="col-lg-3 col-md-6">
 					<div class="footer-box subscribe">
-						<h2 class="widget-title">Đăng kí</h2>
-						<p>Đăng kí để nhận thông tin các khóa học mới nhất.</p>
+						<h2 class="widget-title">Subscribe</h2>
+						<p>Subscribe to our mailing list to get the latest updates.</p>
 						<form action="index.html">
 							<input type="email" placeholder="Email">
 							<button type="submit"><i class="fas fa-paper-plane"></i></button>
@@ -370,6 +422,6 @@ if(isset($_POST['send'])){
 	<script src="fruitkha-1.0.0/fruitkha-1.0.0/assets/js/sticker.js"></script>
 	<!-- main js -->
 	<script src="fruitkha-1.0.0/fruitkha-1.0.0/assets/js/main.js"></script>
-	
+
 </body>
 </html>

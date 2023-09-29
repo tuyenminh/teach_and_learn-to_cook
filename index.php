@@ -65,7 +65,7 @@ include 'components/add_cart.php';
 					<div class="main-menu-wrap">
 						<!-- logo -->
 						<div class="site-logo">
-							<a href="index.html">
+							<a href="index.php">
 								<img style="width: 100%;" src="fruitkha-1.0.0/fruitkha-1.0.0/assets/img/logo.png" alt="">
 							</a>
 						</div>
@@ -81,32 +81,62 @@ include 'components/add_cart.php';
 								<li><a href="contacts.php">Liên hệ</a></li>
 								<li>
 									<div class="header-icons">
-										<a class="shopping-cart" href="giohang.php"><i class="fas fa-shopping-cart"></i></a>
-										<a class="mobile-hide search-bar-icon" href="search.php"><i class="fas fa-search"></i></a>
-                                        <a> <i class = "fa fa-user"></i></a>
+									<?php
+										$count_cart_items = $conn->prepare("SELECT * FROM `cart` WHERE user_id = ?");
+										$count_cart_items->execute([$user_id]);
+										$total_cart_items = $count_cart_items->rowCount();
+									?>
+									<style>
+										.shopping-cart {
+											position: relative; 
+											text-decoration: none; 
+										}
+											.shopping-cart span {
+											position: absolute; 
+											top: -10px; 
+											right: -10px; 
+											background-color: #F28123; 
+											color: white; 
+											border-radius: 50%; 
+											padding: 5px 10px; 
+											font-size: 14px; 
+											}
+									</style>
+										<a class="shopping-cart" href="cart.php"><i class="fas fa-shopping-cart"></i><?php if ($user_id) { ?><span>(<?= $total_cart_items; ?>)</span><?php } ?></a>
+										<a class="mobile-hide search-bar-icon" href="#"><i class="fas fa-search"></i></a>
 										<?php
-                                            $select_profile = $conn->prepare("SELECT * FROM `users` WHERE id = ?");
-                                            $select_profile->execute([$user_id]);
-                                            if($select_profile->rowCount() > 0){
-                                            $fetch_profile = $select_profile->fetch(PDO::FETCH_ASSOC);
-                                        ?>
-                                        <p class="name"><?= $fetch_profile['name']; ?></p>
-                                        <div class="flex">
-                                            <a href="profile.php" class="btn">Hồ Sơ</a>
-                                            <a href="components/user_logout.php" onclick="return confirm('Đăng xuất khỏi trang web này?');" class="delete-btn">Đăng xuất</a>
-                                        </div>
-                                        <p class="account">
-                                            <a href="login.php">Đăng nhập</a> /
-                                            <a href="register.php">Đăng kí</a>
-                                        </p> 
-                                        <?php
-                                            }else{
-                                        ?>
-                                            <p class="name">Vui lòng đăng nhập</p>
-                                            <a href="login.php" class="btn">Đăng nhập</a>
-                                        <?php
-                                        }
-                                        ?>
+										$select_profile = $conn->prepare("SELECT * FROM `users` WHERE id = ?");
+										$select_profile->execute([$user_id]);
+										if ($select_profile->rowCount() > 0) {
+											$fetch_profile = $select_profile->fetch(PDO::FETCH_ASSOC);
+
+											?>
+												<a href="profile.php" class="btn">
+												<?php
+													$name = $fetch_profile['name'];
+													$spacePosition = strpos($name, ' ');
+
+													if ($spacePosition !== false) {
+														// Tên có dấu cách, hiển thị họ
+														$lastName = substr(strrchr($name, ' '), 1);
+														echo '<a href="profile.php" class="btn">' . $lastName . '</a>';
+													} else {
+														// Tên không có dấu cách, hiển thị icon user
+														echo '<a href="profile.php" class="btn"><i class="fas fa-user"></i></a>';
+													}
+													?>
+
+												</a>
+												<a style = "font-size: 15px; "href="components/user_logout.php" onclick="return confirm('Đăng xuất khỏi trang web này?');" class="delete-btn">| Đăng xuất</a>
+											<?php
+										} else {
+											?>
+											<a style="font-size: 15px;" href="login.php">Đăng nhập</a>
+											<a style="font-size: 15px;" href="register.php">| Đăng ký</a>
+											<?php
+										}
+										?>
+											
 									</div>
 								</li>
 							</ul>
@@ -150,7 +180,7 @@ include 'components/add_cart.php';
 						<div class="hero-text">
 							<div class="hero-text-tablecell">
 								<p class="subtitle">Dạy và học hiệu quả</p>
-								<h1 style= "width:1000px;">Học nấu ăn gia đình</h1>
+								<h1>Món ăn gia đình</h1>
 								<div class="hero-btns">
 									<a href="shop.html" class="boxed-btn">Đăng kí học</a>
 									<a href="contact.html" class="bordered-btn">Liên hệ</a>
@@ -190,8 +220,8 @@ include 'components/add_cart.php';
 							<p class="subtitle">Dễ hiểu, dễ thực hiện</p>
 								<h1>Công thức nấu ăn đa dạng</h1>
 								<div class="hero-btns">
-									<a href="shop.html" class="boxed-btn">Xem công thức</a>
-									<a href="contact.html" class="bordered-btn">Liên hệ</a>
+									<a href="recipe.php" class="boxed-btn">Xem công thức</a>
+									<a href="contacts.php" class="bordered-btn">Liên hệ</a>
 								</div>
 							</div>
 						</div>
@@ -282,12 +312,22 @@ include 'components/add_cart.php';
 						?>
 									<div class="col-lg-4 col-md-6 text-center courses">
 										<div class="single-product-item">
-												<div class="product-image">
+											<form action="" method="post">
+												<input type="hidden" name="pid" value="<?= $fetch_products['id']; ?>">
+												<input type="hidden" name="name" value="<?= $fetch_products['name']; ?>">
+												<input type="hidden" name="image" value="<?= $fetch_products['image']; ?>">
+												<input type="hidden" name="price" value="<?= $fetch_products['price']; ?>">
+											<div class="product-image">
 													<a href="view-courses.php?pid=<?= $fetch_products['id']; ?>"><img src="uploaded_img/<?= $fetch_products['image']; ?>" alt=""></a>
 												</div>
 												<h3><?= $fetch_products['name']; ?></h3>
 												<p class="product-price"><span><?= $fetch_products['name_cate']; ?></span><?= number_format($fetch_products['price'], 0, ',', '.') . " VNĐ" ?></p>
-													<a type="submit" name="add_to_cart"class="cart-btn"><i class="fas fa-shopping-cart"></i></a>
+												
+												<button style ="border: none;   background-color: rgba(0, 0, 0, 0); 
+												" type="submit" name="add_to_cart"><a class="cart-btn"><i class="fas fa-shopping-cart"></i></a></button>
+
+											</form>
+												
 										</div>
 									</div>
 						<?php
@@ -359,93 +399,6 @@ function loadProductsByPage(page) {
 		</div>
 	</div>
 	<!-- end products -->
-
-
-	<!-- cart banner section -->
-	<section class="cart-banner pt-100 pb-100">
-    	<div class="container">
-        	<div class="row clearfix">
-            	<!--Image Column-->
-            	<div class="image-column col-lg-6">
-                	<div class="image">
-                    	<div class="price-box">
-                        	<div class="inner-price">
-                                <span class="price">
-                                    <strong>30%</strong> <br> off per kg
-                                </span>
-                            </div>
-                        </div>
-                    	<img src="assets/img/a.jpg" alt="">
-                    </div>
-                </div>
-                <!--Content Column-->
-                <div class="content-column col-lg-6">
-					<h3><span class="orange-text">Deal</span> of the month</h3>
-                    <h4>Hikan Strwaberry</h4>
-                    <div class="text">Quisquam minus maiores repudiandae nobis, minima saepe id, fugit ullam similique! Beatae, minima quisquam molestias facere ea. Perspiciatis unde omnis iste natus error sit voluptatem accusant</div>
-                    <!--Countdown Timer-->
-                    <div class="time-counter"><div class="time-countdown clearfix" data-countdown="2020/2/01"><div class="counter-column"><div class="inner"><span class="count">00</span>Days</div></div> <div class="counter-column"><div class="inner"><span class="count">00</span>Hours</div></div>  <div class="counter-column"><div class="inner"><span class="count">00</span>Mins</div></div>  <div class="counter-column"><div class="inner"><span class="count">00</span>Secs</div></div></div></div>
-                	<a href="cart.html" class="cart-btn mt-3"><i class="fas fa-shopping-cart"></i> Add to Cart</a>
-                </div>
-            </div>
-        </div>
-    </section>
-    <!-- end cart banner section -->
-
-	<!-- testimonail-section -->
-	<div class="testimonail-section mt-150 mb-150">
-		<div class="container">
-			<div class="row">
-				<div class="col-lg-10 offset-lg-1 text-center">
-					<div class="testimonial-sliders">
-						<div class="single-testimonial-slider">
-							<div class="client-avater">
-								<img src="fruitkha-1.0.0/fruitkha-1.0.0/assets/img/avaters/avatar1.png" alt="">
-							</div>
-							<div class="client-meta">
-								<h3>Saira Hakim <span>Local shop owner</span></h3>
-								<p class="testimonial-body">
-									" Sed ut perspiciatis unde omnis iste natus error veritatis et  quasi architecto beatae vitae dict eaque ipsa quae ab illo inventore Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium "
-								</p>
-								<div class="last-icon">
-									<i class="fas fa-quote-right"></i>
-								</div>
-							</div>
-						</div>
-						<div class="single-testimonial-slider">
-							<div class="client-avater">
-								<img src="fruitkha-1.0.0/fruitkha-1.0.0/assets/img/avaters/avatar2.png" alt="">
-							</div>
-							<div class="client-meta">
-								<h3>David Niph <span>Local shop owner</span></h3>
-								<p class="testimonial-body">
-									" Sed ut perspiciatis unde omnis iste natus error veritatis et  quasi architecto beatae vitae dict eaque ipsa quae ab illo inventore Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium "
-								</p>
-								<div class="last-icon">
-									<i class="fas fa-quote-right"></i>
-								</div>
-							</div>
-						</div>
-						<div class="single-testimonial-slider">
-							<div class="client-avater">
-								<img src="fruitkha-1.0.0/fruitkha-1.0.0/assets/img/avaters/avatar3.png" alt="">
-							</div>
-							<div class="client-meta">
-								<h3>Jacob Sikim <span>Local shop owner</span></h3>
-								<p class="testimonial-body">
-									" Sed ut perspiciatis unde omnis iste natus error veritatis et  quasi architecto beatae vitae dict eaque ipsa quae ab illo inventore Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium "
-								</p>
-								<div class="last-icon">
-									<i class="fas fa-quote-right"></i>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- end testimonail-section -->
 	
 	<!-- advertisement section -->
 	<div class="abt-section mb-150">
@@ -453,16 +406,17 @@ function loadProductsByPage(page) {
 			<div class="row">
 				<div class="col-lg-6 col-md-12">
 					<div class="abt-bg">
-						<a href="https://www.youtube.com/watch?v=DBLlFWYcIGQ" class="video-play-btn popup-youtube"><i class="fas fa-play"></i></a>
+						<a href="https://www.youtube.com/watch?v=EKem2tqU-ic" class="video-play-btn popup-youtube"><i class="fas fa-play"></i></a>
 					</div>
 				</div>
 				<div class="col-lg-6 col-md-12">
 					<div class="abt-text">
-						<p class="top-sub">Since Year 1999</p>
-						<h2>We are <span class="orange-text">Fruitkha</span></h2>
-						<p>Etiam vulputate ut augue vel sodales. In sollicitudin neque et massa porttitor vestibulum ac vel nisi. Vestibulum placerat eget dolor sit amet posuere. In ut dolor aliquet, aliquet sapien sed, interdum velit. Nam eu molestie lorem.</p>
-						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sapiente facilis illo repellat veritatis minus, et labore minima mollitia qui ducimus.</p>
-						<a href="about.html" class="boxed-btn mt-4">know more</a>
+						<p class="top-sub">Phát triển từ năm 2022</p>
+						<h2>Học nấu ăn cùng <span class="orange-text">CookingFood</span></h2>
+						<p>Một khóa học nấu ăn thú vị và bổ ích dành cho những người muốn học cách nấu ăn từ cơ bản đến nâng cao. Khóa học này được thiết kế để giúp bạn phát triển kỹ năng nấu ăn, từ việc chuẩn bị các nguyên liệu đơn giản cho các món ăn hằng ngày cho đến việc tạo ra các món ăn phức tạp và thú vị.</p>
+						<p>Trong khóa học CookingFood, bạn sẽ được hướng dẫn bởi các đầu bếp chuyên nghiệp và các chuyên gia về ẩm thực. Bạn sẽ học cách lựa chọn nguyên liệu tốt nhất, cách thực hiện các kỹ thuật nấu ăn cơ bản và nâng cao, cách tổ chức và trình bày món ăn một cách esthetically, cũng như cách tạo ra các món ăn ngon và độc đáo từ nhiều nền ẩm thực khác nhau.</p>
+						<p>Khóa học CookingFood không chỉ giúp bạn trở thành một đầu bếp tài năng mà còn giúp bạn thư giãn và thúc đẩy sự sáng tạo trong nấu ăn. Bất kể bạn là người mới bắt đầu hay đã có kinh nghiệm, khóa học này sẽ cung cấp cho bạn kiến thức và kỹ năng cần thiết để tự tin nấu ăn và tạo ra những bữa ăn ngon miệng cho gia đình và bạn bè.</p>
+						<a href="about.html" class="boxed-btn mt-4">Tìm hiểu thêm</a>
 					</div>
 				</div>
 			</div>
@@ -473,21 +427,21 @@ function loadProductsByPage(page) {
 	<!-- shop banner -->
 	<section class="shop-banner">
     	<div class="container">
-        	<h3>December sale is on! <br> with big <span class="orange-text">Discount...</span></h3>
-            <div class="sale-percent"><span>Sale! <br> Upto</span>50% <span>off</span></div>
-            <a href="shop.html" class="cart-btn btn-lg">Shop Now</a>
+        	<h3>Công thức nấu ăn<br> đa dạng <span class="orange-text">đang chờ bạn khám phá...</span></h3>
+            <!-- <div class="sale-percent"><span>Sale! <br> Upto</span>50% <span>off</span></div> -->
+            <a href="recipe.php" class="cart-btn btn-lg">Xem ngay</a>
         </div>
     </section>
 	<!-- end shop banner -->
 
 	<!-- latest news -->
-	<div class="latest-news pt-150 pb-150">
+	<!-- <div class="latest-news pt-150 pb-150">
 		<div class="container">
 
 			<div class="row">
 				<div class="col-lg-8 offset-lg-2 text-center">
 					<div class="section-title">	
-						<h3><span class="orange-text">Our</span> News</h3>
+						<h3><span class="orange-text">Tin tức</span> Mới nhất</h3>
 						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquid, fuga quas itaque eveniet beatae optio.</p>
 					</div>
 				</div>
@@ -543,36 +497,8 @@ function loadProductsByPage(page) {
 				</div>
 			</div>
 		</div>
-	</div>
+	</div> -->
 	<!-- end latest news -->
-
-	<!-- logo carousel -->
-	<div class="logo-carousel-section">
-		<div class="container">
-			<div class="row">
-				<div class="col-lg-12">
-					<div class="logo-carousel-inner">
-						<div class="single-logo-item">
-							<img src="fruitkha-1.0.0/fruitkha-1.0.0/assets/img/company-logos/1.png" alt="">
-						</div>
-						<div class="single-logo-item">
-							<img src="fruitkha-1.0.0/fruitkha-1.0.0/assets/img/company-logos/2.png" alt="">
-						</div>
-						<div class="single-logo-item">
-							<img src="fruitkha-1.0.0/fruitkha-1.0.0/assets/img/company-logos/3.png" alt="">
-						</div>
-						<div class="single-logo-item">
-							<img src="fruitkha-1.0.0/fruitkha-1.0.0/assets/img/company-logos/4.png" alt="">
-						</div>
-						<div class="single-logo-item">
-							<img src="fruitkha-1.0.0/fruitkha-1.0.0/assets/img/company-logos/5.png" alt="">
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- end logo carousel -->
 
 	<!-- footer -->
 	<div class="footer-area">
@@ -580,36 +506,38 @@ function loadProductsByPage(page) {
 			<div class="row">
 				<div class="col-lg-3 col-md-6">
 					<div class="footer-box about-widget">
-						<h2 class="widget-title">About us</h2>
-						<p>Ut enim ad minim veniam perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae.</p>
+						<h2 class="widget-title">Thông tin</h2>
+						<p>Tổng đài tư vấn: 1800 6148 hoặc 1800 2027 08h00 - 20h00 (Miễn phí cước gọi)</p>
+							<p>Góp ý phản ánh: 028 7109 9232</p>
+							<p>Liên hệ Quản Lý Học Viên: 028 7300 2672</p>
+							<p>08h00 - 20h00</p>
 					</div>
 				</div>
 				<div class="col-lg-3 col-md-6">
 					<div class="footer-box get-in-touch">
-						<h2 class="widget-title">Get in Touch</h2>
+						<h2 class="widget-title">Thời gian hoạt động</h2>
 						<ul>
-							<li>34/8, East Hukupara, Gifirtok, Sadan.</li>
-							<li>support@fruitkha.com</li>
-							<li>+00 111 222 3333</li>
+							<li>34/8, Phường Phú Hưng, Tp Bến Tre, Tỉnh Bến Tre</li>
+							<li>cookingfood@gmail.com</li>
+							<li>+84 582268858</li>
 						</ul>
 					</div>
 				</div>
 				<div class="col-lg-3 col-md-6">
 					<div class="footer-box pages">
-						<h2 class="widget-title">Pages</h2>
+						<h2 class="widget-title">Trang chính</h2>
 						<ul>
-							<li><a href="index.html">Home</a></li>
-							<li><a href="about.html">About</a></li>
-							<li><a href="services.html">Shop</a></li>
-							<li><a href="news.html">News</a></li>
-							<li><a href="contact.html">Contact</a></li>
+							<li><a href="index.php">Trang chủ</a></li>
+							<li><a href="recipe.php">Công thức</a></li>
+							<li><a href="news.php">Tin tức</a></li>
+							<li><a href="contacts.php">Liên hệ</a></li>
 						</ul>
 					</div>
 				</div>
 				<div class="col-lg-3 col-md-6">
 					<div class="footer-box subscribe">
-						<h2 class="widget-title">Subscribe</h2>
-						<p>Subscribe to our mailing list to get the latest updates.</p>
+						<h2 class="widget-title">Đăng kí</h2>
+						<p>Đăng kí để nhận thông tin các khóa học mới nhất.</p>
 						<form action="index.html">
 							<input type="email" placeholder="Email">
 							<button type="submit"><i class="fas fa-paper-plane"></i></button>
@@ -626,8 +554,7 @@ function loadProductsByPage(page) {
 		<div class="container">
 			<div class="row">
 				<div class="col-lg-6 col-md-12">
-					<p>Copyrights &copy; 2019 - <a href="https://imransdesign.com/">Imran Hossain</a>,  All Rights Reserved.<br>
-						Distributed By - <a href="https://themewagon.com/">Themewagon</a>
+					<p>Copyrights &copy; 2019 - <a href="https://imransdesign.com/">CookingFood</a>,  All Rights Reserved.<br>
 					</p>
 				</div>
 				<div class="col-lg-6 text-right col-md-12">

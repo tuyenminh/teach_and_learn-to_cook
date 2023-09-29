@@ -77,13 +77,67 @@ include 'components/add_cart.php';
 							<ul>
 								<li class="current-list-item"><a href="index.php">Trang chủ</a>
 								</li>
-								<li><a href="about.html">Công thức nấu ăn</a></li>
-								<li><a href="news.html">Tin tức</a></li>
+								<li><a href="recipe.php">Công thức nấu ăn</a></li>
+								<li><a href="news.php">Tin tức</a></li>
 								<li><a href="contacts.php">Liên hệ</a></li>
 								<li>
 									<div class="header-icons">
-										<a class="shopping-cart" href="cart.html"><i class="fas fa-shopping-cart"></i></a>
+									<?php
+										$count_cart_items = $conn->prepare("SELECT * FROM `cart` WHERE user_id = ?");
+										$count_cart_items->execute([$user_id]);
+										$total_cart_items = $count_cart_items->rowCount();
+									?>
+									<style>
+										.shopping-cart {
+											position: relative; 
+											text-decoration: none; 
+										}
+											.shopping-cart span {
+											position: absolute; 
+											top: -10px; 
+											right: -10px; 
+											background-color: #F28123; 
+											color: white; 
+											border-radius: 50%; 
+											padding: 5px 10px; 
+											font-size: 14px; 
+											}
+									</style>
+										<a class="shopping-cart" href="cart.php"><i class="fas fa-shopping-cart"></i><?php if ($user_id) { ?><span>(<?= $total_cart_items; ?>)</span><?php } ?></a>
 										<a class="mobile-hide search-bar-icon" href="#"><i class="fas fa-search"></i></a>
+										<?php
+										$select_profile = $conn->prepare("SELECT * FROM `users` WHERE id = ?");
+										$select_profile->execute([$user_id]);
+										if ($select_profile->rowCount() > 0) {
+											$fetch_profile = $select_profile->fetch(PDO::FETCH_ASSOC);
+
+											?>
+												<a href="profile.php" class="btn">
+												<?php
+													$name = $fetch_profile['name'];
+													$spacePosition = strpos($name, ' ');
+
+													if ($spacePosition !== false) {
+														// Tên có dấu cách, hiển thị họ
+														$lastName = substr(strrchr($name, ' '), 1);
+														echo '<a href="profile.php" class="btn">' . $lastName . '</a>';
+													} else {
+														// Tên không có dấu cách, hiển thị icon user
+														echo '<a href="profile.php" class="btn"><i class="fas fa-user"></i></a>';
+													}
+													?>
+
+												</a>
+												<a style = "font-size: 15px; "href="components/user_logout.php" onclick="return confirm('Đăng xuất khỏi trang web này?');" class="delete-btn">| Đăng xuất</a>
+											<?php
+										} else {
+											?>
+											<a style="font-size: 15px;" href="login.php">Đăng nhập</a>
+											<a style="font-size: 15px;" href="register.php">| Đăng ký</a>
+											<?php
+										}
+										?>
+											
 									</div>
 								</li>
 							</ul>
@@ -133,49 +187,125 @@ include 'components/add_cart.php';
 	<!-- end breadcrumb section -->
 
 	<!-- single product -->
-	<div class="single-product mt-150 mb-150">
+	<?php
+					$pid = $_GET['pid'];
+
+					// Truy vấn để lấy thông tin sản phẩm hiện tại và danh mục của nó
+					$select_products = $conn->prepare("SELECT * FROM `courses` INNER JOIN category ON category.id_cate=courses.id_cate WHERE id = ?");
+					$select_products->execute([$pid]);
+
+					if ($select_products->rowCount() > 0) {
+						$fetch_products = $select_products->fetch(PDO::FETCH_ASSOC);
+						$productName = $fetch_products['name'];
+						$categoryID = $fetch_products['id_cate'];
+
+						// Truy vấn để lấy tất cả các sản phẩm cùng danh mục
+						$related_products = $conn->prepare("SELECT * FROM `courses` WHERE id_cate = :category AND id != :pid LIMIT 3");
+						$related_products->bindValue(':category', $categoryID, PDO::PARAM_INT);
+						$related_products->bindValue(':pid', $pid, PDO::PARAM_INT);
+						$related_products->execute();
+
+				?>
+	<div class="single-product mt-150 mb-150" style= "margin-top: 50px;
+													margin-bottom: 50px;">
 		<div class="container">
-			<div class="row">
-                <?php
-                    $pid = $_GET['pid'];
-                    $select_products = $conn->prepare("SELECT * FROM `courses` INNER JOIN category ON category.id_cate=courses.id_cate WHERE id = ?");
-                    $select_products->execute([$pid]);
-                    if($select_products->rowCount() > 0){
-                        while($fetch_products = $select_products->fetch(PDO::FETCH_ASSOC)){
-                ?>
-				<div class="col-md-5">
-					<div class="single-product-img">
-						<img src="uploaded_img/<?= $fetch_products['image']; ?>" alt="">
-					</div>
-				</div>
-				<div class="col-md-7">
-					<div class="single-product-content">
-						<h3><?= $fetch_products['name']; ?></h3>
-						<p class="single-product-pricing"><?= number_format($fetch_products['price']) . " VNĐ"; ?></p>
-						<p><?= $fetch_products['description']; ?></p>
-						<div class="single-product-form">
-							<!-- <form action="index.html">
-								<input type="number" placeholder="0">
-							</form> -->
-							<a href="cart.html" class="cart-btn"><i class="fas fa-shopping-cart"></i> Thêm vào giỏ hàng</a>
-							<p><strong>Danh mục: </strong><?= $fetch_products['name_cate']; ?></p>
+			<div class="row" >
+				<div class="col-md-8" style="border: 0.2px solid #ccc; 
+											padding: 30px; 
+											margin-bottom: 20px; 
+											box-shadow: -4px 0 4px rgba(0, 0, 0, 0.1);
+											max-width: 70.333333%;">
+					<div class="row" >
+						<div class="col-md-6">
+							<div class="single-product-img">
+									<img src="uploaded_img/<?= $fetch_products['image']; ?>" alt="">
+							</div>
 						</div>
-						<h4>Chia sẻ:</h4>
-						<ul class="product-share">
-							<li><a href=""><i class="fab fa-facebook-f"></i></a></li>
-							<li><a href=""><i class="fab fa-twitter"></i></a></li>
-							<li><a href=""><i class="fab fa-google-plus-g"></i></a></li>
-							<li><a href=""><i class="fab fa-linkedin"></i></a></li>
-						</ul>
+						<div class="col-md-6">
+							<div class="single-product-content">
+								<form action="" method="post">
+									<!-- Các thông tin sản phẩm -->
+									<input type="hidden" name="pid" value="<?= $fetch_products['id']; ?>">
+									<input type="hidden" name="name" value="<?= $fetch_products['name']; ?>">
+									<input type="hidden" name="price" value="<?= $fetch_products['price']; ?>">
+									<input type="hidden" name="image" value="<?= $fetch_products['image']; ?>">
+									<!-- <input type="hidden" name="description" value="<?= $fetch_products['description']; ?>"> -->
+									<h3><?= $fetch_products['name']; ?></h3>
+									<p><strong>Danh mục: </strong><?= $fetch_products['name_cate']; ?></p>
+									<p><strong>Ngày khai giảng: </strong><?= $fetch_products['opening_day']; ?></p>
+									<p class="single-product-pricing"><?= number_format($fetch_products['price']) . " VNĐ"; ?></p>
+									
+									<!-- <p><?= $fetch_products['description']; ?></p> -->
+									<!-- Nút thêm vào giỏ hàng -->
+									<div class="single-product-form">
+										<button style="border: none; background-color: rgba(0, 0, 0, 0);" type="submit" name="add_to_cart">
+											<a class="cart-btn"><i class="fas fa-shopping-cart"></i></a>
+										</button>
+									</div>
+								</form>
+									<ul class="product-share">
+										<li><a href=""><i class="fab fa-facebook-f"></i></a></li>
+										<li><a href=""><i class="fab fa-twitter"></i></a></li>
+										<li><a href=""><i class="fab fa-google-plus-g"></i></a></li>
+										<li><a href=""><i class="fab fa-linkedin"></i></a></li>
+									</ul>
+							</div>
+						</div>
+					</div>
+					<div class="row" >
+						<div class="col-md-12">
+							<p><?= $fetch_products['description']; ?></p>
+						</div>
 					</div>
 				</div>
-                <?php
-   
-         }
-      }else{
-         echo '<p class="empty">Không có dữ liệu nào!</p>';
-      }
-   ?>
+				<div class="col-md-4" style="border: 0.2px solid #ccc; 
+											padding: 10px; 
+											margin-bottom: 20px; 
+											box-shadow: 4px 0 4px rgba(0, 0, 0, 0.1); 
+											">
+					<div class="frame">
+    					<p>Tham khảo các khóa học</p>
+					</div>
+					<style>
+						.frame {
+						background-color: #F28123;
+						padding: 10px; 
+						border: 1px solid #ccc;
+						text-align: center; 
+						margin-bottom:20px;
+					}
+
+					.frame p {
+						font-size: 20px;
+						color: #fff; 
+					}
+					</style>
+							<?php
+								$select_random_products = $conn->prepare("SELECT * FROM `courses` INNER JOIN category ON category.id_cate=courses.id_cate ORDER BY RAND() LIMIT 10");
+								$select_random_products->execute();
+
+								if ($select_random_products->rowCount() > 0) {
+									while ($fetch_random_products = $select_random_products->fetch(PDO::FETCH_ASSOC)) {
+										?>
+										<div class="row" style="padding: 10px;">
+											<div class="col-md-6">
+												<a href="view-courses.php?pid=<?= $fetch_random_products['id']; ?>"><img style="width: 150px; height:80px;" src="uploaded_img/<?= $fetch_random_products['image']; ?>" alt=""></a>
+											</div>
+											<div class="col-md-6">
+												<a href="view-courses.php?pid=<?= $fetch_random_products['id']; ?>">
+													<p style="font-size: 15px;"><?= $fetch_random_products['name']; ?></p>
+												</a>
+												<p class="product-price"><span><?= number_format($fetch_random_products['price'], 0, ',', '.') . " VNĐ" ?></span></p>
+											</div>
+										</div>
+										<?php
+									}
+								} else {
+									echo "Không có dữ liệu";
+								}
+							?>
+
+				</div>
 			</div>
 		</div>
 	</div>
@@ -191,70 +321,41 @@ include 'components/add_cart.php';
 						<p>Những khóa học bổ ích, mới mẻ được cập nhật giúp học viên muốn học thêm liên quan đến khóa học ở trên.</p>
 					</div>
 				</div>
-			</div>
+			</div>	
 			<div class="row">
+				<?php
+				// Hiển thị các sản phẩm cùng danh mục
+					while ($related_product = $related_products->fetch(PDO::FETCH_ASSOC)) {
+				?>
 				<div class="col-lg-4 col-md-6 text-center">
 					<div class="single-product-item">
-						<div class="product-image">
-							<a href="single-product.html"><img src="assets/img/products/product-img-1.jpg" alt=""></a>
-						</div>
-						<h3>Strawberry</h3>
-						<p class="product-price"><span>Per Kg</span> 85$ </p>
-						<a href="cart.html" class="cart-btn"><i class="fas fa-shopping-cart"></i> Add to Cart</a>
+						<form action="" method="post">
+							<input type="hidden" name="pid" value="<?= $related_product['id']; ?>">
+							<input type="hidden" name="name" value="<?= $related_product['name']; ?>">
+							<input type="hidden" name="image" value="<?= $related_product['image']; ?>">
+							<input type="hidden" name="price" value="<?= $related_product['price']; ?>">
+							<div class="product-image">
+							<a href="view-courses.php?pid=<?= $related_product['id']; ?>"><img src="uploaded_img/<?= $related_product['image']; ?>" alt=""></a>
+							</div>
+							<h3><?= $related_product['name']; ?></h3>
+							<p class="product-price"><span><?= $fetch_products['name_cate']; ?></span><?= number_format($related_product['price'], 0, ',', '.') . " VNĐ" ?></p>
+							<button style ="border: none;   background-color: rgba(0, 0, 0, 0); 
+							" type="submit" name="add_to_cart"><a class="cart-btn"><i class="fas fa-shopping-cart"></i></a></button>
+						</form>
 					</div>
 				</div>
-				<div class="col-lg-4 col-md-6 text-center">
-					<div class="single-product-item">
-						<div class="product-image">
-							<a href="single-product.html"><img src="assets/img/products/product-img-2.jpg" alt=""></a>
-						</div>
-						<h3>Berry</h3>
-						<p class="product-price"><span>Per Kg</span> 70$ </p>
-						<a href="cart.html" class="cart-btn"><i class="fas fa-shopping-cart"></i> Add to Cart</a>
-					</div>
-				</div>
-				<div class="col-lg-4 col-md-6 offset-lg-0 offset-md-3 text-center">
-					<div class="single-product-item">
-						<div class="product-image">
-							<a href="single-product.html"><img src="assets/img/products/product-img-3.jpg" alt=""></a>
-						</div>
-						<h3>Lemon</h3>
-						<p class="product-price"><span>Per Kg</span> 35$ </p>
-						<a href="cart.html" class="cart-btn"><i class="fas fa-shopping-cart"></i> Add to Cart</a>
-					</div>
-				</div>
+				<?php
+					}
+				} else {
+					echo '<p class="empty">Không có dữ liệu nào!</p>';
+				}
+				?>
 			</div>
 		</div>
 	</div>
+
 	<!-- end more products -->
 
-	<!-- logo carousel -->
-	<div class="logo-carousel-section">
-		<div class="container">
-			<div class="row">
-				<div class="col-lg-12">
-					<div class="logo-carousel-inner">
-						<div class="single-logo-item">
-							<img src="assets/img/company-logos/1.png" alt="">
-						</div>
-						<div class="single-logo-item">
-							<img src="assets/img/company-logos/2.png" alt="">
-						</div>
-						<div class="single-logo-item">
-							<img src="assets/img/company-logos/3.png" alt="">
-						</div>
-						<div class="single-logo-item">
-							<img src="assets/img/company-logos/4.png" alt="">
-						</div>
-						<div class="single-logo-item">
-							<img src="assets/img/company-logos/5.png" alt="">
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- end logo carousel -->
 
 	<!-- footer -->
 	<div class="footer-area">

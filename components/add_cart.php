@@ -19,11 +19,11 @@ if(isset($_POST['add_to_cart'])){
       $check_cart_numbers->execute([$name, $user_id]);
 
       if($check_cart_numbers->rowCount() > 0){
-         $message[] = 'Đã được thêm vào giỏ hàng!';
+         echo '<script>alert("Khóa học này đã có trong giỏ hàng! ");</script>';   
       }else{
          $insert_cart = $conn->prepare("INSERT INTO `cart`(user_id, pid, name, price, image) VALUES(?,?,?,?,?)");
          $insert_cart->execute([$user_id, $pid, $name, $price, $image]);
-         $message[] = 'Đã thêm vào giỏ hàng!';
+         echo '<script>alert("Thêm vào giỏ hàng thành công!");</script>';   
          
       }
 

@@ -74,15 +74,68 @@ include 'components/add_cart.php';
 						<!-- menu start -->
 						<nav class="main-menu">
 							<ul>
-								<li class="current-list-item"><a href="#">Trang chủ</a>
+								<li class="current-list-item"><a href="index.php">Trang chủ</a>
 								</li>
 								<li><a href="recipe.php">Công thức nấu ăn</a></li>
 								<li><a href="news.php">Tin tức</a></li>
 								<li><a href="contacts.php">Liên hệ</a></li>
 								<li>
 									<div class="header-icons">
-										<a class="shopping-cart" href="cart.html"><i class="fas fa-shopping-cart"></i></a>
+									<?php
+										$count_cart_items = $conn->prepare("SELECT * FROM `cart` WHERE user_id = ?");
+										$count_cart_items->execute([$user_id]);
+										$total_cart_items = $count_cart_items->rowCount();
+									?>
+									<style>
+										.shopping-cart {
+											position: relative; 
+											text-decoration: none; 
+										}
+											.shopping-cart span {
+											position: absolute; 
+											top: -10px; 
+											right: -10px; 
+											background-color: #F28123; 
+											color: white; 
+											border-radius: 50%; 
+											padding: 5px 10px; 
+											font-size: 14px; 
+											}
+									</style>
+										<a class="shopping-cart" href="giohang.php"><i class="fas fa-shopping-cart"></i><?php if ($user_id) { ?><span>(<?= $total_cart_items; ?>)</span><?php } ?></a>
 										<a class="mobile-hide search-bar-icon" href="#"><i class="fas fa-search"></i></a>
+										<?php
+										$select_profile = $conn->prepare("SELECT * FROM `users` WHERE id = ?");
+										$select_profile->execute([$user_id]);
+										if ($select_profile->rowCount() > 0) {
+											$fetch_profile = $select_profile->fetch(PDO::FETCH_ASSOC);
+
+											?>
+												<a href="profile.php" class="btn">
+												<?php
+													$name = $fetch_profile['name'];
+													$spacePosition = strpos($name, ' ');
+
+													if ($spacePosition !== false) {
+														// Tên có dấu cách, hiển thị họ
+														$lastName = substr(strrchr($name, ' '), 1);
+														echo '<a href="profile.php" class="btn">' . $lastName . '</a>';
+													} else {
+														// Tên không có dấu cách, hiển thị icon user
+														echo '<a href="profile.php" class="btn"><i class="fas fa-user"></i></a>';
+													}
+													?>
+												</a>
+												<a style = "font-size: 15px; "href="components/user_logout.php" onclick="return confirm('Đăng xuất khỏi trang web này?');" class="delete-btn">| Đăng xuất</a>
+											<?php
+										} else {
+											?>
+											<a style="font-size: 15px;" href="login.php">Đăng nhập</a>
+											<!-- <a style="font-size: 15px;" href="register.php">| Đăng kí</a> -->
+											<?php
+										}
+										?>
+											
 									</div>
 								</li>
 							</ul>
@@ -126,8 +179,7 @@ include 'components/add_cart.php';
 						<div class="hero-text">
 							<div class="hero-text-tablecell">
 								<p class="subtitle">Dạy và học hiệu quả</p>
-								<h1 style= "width:1000px;">Học nấu ăn gia đình</h1>
-								<div class="hero-btns">
+									<h1>Món ăn gia đình</h1>								<div class="hero-btns">
 									<a href="shop.html" class="boxed-btn">Đăng kí học</a>
 									<a href="contact.html" class="bordered-btn">Liên hệ</a>
 								</div>
@@ -545,36 +597,38 @@ $('.pagination-wrap ul li a').click(function (e) {
 			<div class="row">
 				<div class="col-lg-3 col-md-6">
 					<div class="footer-box about-widget">
-						<h2 class="widget-title">About us</h2>
-						<p>Ut enim ad minim veniam perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae.</p>
+						<h2 class="widget-title">Thông tin</h2>
+						<p>Tổng đài tư vấn: 1800 6148 hoặc 1800 2027 08h00 - 20h00 (Miễn phí cước gọi)</p>
+							<p>Góp ý phản ánh: 028 7109 9232</p>
+							<p>Liên hệ Quản Lý Học Viên: 028 7300 2672</p>
+							<p>08h00 - 20h00</p>
 					</div>
 				</div>
 				<div class="col-lg-3 col-md-6">
 					<div class="footer-box get-in-touch">
-						<h2 class="widget-title">Get in Touch</h2>
+						<h2 class="widget-title">Thời gian hoạt động</h2>
 						<ul>
-							<li>34/8, East Hukupara, Gifirtok, Sadan.</li>
-							<li>support@fruitkha.com</li>
-							<li>+00 111 222 3333</li>
+							<li>34/8, Phường Phú Hưng, Tp Bến Tre, Tỉnh Bến Tre</li>
+							<li>cookingfood@gmail.com</li>
+							<li>+84 582268858</li>
 						</ul>
 					</div>
 				</div>
 				<div class="col-lg-3 col-md-6">
 					<div class="footer-box pages">
-						<h2 class="widget-title">Pages</h2>
+						<h2 class="widget-title">Trang chính</h2>
 						<ul>
-							<li><a href="index.html">Home</a></li>
-							<li><a href="about.html">About</a></li>
-							<li><a href="services.html">Shop</a></li>
-							<li><a href="news.html">News</a></li>
-							<li><a href="contact.html">Contact</a></li>
+							<li><a href="index.php">Trang chủ</a></li>
+							<li><a href="recipe.php">Công thức</a></li>
+							<li><a href="news.php">Tin tức</a></li>
+							<li><a href="contacts.php">Liên hệ</a></li>
 						</ul>
 					</div>
 				</div>
 				<div class="col-lg-3 col-md-6">
 					<div class="footer-box subscribe">
-						<h2 class="widget-title">Subscribe</h2>
-						<p>Subscribe to our mailing list to get the latest updates.</p>
+						<h2 class="widget-title">Đăng kí</h2>
+						<p>Đăng kí để nhận thông tin các khóa học mới nhất.</p>
 						<form action="index.html">
 							<input type="email" placeholder="Email">
 							<button type="submit"><i class="fas fa-paper-plane"></i></button>

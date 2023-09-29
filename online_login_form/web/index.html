@@ -1,43 +1,12 @@
-<?php
-
-include 'components/connect.php';
-
-session_start();
-
-if(isset($_SESSION['user_id'])){
-   $user_id = $_SESSION['user_id'];
-}else{
-   $user_id = '';
-};
-
-if(isset($_POST['submit'])){
-
-   $email = $_POST['email'];
-   $email = filter_var($email, FILTER_SANITIZE_STRING);
-   $pass = sha1($_POST['pass']);
-   $pass = filter_var($pass, FILTER_SANITIZE_STRING);
-
-   $select_user = $conn->prepare("SELECT * FROM `users` WHERE email = ? AND password = ?");
-   $select_user->execute([$email, $pass]);
-   $row = $select_user->fetch(PDO::FETCH_ASSOC);
-
-   if($select_user->rowCount() > 0){
-      $_SESSION['user_id'] = $row['id'];
-      // header('location:home.php');
-      header('location:index.php');
-      echo '<script>alert("Đăng nhập thành công!");</script>';   
-
-   }else{
-    echo '<script>alert("Tài khoản hoặc mật khẩu sai!");</script>';   
-}
-
-}
-
-?>
+<!--Author: W3layouts
+Author URL: http://w3layouts.com
+License: Creative Commons Attribution 3.0 Unported
+License URL: http://creativecommons.org/licenses/by/3.0/
+-->
 <!DOCTYPE HTML>
 <html lang="en">
 <head>
-<title>Đăng nhập</title>
+<title>Online Login Form Responsive Widget Template :: w3layouts</title>
 <!-- Meta tag Keywords -->
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -46,8 +15,8 @@ if(isset($_POST['submit'])){
 function hideURLbar(){ window.scrollTo(0,1); } </script>
 <!-- Meta tag Keywords -->
 <!-- css files -->
-<link rel="stylesheet" href="online_login_form/web/css/style.css" type="text/css" media="all" /> <!-- Style-CSS --> 
-<link rel="stylesheet" href="online_login_form/web/css/font-awesome.css"> <!-- Font-Awesome-Icons-CSS -->
+<link rel="stylesheet" href="css/style.css" type="text/css" media="all" /> <!-- Style-CSS --> 
+<link rel="stylesheet" href="css/font-awesome.css"> <!-- Font-Awesome-Icons-CSS -->
 <!-- //css files -->
 <!-- online-fonts -->
 <link href="//fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i,800,800i&amp;subset=cyrillic,cyrillic-ext,greek,greek-ext,latin-ext,vietnamese" rel="stylesheet">
@@ -59,27 +28,27 @@ function hideURLbar(){ window.scrollTo(0,1); } </script>
 <div class="center-container">
 	<!--header-->
 	<div class="header-w3l">
-		<h1>CookingFood</h1>
+		<h1>Online Login Form</h1>
 	</div>
 	<!--//header-->
 	<div class="main-content-agile">
 		<div class="sub-main-w3">	
 			<div class="wthree-pro">
-				<h2>Đăng nhập</h2>
+				<h2>Login Quick</h2>
 			</div>
-			<form action="" method="POST">
+			<form action="#" method="post">
 				<div class="pom-agile">
-					<input placeholder="E-mail" name="email" class="user" type="email" required="">
+					<input placeholder="E-mail" name="Name" class="user" type="email" required="">
 					<span class="icon1"><i class="fa fa-user" aria-hidden="true"></i></span>
 				</div>
 				<div class="pom-agile">
-					<input  placeholder="Password" name="pass" class="pass" type="password" required="">
+					<input  placeholder="Password" name="Password" class="pass" type="password" required="">
 					<span class="icon2"><i class="fa fa-unlock" aria-hidden="true"></i></span>
 				</div>
 				<div class="sub-w3l">
-					<h6><a href="#">Quên mật khẩu</a></h6>
+					<h6><a href="#">Forgot Password?</a></h6>
 					<div class="right-w3l">
-						<input type="submit" name="submit" value="Đăng nhập">
+						<input type="submit" value="Login">
 					</div>
 				</div>
 			</form>
@@ -88,6 +57,7 @@ function hideURLbar(){ window.scrollTo(0,1); } </script>
 	<!--//main-->
 	<!--footer-->
 	<div class="footer">
+		<p>&copy; 2017 Online Login Form. All rights reserved | Design by <a href="http://w3layouts.com">W3layouts</a></p>
 	</div>
 	<!--//footer-->
 </div>
