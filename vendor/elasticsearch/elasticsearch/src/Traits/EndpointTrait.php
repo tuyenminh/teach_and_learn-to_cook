@@ -17,7 +17,6 @@ namespace Elastic\Elasticsearch\Traits;
 use Elastic\Elasticsearch\Client;
 use Elastic\Elasticsearch\Exception\ContentTypeException;
 use Elastic\Elasticsearch\Exception\MissingParameterException;
-use Elastic\Elasticsearch\Utility;
 use Elastic\Transport\Serializer\JsonSerializer;
 use Elastic\Transport\Serializer\NDJsonSerializer;
 use Http\Discovery\Psr17FactoryDiscovery;
@@ -80,7 +79,7 @@ trait EndpointTrait
      */
     protected function encode($value): string
     {
-        return Utility::urlencode($this->convertValue($value));
+        return urlencode($this->convertValue($value));
     }
 
     /**

@@ -1,0 +1,33 @@
+?partnerCode=MOMOBKUN20180529
+&orderId=1697000257&requestId=1697000257
+&amount=10000
+&orderInfo=Thanh+toán+qua+MoMo
+&orderType=momo_wallet
+&transId=3108236352
+&resultCode=0
+&message=Successful.
+&payType=napas
+&responseTime=1697000609492
+&extraData=
+&signature=df27aa150267335ceb6727ed9f519e49558ca1d2edb2b8f3cc879506afacf9a5
+
+
+ https://sandbox.vnpayment.vn/devreg/Developer/Activation?email=tuyenct2001@gmail.com&mcCode=20231011121634&tmnCode=72WSK6RR&checksum=42f1e761286b58e429979793fd64eb7a
+
+
+
+ MOMO:
+ ̣9704000000000018
+ NGUYEN VAN A
+ 03/07
+ OTP
+
+VNPAY:
+9704198526191432198
+NGUYEN VAN A
+07/15
+123456
+OTP
+
+	$vnp_TmnCode = "CGXZLS0Z";//Mã website tại VNPAY 
+	$vnp_HashSecret = "XNBCJFAKAZQSGTARRLGCHVZWCIOIGSHN"; //Chuỗi bí mật

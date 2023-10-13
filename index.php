@@ -142,7 +142,7 @@ include 'components/add_cart.php';
 							</ul>
 						</nav>
 						<a class="mobile-show search-bar-icon" href="#"><i class="fas fa-search"></i></a>
-						<div class="mobile-menu"></div>
+						<div class=""></div>
 						<!-- menu end -->
 					</div>
 				</div>

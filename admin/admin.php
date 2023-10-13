@@ -29,6 +29,34 @@ $data1 = [];
 while ($fetch_courses = $select_courses->fetch(PDO::FETCH_ASSOC)){ 
     $data1[] = $fetch_courses; 
 }
+// Bước 1: Truy vấn danh sách các năm có trong cơ sở dữ liệu
+$year_query = $conn->prepare("SELECT DISTINCT YEAR(regis_date) AS year FROM receipt");
+$year_query->execute();
+
+$years = array();
+while ($row = $year_query->fetch(PDO::FETCH_ASSOC)) {
+    $years[] = $row['year'];
+}
+
+// Bước 2: Chọn năm cần hiển thị (ví dụ: năm 2022)
+$selected_year = 2021; // Thay thế bằng năm bạn muốn
+
+// Bước 3: Sử dụng năm đã chọn để truy vấn dữ liệu
+$select_total_sales = $conn->prepare("SELECT DATE_FORMAT(regis_date, '%Y-%m-%d') AS date, SUM(total_price) AS total_price
+                                     FROM receipt
+                                     WHERE YEAR(regis_date) = :selected_year
+                                     GROUP BY date
+                                     ORDER BY date");
+
+$select_total_sales->bindParam(':selected_year', $selected_year, PDO::PARAM_INT);
+$select_total_sales->execute();
+
+// Bước 4: Xử lý dữ liệu
+$data_sales = array();
+while ($fetch_total_sales = $select_total_sales->fetch(PDO::FETCH_ASSOC)) { 
+    $data_sales[] = array($fetch_total_sales['date'], (float)$fetch_total_sales['total_price']); 
+}
+
    		?>
 <!DOCTYPE html>
 <html lang="en">
@@ -490,20 +518,31 @@ while ($fetch_courses = $select_courses->fetch(PDO::FETCH_ASSOC)){
                 </h3>
               </div>
               <div class="card-body" style = "background: #fff;">
-					<div id="piechart" style = "
-											width: 400px; 
-											height: 300px;">
-					</div> 
-					<!-- <div id="piechart_recipe" style = "width: 200px; height: 200px;"> -->
+                <div id="piechart" style = "
+                            width: 300px; 
+                            height: 300px;">
                 </div> 
-			</div>
+					      <!-- <div id="piechart_recipe" style = "
+                            width: 200px; height: 200px;"> -->
+                </div> 
+			        </div>
 					
-              </div>
             </div>
+          </div>
             <!-- /.card -->
           </section>
           <!-- right col -->
-          <div id="curve_chart" style="width: 100%; height: 500px"></div>
+          <!-- Bước 1: Tạo dropdown để chọn năm -->
+
+          <!-- <div id="curve_chart" style="width: 100%; height: 500px"></div> -->
+          <div class="row">
+                              <?php
+include 'admin1.php';
+
+
+                              ?>
+          </div>
+         
 
         </div>
         <!-- /.row (main row) -->
@@ -620,27 +659,51 @@ while ($fetch_courses = $select_courses->fetch(PDO::FETCH_ASSOC)){
       }
     </script>
     <script type="text/javascript">
-      google.charts.load('current', {'packages':['corechart']});
-      google.charts.setOnLoadCallback(drawChart);
+        google.charts.load('current', {'packages':['corechart']});
+        google.charts.setOnLoadCallback(drawChart);
 
-      function drawChart() {
-        var data = google.visualization.arrayToDataTable([
-          ['Year', 'Sales', 'Expenses'],
-          ['2004',  1000,      400],
-          ['2005',  1170,      460],
-          ['2006',  660,       1120],
-          ['2007',  1030,      540]
-        ]);
+        function drawChart() {
+            // Khởi tạo biến dataPHP
+            var dataPHP = [];
 
-        var options = {
-          title: 'Company Performance',
-          curveType: 'function',
-          legend: { position: 'bottom' }
-        };
+            <?php
+            if(isset($_POST["year"])) {
+                $selectedYear = $_POST["year"];
+                $query = "SELECT MONTH(regis_date) AS month, SUM(total_price) AS revenue
+                          FROM receipt
+                          WHERE YEAR(regis_date) = :year
+                          GROUP BY MONTH(regis_date)";
+                $stmt = $conn->prepare($query);
+                $stmt->bindParam(":year", $selectedYear, PDO::PARAM_INT);
+                $stmt->execute();
 
-        var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+                $data = [];
+                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                    $data[] = [$row['month'], (int)$row['revenue']];
+                }
 
-        chart.draw(data, options);
-      }
-    </script></body>
+                // Chuyển dữ liệu sang định dạng JSON
+                echo "dataPHP = " . json_encode($data) . ";";
+            }
+            ?>
+
+            // Tạo dữ liệu cho biểu đồ
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', 'Tháng');
+            data.addColumn('number', 'Doanh thu');
+            data.addRows(dataPHP);
+
+            // Tùy chọn của biểu đồ
+            var options = {
+                title: 'Doanh thu hàng tháng',
+                curveType: 'function',
+                legend: { position: 'bottom' }
+            };
+
+            // Vẽ biểu đồ
+            var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+            chart.draw(data, options);
+        }
+    </script>
+</body>
 </html>

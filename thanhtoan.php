@@ -1,10 +1,10 @@
 <?php
 use Carbon\Carbon;
 use Carbon\CarbonInterval;
-include 'components/connect.php';
 require('carbon/autoload.php');
 
-$now = Carbon::now('Asia/Ho_Chi_Minh')->toDateString();
+include 'components/connect.php';
+
 session_start();
 
 if(isset($_SESSION['user_id'])){
@@ -13,42 +13,137 @@ if(isset($_SESSION['user_id'])){
    $user_id = '';
    header('location:index.php');
 };
+	$grand_total = 0;
+	$cart_items[] = '';
+	$select_cart = $conn->prepare("SELECT * FROM `cart` WHERE user_id = ?");
+	$select_cart->execute([$user_id]);
+	if($select_cart->rowCount() > 0){
+		while($fetch_cart = $select_cart->fetch(PDO::FETCH_ASSOC)){
+		$cart_items[] = $fetch_cart['name'].' ('.$fetch_cart['price'].') - ';
+		$total_course = implode($cart_items);
+		$grand_total += ($fetch_cart['price']);
+	
+		}
+	}
+function execPostRequest($url, $data)
+	{
+		$ch = curl_init($url);
+		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+				'Content-Type: application/json',
+				'Content-Length: ' . strlen($data))
+		);
+		curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+		//execute post
+		$result = curl_exec($ch);
+		//close connection
+		curl_close($ch);
+		return $result;
+	}
+if(isset($_POST['payUrl'])){
+	$endpoint = "https://test-payment.momo.vn/v2/gateway/api/create";
 
-if(isset($_POST['submit'])){
 
-   $name = $_POST['name'];
-   $name = filter_var($name, FILTER_SANITIZE_STRING);
-   $number = $_POST['number'];
-   $number = filter_var($number, FILTER_SANITIZE_STRING);
+	$partnerCode = 'MOMOBKUN20180529';
+	$accessKey = 'klm05TvNBzhg7h7j';
+	$secretKey = 'at67qH6mk8w5Y1nAyMoYKMWACiEi2bsa';
+	$orderInfo = 'Thanh toán qua momo';
+	$amount = $grand_total;
+	$orderId = time() ."";
+	$redirectUrl = "http://localhost/teach_and_learn-to_cook/thanhtoan.php";
+	$ipnUrl = "https://webhook.site/b3088a6a-2d17-4f8d-a383-71389a6c600b";
+	$extraData = "";
 
 
-   // $address = $_POST['address'];
-   // $address = filter_var($address, FILTER_SANITIZE_STRING);
-   $total_course = $_POST['total_course'];
-   $total_price = $_POST['total_price'];
-   $email = $_POST['email'];
-   $email = filter_var($email, FILTER_SANITIZE_STRING);
+		$partnerCode = $partnerCode;
+		$accessKey = $accessKey;
+		$secretKey = $secretKey;
+		$orderId = $orderId; // Mã đơn hàng
+		$orderInfo = $orderInfo;
+		$amount = $amount;
+		$ipnUrl = $ipnUrl;
+		$redirectUrl = $redirectUrl;
+		$extraData = $extraData;
 
-   $check_cart = $conn->prepare("SELECT * FROM `cart` WHERE user_id = ?");
-   $check_cart->execute([$user_id]);
+		$requestId = time() . "";
+		$requestType = "payWithATM";
+		// $extraData = ($_POST["extraData"] ? $_POST["extraData"] : "");
+		//before sign HMAC SHA256 signature
+		$rawHash = "accessKey=" . $accessKey . "&amount=" . $amount . "&extraData=" . $extraData . "&ipnUrl=" . $ipnUrl . "&orderId=" . $orderId . "&orderInfo=" . $orderInfo . "&partnerCode=" . $partnerCode . "&redirectUrl=" . $redirectUrl . "&requestId=" . $requestId . "&requestType=" . $requestType;
+		$signature = hash_hmac("sha256", $rawHash, $secretKey);
+		$data = array('partnerCode' => $partnerCode,
+			'partnerName' => "Test",
+			"storeId" => "MomoTestStore",
+			'requestId' => $requestId,
+			'amount' => $amount,
+			'orderId' => $orderId,
+			'orderInfo' => $orderInfo,
+			'redirectUrl' => $redirectUrl,
+			'ipnUrl' => $ipnUrl,
+			'lang' => 'vi',
+			'extraData' => $extraData,
+			'requestType' => $requestType,
+			'signature' => $signature);
+//execPostRequest(kiểu string). json_encode biến kiểu thành json để phù hợp dữ liệu
+		$result = execPostRequest($endpoint, json_encode($data));
+		$jsonResult = json_decode($result, true);  // decode json
 
-   if($check_cart->rowCount() > 0){
+		//Just a example, please check more in there
 
-      // if($address == ''){
-      //    $message[] = 'please add your address!';
-      // }else{
-         
-         $insert_order = $conn->prepare("INSERT INTO `receipt`(user_id, name, number, total_course, total_price, email, regis_date) VALUES(?,?,?,?,?,?,?)");
-         $insert_order->execute([$user_id, $name, $number,  $total_course, $total_price, $email, $now]);
-
-         $delete_cart = $conn->prepare("DELETE FROM `cart` WHERE user_id = ?");
-         $delete_cart->execute([$user_id]);
-
-		 echo '<script>alert("Thanh toán thành công");</script>';         
-   }else{
-		echo '<span>Giỏ hàng trống!</span>';
+		header('Location: ' . $jsonResult['payUrl']);
 }
 
+if (isset($_GET['partnerCode'])) {
+    if (
+        isset($_GET['partnerCode']) &&
+        isset($_GET['orderId']) &&
+        isset($_GET['amount']) &&
+        isset($_GET['orderType']) &&
+        isset($_GET['transId']) &&
+        isset($_GET['payType']) &&
+        isset($_GET['signature'])
+    ) {
+        $code_order = rand(0, 9999);
+        $partnerCode = filter_var($_GET['partnerCode'], FILTER_SANITIZE_STRING);
+        $orderId = filter_var($_GET['orderId'], FILTER_SANITIZE_STRING);
+        $amount = filter_var($_GET['amount'], FILTER_SANITIZE_STRING);
+        $orderType = filter_var($_GET['orderType'], FILTER_SANITIZE_STRING);
+        $transId = filter_var($_GET['transId'], FILTER_SANITIZE_STRING);
+        $payType = filter_var($_GET['payType'], FILTER_SANITIZE_STRING);
+        $signature = filter_var($_GET['signature'], FILTER_SANITIZE_STRING);
+
+        // Chèn dữ liệu vào bảng `momo`
+        $insert_momo = $conn->prepare("INSERT INTO `momo`(partnerCode, orderId, amount, orderType, transId, payType, signature, code_cart) VALUES(?,?,?,?,?,?,?,?)");
+        $insert_momo->execute([$partnerCode, $orderId, $amount, $orderType, $transId, $payType, $signature, $code_order]);
+
+        if ($insert_momo) {
+            $name = filter_var($_POST['name'], FILTER_SANITIZE_STRING);
+            $number = filter_var($_POST['number'], FILTER_SANITIZE_STRING);
+            $total_course =  filter_var($_POST['total_course'], FILTER_SANITIZE_STRING) ;
+            $total_price = filter_var($_POST['total_price'], FILTER_SANITIZE_STRING) ;
+            $email = filter_var($_POST['email'], FILTER_SANITIZE_STRING);
+			$now = Carbon::now('Asia/Ho_Chi_Minh')->toDateString();
+
+            $check_cart = $conn->prepare("SELECT * FROM `cart` WHERE user_id = ?");
+            $check_cart->execute([$user_id]);
+
+            if ($check_cart->rowCount() > 0) {
+                // Chèn dữ liệu vào bảng `receipt`
+
+				$insert_order = $conn->prepare("INSERT INTO `receipt`(user_id, name, number, total_course, total_price, email, regis_date) VALUES(?,?,?,?,?,?,?)");
+				$insert_order->execute([$user_id, $name, $number,  $total_course, $total_price, $email, $now]);
+                $delete_cart = $conn->prepare("DELETE FROM `cart` WHERE user_id = ?");
+                $delete_cart->execute([$user_id]);
+
+                echo '<script>alert("Thanh toán thành công");</script>';
+            } else {
+				echo '<script>alert("Giỏ hàng trống");</script>';            }
+        }
+    } else {
+		echo '<script>alert("Thiếu thông tin từ momo");</script>';    }
 }
 
 ?>
@@ -226,7 +321,8 @@ if(isset($_POST['submit'])){
 	<!-- check out section -->
 	<div class="checkout-section mt-150 mb-150">
 		<div class="container">
-		<form action="" method="post">
+		<!-- <form action="" method="post" target="_blank" enctype="application/x-www-form-urlencode"> -->
+		<form action="thanhtoan.php" method="post" >
 			<div class="row">
 				<div class="col-lg-8">
 					<div class="checkout-accordion-wrap">
@@ -289,7 +385,7 @@ if(isset($_POST['submit'])){
 
 										<select class="custom-select" id="inputGroupSelect01" name="method" required>
 											<option value="" disabled selected>Chọn...</option>
-											<option value="MoMo">Momo</option>
+											<option value="Momo">Momo</option>
 											<option value="Paypal">Paypal</option>
 										</select>
 									</div>
@@ -326,6 +422,7 @@ if(isset($_POST['submit'])){
                                         $grand_total += ($fetch_cart['price']);
                                 ?>
 								<input type="hidden" name="total_course" value="<?= $total_course; ?>">
+								<input type="hidden" name="grand_total" value="<?php echo $grand_total; ?>">
 								<input type="hidden" name="total_price" value="<?= $grand_total; ?>" value="">
 								<input type="hidden" name="name" value="<?= $fetch_profile['name'] ?>">
 								<input type="hidden" name="number" value="<?= $fetch_profile['number'] ?>">
@@ -352,20 +449,34 @@ if(isset($_POST['submit'])){
 								</tr>
 							</tbody>
 						</table>
-                        <a href="cart.php" class="boxed-btn">GIỎ HÀNG</a>			
+                        <a href="giohang.php" class="boxed-btn">GIỎ HÀNG</a>			
 					
-    					<input style="font-family: 'Poppins', sans-serif;
+    					<!-- <input style="font-family: 'Poppins', sans-serif;
 									display: inline-block;
 									background-color: #F28123;
 									color: #fff;
 									font-weight: normal;
 									font-size: 1.5rem;
 									padding: 10px 15px;" 
-									class="boxed-btn" type="submit" value="Thanh toán" name="submit">
+									class="boxed-btn" type="submit" value="MOMO" name="payUrl"> -->
+						<button
+						class="boxed-btn" type="submit" name="payUrl">Thanh toán
+							
+						</button>
+						<!-- <input style="font-family: 'Poppins', sans-serif;
+									display: inline-block;
+									background-color: #F28123;
+									color: #fff;
+									font-weight: normal;
+									font-size: 1.5rem;
+									padding: 10px 15px;" 
+									class="boxed-btn" type="submit" value="VnPay" name="redirect"> -->
+						
 					</div>
 				</div>
 			</div>
 		<form>
+			
 		</div>
 	</div>
 	<!-- end check out section -->
