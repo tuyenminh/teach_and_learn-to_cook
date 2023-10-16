@@ -96,7 +96,7 @@ if(isset($_SESSION['user_id'])){
 
 
 <!-- custom js file link  -->
-<script src="js/script.js"></script>
+<script src="home-/js/script.js"></script>
 
 </body>
 </html>

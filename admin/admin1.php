@@ -1,6 +1,11 @@
-<form method="post">
-        <label for="year">Chọn năm:</label>
-        <select name="year" id="year">
+<form method="post" style=" display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;">
+  <label style="color:#000">
+    Chọn năm doanh thu: 
+  </label>
+        <select name="year" id="year" style="margin: 20px;">
             <?php
             // Kết nối cơ sở dữ liệu
 
@@ -18,7 +23,7 @@
             }
             ?>
         </select>
-        <input type="submit" value="Xem biểu đồ">
+        <input class="btn-sm" type="submit" value="Xem biểu đồ">
     </form>
 
     <!-- Div để hiển thị biểu đồ -->

@@ -1,47 +1,55 @@
 
-
 <?php
-	use Carbon\Carbon;
-    use Carbon\CarbonInterval;
-    include '../components/connect.php';
-    require('../carbon/autoload.php');
-    $now = Carbon::now('Asia/Ho_Chi_Minh')->toDateString();
+include '../components/connect.php'; // Kết nối cơ sở dữ liệu
 
-    if(isset($_POST['thoigian'])){
-    	$thoigian = $_POST['thoigian'];
-	}else{
-		$thoigian = '';
-		$subdays = Carbon::now('Asia/Ho_Chi_Minh')->subdays(365)->toDateString();	
-	}
+// Truy vấn cơ sở dữ liệu để lấy dữ liệu tổng hợp doanh thu qua các năm
+$query_revenue = "SELECT YEAR(regis_date) AS year, SUM(total_price) AS revenue
+          FROM receipt
+          GROUP BY YEAR(regis_date)
+          ORDER BY year ASC";
+$result_revenue = $conn->query($query_revenue);
 
-   
-    if($thoigian=='7ngay'){
-    	$subdays = Carbon::now('Asia/Ho_Chi_Minh')->subdays(7)->toDateString();
-	}elseif($thoigian=='28ngay'){
-    	$subdays = Carbon::now('Asia/Ho_Chi_Minh')->subdays(28)->toDateString();
-	}elseif($thoigian=='90ngay'){
-    	$subdays = Carbon::now('Asia/Ho_Chi_Minh')->subdays(90)->toDateString();
-	}elseif($thoigian=='365ngay'){
-		$subdays = Carbon::now('Asia/Ho_Chi_Minh')->subdays(365)->toDateString();	
-	}
-	
-
-    $now = Carbon::now('Asia/Ho_Chi_Minh')->toDateString(); 
-
-    $sql = "SELECT * FROM tbl_thongke WHERE ngaydat BETWEEN '$subdays' AND '$now' ORDER BY ngaydat ASC" ;
-    $sql_query = mysqli_query($mysqli,$sql);
-
-    while($val = mysqli_fetch_array($sql_query)){
-
-    	$chart_data[] = array(
-	        'date' => $val['ngaydat'],
-	        'order' => $val['donhang'],
-	        'sales' => $val['doanhthu'],
-	        'quantity' => $val['soluongban']
-
-    	);
-    }
-  	// print_r($chart_data);
-    echo $data = json_encode($chart_data);
-   
+// Tạo một mảng chứa dữ liệu doanh thu
+$data_revenue= [];
+while ($row_revenue = $result_revenue->fetch(PDO::FETCH_ASSOC)) {
+    $year = $row_revenue['year'];
+    $revenue = (float) $row_revenue['revenue'];
+    $data_revenue[] = [$year, $revenue];
+}
 ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biểu đồ tổng hợp doanh thu</title>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+</head>
+<body>
+    <h1>Biểu đồ tổng hợp doanh thu qua các năm</h1>
+
+    <div id="revenue_chart" style="width: 900px; height: 500px;"></div>
+
+    <script type="text/javascript">
+        google.charts.load('current', { 'packages': ['corechart'] });
+        google.charts.setOnLoadCallback(drawChart);
+
+        function drawChart() {
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', 'Năm');
+            data.addColumn('number', 'Doanh thu');
+            data.addRows(<?php echo json_encode($data_revenue); ?>);
+
+            var options = {
+                title: 'Tổng hợp doanh thu qua các năm',
+                curveType: 'function',
+                legend: { position: 'bottom' }
+            };
+
+            var chart = new google.visualization.LineChart(document.getElementById('revenue_chart'));
+            chart.draw(data, options);
+        }
+    </script>
+</body>
+</html>
+

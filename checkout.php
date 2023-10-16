@@ -1,10 +1,10 @@
 <?php
 use Carbon\Carbon;
 use Carbon\CarbonInterval;
-include 'components/connect.php';
 require('carbon/autoload.php');
 
-$now = Carbon::now('Asia/Ho_Chi_Minh')->toDateString();
+include 'components/connect.php';
+
 session_start();
 
 if(isset($_SESSION['user_id'])){
@@ -13,80 +13,172 @@ if(isset($_SESSION['user_id'])){
    $user_id = '';
    header('location:index.php');
 };
+	$grand_total = 0;
+	$cart_items[] = '';
+	$select_cart = $conn->prepare("SELECT * FROM `cart` WHERE user_id = ?");
+	$select_cart->execute([$user_id]);
+	if($select_cart->rowCount() > 0){
+		while($fetch_cart = $select_cart->fetch(PDO::FETCH_ASSOC)){
+		$cart_items[] = $fetch_cart['name'].' ('.$fetch_cart['price'].') - ';
+		$total_course = implode($cart_items);
+		$grand_total += ($fetch_cart['price']);
+	
+		}
+	}
+function execPostRequest($url, $data)
+	{
+		$ch = curl_init($url);
+		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+				'Content-Type: application/json',
+				'Content-Length: ' . strlen($data))
+		);
+		curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+		//execute post
+		$result = curl_exec($ch);
+		//close connection
+		curl_close($ch);
+		return $result;
+	}
 
-if(isset($_POST['submit'])){
+if(isset($_POST['payUrl'])){
+    // Kiểm tra giỏ hàng
+    $check_cart = $conn->prepare("SELECT * FROM `cart` WHERE user_id = ?");
+    $check_cart->execute([$user_id]);
 
-   $name = $_POST['name'];
-   $name = filter_var($name, FILTER_SANITIZE_STRING);
-   $number = $_POST['number'];
-   $number = filter_var($number, FILTER_SANITIZE_STRING);
+    if ($check_cart->rowCount() > 0) {
+        $name = filter_var($_POST['name'], FILTER_SANITIZE_STRING);
+        $number = filter_var($_POST['number'], FILTER_SANITIZE_STRING);
+        $total_course = filter_var($_POST['total_course'], FILTER_SANITIZE_STRING);
+        $total_price = filter_var($_POST['total_price'], FILTER_SANITIZE_STRING);
+        $email = filter_var($_POST['email'], FILTER_SANITIZE_STRING);
+        $now = Carbon::now('Asia/Ho_Chi_Minh')->toDateString();
 
+        // Kiểm tra xem đơn hàng đã tồn tại trong cơ sở dữ liệu chưa
+        $check_order = $conn->prepare("SELECT * FROM `receipt` WHERE user_id = ? AND total_course = ? AND total_price = ?");
+        $check_order->execute([$user_id, $total_course, $total_price]);
 
-   // $address = $_POST['address'];
-   // $address = filter_var($address, FILTER_SANITIZE_STRING);
-   $total_course = $_POST['total_course'];
-   $total_price = $_POST['total_price'];
-   $email = $_POST['email'];
-   $email = filter_var($email, FILTER_SANITIZE_STRING);
+        if ($check_order->rowCount() == 0) {
+            // Chèn dữ liệu vào bảng `receipt`
+            $insert_order = $conn->prepare("INSERT INTO `receipt`(user_id, name, number, total_course, total_price, email, regis_date) VALUES(?,?,?,?,?,?,?)");
+            $insert_order->execute([$user_id, $name, $number, $total_course, $total_price, $email, $now]);
 
-   $check_cart = $conn->prepare("SELECT * FROM `cart` WHERE user_id = ?");
-   $check_cart->execute([$user_id]);
+            // Xóa giỏ hàng
+            $delete_cart = $conn->prepare("DELETE FROM `cart` WHERE user_id = ?");
+            $delete_cart->execute([$user_id]);
 
-   if($check_cart->rowCount() > 0){
+            // Tiếp tục với thanh toán Momo
+            $endpoint = "https://test-payment.momo.vn/v2/gateway/api/create";
+            $partnerCode = 'MOMOBKUN20180529';
+			$accessKey = 'klm05TvNBzhg7h7j';
+			$secretKey = 'at67qH6mk8w5Y1nAyMoYKMWACiEi2bsa';
+			$orderInfo = 'Thanh toán qua momo';
+			$amount = $grand_total;
+			$orderId = time() ."";
+			$redirectUrl = "http://localhost/teach_and_learn-to_cook/thanhtoan.php";
+			$ipnUrl = "https://webhook.site/b3088a6a-2d17-4f8d-a383-71389a6c600b";
+			$extraData = "";
+	
+			$partnerCode = $partnerCode;
+			$accessKey = $accessKey;
+			$secretKey = $secretKey;
+			$orderId = $orderId; // Mã đơn hàng
+			$orderInfo = $orderInfo;
+			$amount = $amount;
+			$ipnUrl = $ipnUrl;
+			$redirectUrl = $redirectUrl;
+			$extraData = $extraData;
+	
+			$requestId = time() . "";
+			$requestType = "payWithATM";
+			// $extraData = ($_POST["extraData"] ? $_POST["extraData"] : "");
+			//before sign HMAC SHA256 signature
+			$rawHash = "accessKey=" . $accessKey . "&amount=" . $amount . "&extraData=" . $extraData . "&ipnUrl=" . $ipnUrl . "&orderId=" . $orderId . "&orderInfo=" . $orderInfo . "&partnerCode=" . $partnerCode . "&redirectUrl=" . $redirectUrl . "&requestId=" . $requestId . "&requestType=" . $requestType;
+			$signature = hash_hmac("sha256", $rawHash, $secretKey);
+			$data = array('partnerCode' => $partnerCode,
+				'partnerName' => "Test",
+				"storeId" => "MomoTestStore",
+				'requestId' => $requestId,
+				'amount' => $amount,
+				'orderId' => $orderId,
+				'orderInfo' => $orderInfo,
+				'redirectUrl' => $redirectUrl,
+				'ipnUrl' => $ipnUrl,
+				'lang' => 'vi',
+				'extraData' => $extraData,
+				'requestType' => $requestType,
+				'signature' => $signature);
+	//execPostRequest(kiểu string). json_encode biến kiểu thành json để phù hợp dữ liệu
+			$result = execPostRequest($endpoint, json_encode($data));
+			$jsonResult = json_decode($result, true);  // decode json
+	
+			//Just a example, please check more in there
+            header('Location: ' . $jsonResult['payUrl']);
+        } else {
+            // Đơn hàng đã tồn tại, không thực hiện thanh toán
+			echo '<script>alert("Bạn đã đăng kí khóa học này. Không thể tiếp tục!");</script>';   
 
-      // if($address == ''){
-      //    $message[] = 'please add your address!';
-      // }else{
-         
-         $insert_order = $conn->prepare("INSERT INTO `receipt`(user_id, name, number, total_course, total_price, email, regis_date) VALUES(?,?,?,?,?,?,?)");
-         $insert_order->execute([$user_id, $name, $number,  $total_course, $total_price, $email, $now]);
-
-         $delete_cart = $conn->prepare("DELETE FROM `cart` WHERE user_id = ?");
-         $delete_cart->execute([$user_id]);
-
-		 echo '<script>alert("Thanh toán thành công");</script>';         
-   }else{
-		echo '<span>Giỏ hàng trống!</span>';
+        }
+    } else {
+        // Giỏ hàng trống, không thực hiện thanh toán
+			echo '<script>alert("Giỏ hàng trống. Không thể thanh toán!");</script>';   
+    }
 }
 
+if (isset($_GET['partnerCode'])) {
+    if (
+        isset($_GET['partnerCode']) &&
+        isset($_GET['orderId']) &&
+        isset($_GET['amount']) &&
+        isset($_GET['orderType']) &&
+        isset($_GET['transId']) &&
+        isset($_GET['payType']) &&
+        isset($_GET['signature'])
+    ) {
+        $code_order = rand(0, 9999);
+        $partnerCode = filter_var($_GET['partnerCode'], FILTER_SANITIZE_STRING);
+        $orderId = filter_var($_GET['orderId'], FILTER_SANITIZE_STRING);
+        $amount = filter_var($_GET['amount'], FILTER_SANITIZE_STRING);
+        $orderType = filter_var($_GET['orderType'], FILTER_SANITIZE_STRING);
+        $transId = filter_var($_GET['transId'], FILTER_SANITIZE_STRING);
+        $payType = filter_var($_GET['payType'], FILTER_SANITIZE_STRING);
+        $signature = filter_var($_GET['signature'], FILTER_SANITIZE_STRING);
+
+        // Chèn dữ liệu vào bảng `momo`
+        $insert_momo = $conn->prepare("INSERT INTO `momo`(partnerCode, orderId, amount, orderType, transId, payType, signature, code_cart) VALUES(?,?,?,?,?,?,?,?)");
+        $insert_momo->execute([$partnerCode, $orderId, $amount, $orderType, $transId, $payType, $signature, $code_order]);
+
+        // if ($insert_momo) {
+        //     $name = filter_var($_POST['name'], FILTER_SANITIZE_STRING);
+        //     $number = filter_var($_POST['number'], FILTER_SANITIZE_STRING);
+        //     $total_course =  filter_var($_POST['total_course'], FILTER_SANITIZE_STRING) ;
+        //     $total_price = filter_var($_POST['total_price'], FILTER_SANITIZE_STRING) ;
+        //     $email = filter_var($_POST['email'], FILTER_SANITIZE_STRING);
+		// 	$now = Carbon::now('Asia/Ho_Chi_Minh')->toDateString();
+
+        //     $check_cart = $conn->prepare("SELECT * FROM `cart` WHERE user_id = ?");
+        //     $check_cart->execute([$user_id]);
+
+        //     if ($check_cart->rowCount() > 0) {
+        //         // Chèn dữ liệu vào bảng `receipt`
+
+		// 		$insert_order = $conn->prepare("INSERT INTO `receipt`(user_id, name, number, total_course, total_price, email, regis_date) VALUES(?,?,?,?,?,?,?)");
+		// 		$insert_order->execute([$user_id, $name, $number,  $total_course, $total_price, $email, $now]);
+        //         $delete_cart = $conn->prepare("DELETE FROM `cart` WHERE user_id = ?");
+        //         $delete_cart->execute([$user_id]);
+		// 	}
+               
+        // }
+    } 
 }
 
 ?>
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<meta name="description" content="Responsive Bootstrap4 Shop Template, Created by Imran Hossain from https://imransdesign.com/">
-
-	<!-- title -->
-	<title>CookingFood</title>
-
-	<!-- favicon -->
-	<link rel="shortcut icon" type="image/png" href="fruitkha-1.0.0/fruitkha-1.0.0/assets/img/favicon.png">
-	<!-- google font -->
-	<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700" rel="stylesheet">
-	<link href="https://fonts.googleapis.com/css?family=Poppins:400,700&display=swap" rel="stylesheet">
-	<!-- fontawesome -->
-	<link rel="stylesheet" href="fruitkha-1.0.0/fruitkha-1.0.0/assets/css/all.min.css">
-	<!-- bootstrap -->
-	<link rel="stylesheet" href="fruitkha-1.0.0/fruitkha-1.0.0/assets/bootstrap/css/bootstrap.min.css">
-	<!-- owl carousel -->
-	<link rel="stylesheet" href="fruitkha-1.0.0/fruitkha-1.0.0/assets/css/owl.carousel.css">
-	<!-- magnific popup -->
-	<link rel="stylesheet" href="fruitkha-1.0.0/fruitkha-1.0.0/assets/css/magnific-popup.css">
-	<!-- animate css -->
-	<link rel="stylesheet" href="fruitkha-1.0.0/fruitkha-1.0.0/assets/css/animate.css">
-	<!-- mean menu css -->
-	<link rel="stylesheet" href="fruitkha-1.0.0/fruitkha-1.0.0/assets/css/meanmenu.min.css">
-	<!-- main style -->
-	<link rel="stylesheet" href="fruitkha-1.0.0/fruitkha-1.0.0/assets/css/main.css">
-	<!-- responsive -->
-	<link rel="stylesheet" href="fruitkha-1.0.0/fruitkha-1.0.0/assets/css/responsive.css">
-
-   
-</head>
+<?php include 'components/user_head.php'; ?>
 <body>
 	
 	<!--PreLoader-->
@@ -112,74 +204,7 @@ if(isset($_POST['submit'])){
 						<!-- logo -->
 
 						<!-- menu start -->
-                        <nav class="main-menu">
-							<ul>
-								<li class="current-list-item"><a href="index.php">Trang chủ</a>
-								</li>
-								<li><a href="recipe.php">Công thức nấu ăn</a></li>
-								<li><a href="news.php">Tin tức</a></li>
-								<li><a href="contacts.php">Liên hệ</a></li>
-								<li>
-									<div class="header-icons">
-									<?php
-										$count_cart_items = $conn->prepare("SELECT * FROM `cart` WHERE user_id = ?");
-										$count_cart_items->execute([$user_id]);
-										$total_cart_items = $count_cart_items->rowCount();
-									?>
-									<style>
-										.shopping-cart {
-											position: relative; 
-											text-decoration: none; 
-										}
-											.shopping-cart span {
-											position: absolute; 
-											top: -10px; 
-											right: -10px; 
-											background-color: #F28123; 
-											color: white; 
-											border-radius: 50%; 
-											padding: 5px 10px; 
-											font-size: 14px; 
-											}
-									</style>
-										<a class="shopping-cart" href="giohang.php"><i class="fas fa-shopping-cart"></i><?php if ($user_id) { ?><span>(<?= $total_cart_items; ?>)</span><?php } ?></a>
-										<a class="mobile-hide search-bar-icon" href="#"><i class="fas fa-search"></i></a>
-										<?php
-										$select_profile = $conn->prepare("SELECT * FROM `users` WHERE id = ?");
-										$select_profile->execute([$user_id]);
-										if ($select_profile->rowCount() > 0) {
-											$fetch_profile = $select_profile->fetch(PDO::FETCH_ASSOC);
-
-											?>
-												<a href="profile.php" class="btn">
-												<?php
-													$name = $fetch_profile['name'];
-													$spacePosition = strpos($name, ' ');
-
-													if ($spacePosition !== false) {
-														// Tên có dấu cách, hiển thị họ
-														$lastName = substr(strrchr($name, ' '), 1);
-														echo '<a href="profile.php" class="btn">' . $lastName . '</a>';
-													} else {
-														// Tên không có dấu cách, hiển thị icon user
-														echo '<a href="profile.php" class="btn"><i class="fas fa-user"></i></a>';
-													}
-													?>
-												</a>
-												<a style = "font-size: 15px; "href="components/user_logout.php" onclick="return confirm('Đăng xuất khỏi trang web này?');" class="delete-btn">| Đăng xuất</a>
-											<?php
-										} else {
-											?>
-											<a style="font-size: 15px;" href="login.php">Đăng nhập</a>
-											<a style="font-size: 15px;" href="register.php">| Đăng ký</a>
-											<?php
-										}
-										?>
-											
-									</div>
-								</li>
-							</ul>
-						</nav>
+                        <?php include 'components/user_nav.php'; ?>
 						<a class="mobile-show search-bar-icon" href="#"><i class="fas fa-search"></i></a>
 						<div class="mobile-menu"></div>
 					</div>
@@ -226,7 +251,8 @@ if(isset($_POST['submit'])){
 	<!-- check out section -->
 	<div class="checkout-section mt-150 mb-150">
 		<div class="container">
-		<form action="" method="post">
+		<!-- <form action="" method="post" target="_blank" enctype="application/x-www-form-urlencode"> -->
+		<form action="thanhtoan.php" method="post" >
 			<div class="row">
 				<div class="col-lg-8">
 					<div class="checkout-accordion-wrap">
@@ -289,7 +315,7 @@ if(isset($_POST['submit'])){
 
 										<select class="custom-select" id="inputGroupSelect01" name="method" required>
 											<option value="" disabled selected>Chọn...</option>
-											<option value="MoMo">Momo</option>
+											<option value="Momo">Momo</option>
 											<option value="Paypal">Paypal</option>
 										</select>
 									</div>
@@ -326,6 +352,7 @@ if(isset($_POST['submit'])){
                                         $grand_total += ($fetch_cart['price']);
                                 ?>
 								<input type="hidden" name="total_course" value="<?= $total_course; ?>">
+								<input type="hidden" name="grand_total" value="<?php echo $grand_total; ?>">
 								<input type="hidden" name="total_price" value="<?= $grand_total; ?>" value="">
 								<input type="hidden" name="name" value="<?= $fetch_profile['name'] ?>">
 								<input type="hidden" name="number" value="<?= $fetch_profile['number'] ?>">
@@ -352,117 +379,33 @@ if(isset($_POST['submit'])){
 								</tr>
 							</tbody>
 						</table>
-                        <a href="cart.php" class="boxed-btn">GIỎ HÀNG</a>			
-					
-    					<input style="font-family: 'Poppins', sans-serif;
-									display: inline-block;
-									background-color: #F28123;
-									color: #fff;
-									font-weight: normal;
-									font-size: 1.5rem;
-									padding: 10px 15px;" 
-									class="boxed-btn" type="submit" value="Thanh toán" name="submit">
+                        <a href="giohang.php" class="boxed-btn">GIỎ HÀNG</a>			
+						<button style="font-family: 'Poppins', sans-serif;
+										display: inline-block;
+										background-color: transparent; /* Đặt nền trong suốt */
+										color: #F28123; /* Màu chữ */
+										font-weight: normal;
+										font-size: 1.5rem;
+										padding: 10px 15px;
+										border: 2px solid #F28123; /* Viền có độ rộng 2px và màu trùng với màu chữ */
+										border-radius: 50px; /* Đặt độ cong để nút trở nên tròn */
+										text-align: center;
+										text-decoration: none;
+										cursor: pointer;" 
+						class="boxed-btn" type="submit" name="payUrl">Thanh toán
+							
+						</button>	
 					</div>
 				</div>
 			</div>
 		<form>
+			
 		</div>
 	</div>
 	<!-- end check out section -->
+	<?php include 'components/chatbox.php'; ?>
 
 	<!-- footer -->
-	<div class="footer-area">
-		<div class="container">
-			<div class="row">
-				<div class="col-lg-3 col-md-6">
-					<div class="footer-box about-widget">
-						<h2 class="widget-title">Thông tin</h2>
-						<p>Tổng đài tư vấn: 1800 6148 hoặc 1800 2027 08h00 - 20h00 (Miễn phí cước gọi)</p>
-							<p>Góp ý phản ánh: 028 7109 9232</p>
-							<p>Liên hệ Quản Lý Học Viên: 028 7300 2672</p>
-							<p>08h00 - 20h00</p>
-					</div>
-				</div>
-				<div class="col-lg-3 col-md-6">
-					<div class="footer-box get-in-touch">
-						<h2 class="widget-title">Thời gian hoạt động</h2>
-						<ul>
-							<li>34/8, Phường Phú Hưng, Tp Bến Tre, Tỉnh Bến Tre</li>
-							<li>cookingfood@gmail.com</li>
-							<li>+84 582268858</li>
-						</ul>
-					</div>
-				</div>
-				<div class="col-lg-3 col-md-6">
-					<div class="footer-box pages">
-						<h2 class="widget-title">Trang chính</h2>
-						<ul>
-							<li><a href="index.php">Trang chủ</a></li>
-							<li><a href="recipe.php">Công thức</a></li>
-							<li><a href="news.php">Tin tức</a></li>
-							<li><a href="contacts.php">Liên hệ</a></li>
-						</ul>
-					</div>
-				</div>
-				<div class="col-lg-3 col-md-6">
-					<div class="footer-box subscribe">
-						<h2 class="widget-title">Đăng kí</h2>
-						<p>Đăng kí để nhận thông tin các khóa học mới nhất.</p>
-						<form action="index.html">
-							<input type="email" placeholder="Email">
-							<button type="submit"><i class="fas fa-paper-plane"></i></button>
-						</form>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- end footer -->
-	
-	<!-- copyright -->
-	<div class="copyright">
-		<div class="container">
-			<div class="row">
-				<div class="col-lg-6 col-md-12">
-					<p>Copyrights &copy; 2019 - <a href="https://imransdesign.com/">Imran Hossain</a>,  All Rights Reserved.<br>
-						Distributed By - <a href="https://themewagon.com/">Themewagon</a>
-					</p>
-				</div>
-				<div class="col-lg-6 text-right col-md-12">
-					<div class="social-icons">
-						<ul>
-							<li><a href="#" target="_blank"><i class="fab fa-facebook-f"></i></a></li>
-							<li><a href="#" target="_blank"><i class="fab fa-twitter"></i></a></li>
-							<li><a href="#" target="_blank"><i class="fab fa-instagram"></i></a></li>
-							<li><a href="#" target="_blank"><i class="fab fa-linkedin"></i></a></li>
-							<li><a href="#" target="_blank"><i class="fab fa-dribbble"></i></a></li>
-						</ul>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- end copyright -->
-	
-    <script src="fruitkha-1.0.0/fruitkha-1.0.0/assets/js/jquery-1.11.3.min.js"></script>
-	<!-- bootstrap -->
-	<script src="fruitkha-1.0.0/fruitkha-1.0.0/assets/bootstrap/js/bootstrap.min.js"></script>
-	<!-- count down -->
-	<script src="fruitkha-1.0.0/fruitkha-1.0.0/assets/js/jquery.countdown.js"></script>
-	<!-- isotope -->
-	<script src="fruitkha-1.0.0/fruitkha-1.0.0/assets/js/jquery.isotope-3.0.6.min.js"></script>
-	<!-- waypoints -->
-	<script src="fruitkha-1.0.0/fruitkha-1.0.0/assets/js/waypoints.js"></script>
-	<!-- owl carousel -->
-	<script src="fruitkha-1.0.0/fruitkha-1.0.0/assets/js/owl.carousel.min.js"></script>
-	<!-- magnific popup -->
-	<script src="fruitkha-1.0.0/fruitkha-1.0.0/assets/js/jquery.magnific-popup.min.js"></script>
-	<!-- mean menu -->
-	<script src="fruitkha-1.0.0/fruitkha-1.0.0/assets/js/jquery.meanmenu.min.js"></script>
-	<!-- sticker js -->
-	<script src="fruitkha-1.0.0/fruitkha-1.0.0/assets/js/sticker.js"></script>
-	<!-- main js -->
-	<script src="fruitkha-1.0.0/fruitkha-1.0.0/assets/js/main.js"></script>
-
+	<?php include 'components/user_footer.php'; ?>
 </body>
 </html>

@@ -1,7 +1,4 @@
-
-
-  <!-- Main Sidebar Container -->
-  <aside class="main-sidebar sidebar-dark-primary elevation-4">
+<aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
     <a href="index3.html" class="brand-link">
       <span class="brand-text font-weight-light">CookingFood ADMIN</span>
@@ -12,7 +9,7 @@
       <!-- Sidebar user panel (optional) -->
       <div class="user-panel mt-3 pb-3 mb-3 d-flex">
         <div class="image">
-          <img src="../../dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
+          <img src="../dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
         </div>
         <div class="info">
         <?php
@@ -56,24 +53,26 @@
               <p>
                 Tài khoản
                 <i class="fas fa-angle-left right"></i>
-                <span class="badge badge-info right">2</span>
+                <span class="badge badge-info right">3</span>
               </p>
             </a>
+            
             <ul class="nav nav-treeview">
               <li class="nav-item">
                 <a href="" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
                   <p>Quản trị</p>
                   <i class="right fas fa-angle-left"></i>
                 </a>
                 <ul class="nav nav-treeview">
               <li class="nav-item">
                 <a href="http://localhost/teach_and_learn-to_cook/admin/accounts/add_admin.php" class="nav-link">
+                <i class="far fa-circle nav-icon"></i>
                   <p>Thêm quản trị</p>
                 </a>
               </li>
               <li class="nav-item">
                 <a href="http://localhost/teach_and_learn-to_cook/admin/accounts/list_admin.php" class="nav-link">
+                <i class="far fa-circle nav-icon"></i>
                   <p>Danh sách quản trị</p>
                 </a>
               </li>
@@ -82,20 +81,21 @@
             </ul>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Khách hàng</p>
+                <a href="#" class="nav-link">
+                  <p>Học viên</p>
                   <i class="right fas fa-angle-left"></i>
                 </a>
                 <ul class="nav nav-treeview">
               <li class="nav-item">
                 <a href="http://localhost/teach_and_learn-to_cook/admin/accounts/add_customer.php" class="nav-link">
-                  <p>Thêm khách hàng</p>
+                <i class="far fa-circle nav-icon"></i>
+                  <p>Thêm học viên</p>
                 </a>
               </li>
               <li class="nav-item">
                 <a href="http://localhost/teach_and_learn-to_cook/admin/accounts/list_customer.php" class="nav-link">
-                  <p>Danh sách khách hàng</p>
+                <i class="far fa-circle nav-icon"></i>
+                  <p>Danh sách học viên</p>
                 </a>
               </li>
             </ul>
@@ -183,7 +183,7 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="http://localhost/teach_and_learn-to_cook/admin/contact/list_contact.php" class="nav-link">
+                <a href="pages/tables/simple.html" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Danh sách liên hệ</p>
                 </a>
@@ -192,4 +192,7 @@
           </li>
         
         </ul>
-      </nav>
+      </nav>      <!-- /.sidebar-menu -->
+    </div>
+    <!-- /.sidebar -->
+  </aside>
