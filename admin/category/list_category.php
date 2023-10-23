@@ -20,9 +20,10 @@ if(isset($_GET['delete'])){
 ?>
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="utf-8">
+
 <?php include ('../../components/head.php');?>
+
+<body class="sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
 <div class="wrapper">
 
   <!-- Preloader -->
@@ -35,18 +36,15 @@ if(isset($_GET['delete'])){
 
   <?php include ('../../components/sidebar.php');?>
       <!-- /.sidebar-menu -->
-    </div>
-    <!-- /.sidebar -->
-  </aside>
 
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
     <!-- Content Header (Page header) -->
-    <section class="content-header">
+    <section class="content-header" style ="padding-top: 70px;">
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1 style = "font-weight: bold; text-color: #5586BO;" >Danh sách danh mục</h1>
+            <h1>Danh sách danh mục</h1>
           </div>
         </div>
       </div><!-- /.container-fluid -->
@@ -115,7 +113,7 @@ if(isset($_GET['delete'])){
                     }
 
                     // Tính toán và hiển thị phân trang
-                    $total_rows = $conn->query("SELECT count(*) FROM `courses`")->fetchColumn();
+                    $total_rows = $conn->query("SELECT count(*) FROM `category`")->fetchColumn();
                     $total_pages = ceil($total_rows / $rows_per_page);
 
                     $list_page = "";
@@ -132,17 +130,20 @@ if(isset($_GET['delete'])){
               <!-- /.card-body -->
             <div class="card-footer clearfix">
                 <ul class="pagination pagination-sm m-0 float-right">
-            <?php
-                if ($page > 1) {
-                    echo '<li class="page-item"><a class="page-link" href="http://localhost/teach_and_learn-to_cook/admin/category/list_category.php?page=1">&laquo;&laquo; Trang đầu</a></li>';
-                }
+                <?php
+                  if (is_numeric($page) && $page > 1) {
+                      echo '<li class="page-item"><a class="page-link" href="http://localhost/teach_and_learn-to_cook/admin/category/list_category.php?page=1">&laquo;&laquo; Trang đầu</a></li>';
+                  }
 
-                echo $list_page;
+                  for ($i = 1; $i <= $total_pages; $i++) {
+                      $activeClass = ($i == $page) ? 'active' : '';
+                      echo '<li class="page-item ' . $activeClass . '"><a class="page-link" href="http://localhost/teach_and_learn-to_cook/admin/category/list_category.php?page=' . $i . '">' . $i . '</a></li>';
+                  }
 
-                if ($page < $total_pages) {
-                    echo '<li class="page-item"><a class="page-link" href="http://localhost/teach_and_learn-to_cook/admin/category/list_category.php?page=' . $total_pages . '">Trang cuối &raquo;&raquo;</a></li>';
-                }
-            ?>
+                  if (is_numeric($page) && $page < $total_pages) {
+                      echo '<li class="page-item"><a class="page-link" href="http://localhost/teach_and_learn-to_cook/admin/category/list_category.php?page=' . $total_pages . '">Trang cuối &raquo;&raquo;</a></li>';
+                  }
+              ?>
             </ul>
         </div>
         </div>

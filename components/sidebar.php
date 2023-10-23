@@ -9,7 +9,7 @@
       <!-- Sidebar user panel (optional) -->
       <div class="user-panel mt-3 pb-3 mb-3 d-flex">
         <div class="image" style="padding-left:60px;">
-          <img src="../dist/img/logoadmin.png" style="width: 6rem; left:60px;" alt="User Image">
+          <img src="../../dist/img/logoadmin.png" style="width: 6rem; left:60px;" alt="User Image">
         </div>
        
       </div>
@@ -176,6 +176,6 @@
         
         </ul>
       </nav>      <!-- /.sidebar-menu -->
-    </div>
+      </div>
     <!-- /.sidebar -->
   </aside>

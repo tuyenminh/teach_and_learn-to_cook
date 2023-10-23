@@ -50,8 +50,8 @@ if(isset($_POST['add_course'])){
          move_uploaded_file($image_tmp_name, $image_folder);
          // move_uploaded_file($video_tmp_name, $video_folder);
 
-         $insert_product = $conn->prepare("INSERT INTO `courses`(name, price, image, description, opening_day, study_time,  id_cate ) VALUES(?,?,?,?,?,?,?)");
-         $insert_product->execute([$name, $price, $image, $description, $opening_day, $study_time, $id_cate]);
+         $insert_product = $conn->prepare("INSERT INTO `courses`(name, price, image, description, opening_day, study_time, id_cate, admin_id ) VALUES(?,?,?,?,?,?,?,?)");
+         $insert_product->execute([$name, $price, $image, $description, $opening_day, $study_time, $id_cate, $admin_id]);
 
          echo '<script>alert("Tạo khóa học thành công!");</script>';   
       }
@@ -65,9 +65,8 @@ if(isset($_POST['add_course'])){
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-  <?php include ('../../components/head.php');?>
-</head>
+
+<?php include ('../../components/head.php');?>
 
 <body class="sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
 <div class="wrapper">
@@ -82,26 +81,15 @@ if(isset($_POST['add_course'])){
 
   <?php include ('../../components/sidebar.php');?>
       <!-- /.sidebar-menu -->
-    </div>
-    <!-- /.sidebar -->
-  </aside>
-
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
     <!-- Content Header (Page header) -->
-    <section class="content-header">
+    <section class="content-header" style ="padding-top: 70px;">
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
             <h1>Thêm khóa học</h1>
           </div>
-          <!-- <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="#">Trang chủ</a></li>
-              <li class="breadcrumb-item active">Tài khoản Admin</li>
-            </ol>
-          </div>
-        </div> -->
       </div><!-- /.container-fluid -->
       <div id="message"></div>
     </section>

@@ -19,8 +19,8 @@ if(!isset($admin_id)){
    $name = $_POST['name'];
    $name = filter_var($name, FILTER_SANITIZE_STRING);
 
-   $update_users = $conn->prepare("UPDATE `category` SET name_cate = ? WHERE id_cate = ?");
-   $update_users->execute([$name, $uid]);
+   $update_users = $conn->prepare("UPDATE `category` SET name_cate = ? , admin_id = ? WHERE id_cate = ? ");
+   $update_users->execute([$name,  $admin_id, $uid]);
 
    echo '<script>alert("Cập nhật thành công!");</script>';   
 }
@@ -29,8 +29,10 @@ if(!isset($admin_id)){
 
 <!DOCTYPE html>
 <html lang="en">
-<head>
+
 <?php include ('../../components/head.php');?>
+
+<body class="sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
 <div class="wrapper">
 
   <!-- Preloader -->
@@ -43,25 +45,16 @@ if(!isset($admin_id)){
 
   <?php include ('../../components/sidebar.php');?>
       <!-- /.sidebar-menu -->
-    </div>
-    <!-- /.sidebar -->
-  </aside>
 
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
     <!-- Content Header (Page header) -->
-    <section class="content-header">
+    <section class="content-header" style ="padding-top: 70px;">
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1>Cập nhật tài khoản Khách hàng</h1>
+            <h1>Cập nhật danh mục</h1>
           </div>
-          <!-- <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="#">Trang chủ</a></li>
-              <li class="breadcrumb-item active">Tài khoản Admin</li>
-            </ol>
-          </div> -->
         </div>
       </div><!-- /.container-fluid -->
       <div id="message"></div>
@@ -76,7 +69,6 @@ if(!isset($admin_id)){
             <!-- jquery validation -->
             <div class="card card-primary">
               <div class="card-header">
-                <!-- <h3 class="card-title">Quick Example <small>jQuery Validation</small></h3> -->
               </div>
               <!-- /.card-header -->
               <!-- form start -->

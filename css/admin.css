@@ -1,0 +1,8 @@
+.page-item.active {
+    background-color: #007bff; /* Màu nền của số trang khi được chọn */
+    color: #fff; /* Màu văn bản của số trang khi được chọn */
+    font-weight: bold; /* In đậm chữ số trang khi được chọn */
+}
+user-panel .image{
+    width: 6rem;
+}

@@ -21,32 +21,27 @@ if(isset($_GET['delete'])){
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
+
 <?php include ('../../components/head.php');?>
+
+<body class="sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
 <div class="wrapper">
 
-  <!-- Preloader -->
-  <div class="preloader flex-column justify-content-center align-items-center">
-    <img class="animation__wobble" src="../../dist/img/AdminLTELogo.png" alt="AdminLTELogo" height="60" width="60">
-  </div>
 
   <!-- Navbar -->
   <?php include ('../../components/navbar.php');?>
 
   <?php include ('../../components/sidebar.php');?>
       <!-- /.sidebar-menu -->
-    </div>
-    <!-- /.sidebar -->
-  </aside>
 
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
     <!-- Content Header (Page header) -->
-    <section class="content-header">
+    <section class="content-header" style="padding-top: 70px;">
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1 style = "font-weight: bold; text-color: #5586BO;" >Danh sách tài khoản Khách hàng</h1>
+            <h1>Danh sách khách hàng</h1>
           </div>
         </div>
       </div><!-- /.container-fluid -->
@@ -71,13 +66,13 @@ if(isset($_GET['delete'])){
                         <th style = "width: 7rem;">Email</th>
                         <th style = "width: 10rem;">Số điện thoại</th>
                         <th style = "width: 10rem;">Địa chỉ</th>
-						<th style = " width: 6.5rem;">Hành động</th>
+						            <th style = " width: 6.5rem;">Hành động</th>
                     </tr>
                   </thead>
                   <tbody>
                     <?php
                     // Số dòng trên mỗi trang
-                    $rows_per_page = 10;
+                    $rows_per_page = 5;
 
                     // Trang hiện tại
                     if (isset($_GET['page'])) {
@@ -139,17 +134,20 @@ if(isset($_GET['delete'])){
               <!-- /.card-body -->
             <div class="card-footer clearfix">
                 <ul class="pagination pagination-sm m-0 float-right">
-            <?php
-                if ($page > 1) {
-                    echo '<li class="page-item"><a class="page-link" href="http://localhost/teach_and_learn-to_cook/admin/accounts/list_customer.php?page=1">&laquo;&laquo; Trang đầu</a></li>';
-                }
+             <?php
+                  if (is_numeric($page) && $page > 1) {
+                      echo '<li class="page-item"><a class="page-link" href="http://localhost/teach_and_learn-to_cook/admin/accounts/list_customer.php?page=1">&laquo;&laquo; Trang đầu</a></li>';
+                  }
 
-                echo $list_page;
+                  for ($i = 1; $i <= $total_pages; $i++) {
+                      $activeClass = ($i == $page) ? 'active' : '';
+                      echo '<li class="page-item ' . $activeClass . '"><a class="page-link" href="http://localhost/teach_and_learn-to_cook/admin/accounts/list_customer.php?page=' . $i . '">' . $i . '</a></li>';
+                  }
 
-                if ($page < $total_pages) {
-                    echo '<li class="page-item"><a class="page-link" href="http://localhost/teach_and_learn-to_cook/admin/accounts/list_customer.php?page=' . $total_pages . '">Trang cuối &raquo;&raquo;</a></li>';
-                }
-            ?>
+                  if (is_numeric($page) && $page < $total_pages) {
+                      echo '<li class="page-item"><a class="page-link" href="http://localhost/teach_and_learn-to_cook/admin/accounts/list_customer.php?page=' . $total_pages . '">Trang cuối &raquo;&raquo;</a></li>';
+                  }
+              ?>
             </ul>
         </div>
         </div>

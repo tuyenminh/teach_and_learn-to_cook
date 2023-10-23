@@ -95,12 +95,7 @@ while ($row_revenue = $result_revenue->fetch(PDO::FETCH_ASSOC)) {
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1 class="m-0">Dashboard </h1>
-          </div><!-- /.col -->
-          <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="#">Trang chủ</a></li>
-            </ol>
+            <h1 class="m-0">Dashboard</h1>
           </div><!-- /.col -->
         </div><!-- /.row -->
       </div><!-- /.container-fluid -->
@@ -157,7 +152,7 @@ while ($row_revenue = $result_revenue->fetch(PDO::FETCH_ASSOC)) {
             <div class="small-box bg-warning">
               <div class="inner">
 			  <?php
-                           $select_users = $conn->prepare("SELECT * FROM `messages`");
+                           $select_users = $conn->prepare("SELECT * FROM `message`");
                            $select_users->execute();
                            $numbers_of_users = $select_users->rowCount();
 							   ?>	
@@ -168,7 +163,7 @@ while ($row_revenue = $result_revenue->fetch(PDO::FETCH_ASSOC)) {
               <div class="icon">
                 <i class="ion ion-person-add"></i>
               </div>
-              <a href="#" class="small-box-footer">Chi tiếttiết<i class="fas fa-arrow-circle-right"></i></a>
+              <a href="#" class="small-box-footer">Chi tiết<i class="fas fa-arrow-circle-right"></i></a>
             </div>
           </div>
           <!-- ./col -->

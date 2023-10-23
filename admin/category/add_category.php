@@ -22,8 +22,8 @@ if(isset($_POST['add_category'])){
         echo '<script>alert("Danh mục đã tồn tại!");</script>';   
     }else{
    
-         $insert_users = $conn->prepare("INSERT INTO `category`(name_cate) VALUES(?)");
-         $insert_users->execute([$name]);
+         $insert_users = $conn->prepare("INSERT INTO `category`(name_cate, admin_id) VALUES(?, ?)");
+         $insert_users->execute([$name, $admin_id]);
 
          echo '<script>alert("Tạo danh mục thành công!");</script>';   
       }
@@ -32,43 +32,28 @@ if(isset($_POST['add_category'])){
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-  <?php include ('../../components/head.php');?>
-</head>
+
+<?php include ('../../components/head.php');?>
 
 <body class="sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
 <div class="wrapper">
-
-  <!-- Preloader -->
-  <div class="preloader flex-column justify-content-center align-items-center">
-    <img class="animation__wobble" src="../../dist/img/AdminLTELogo.png" alt="AdminLTELogo" height="60" width="60">
-  </div>
 
   <!-- Navbar -->
   <?php include ('../../components/navbar.php');?>
 
   <?php include ('../../components/sidebar.php');?>
       <!-- /.sidebar-menu -->
-    </div>
-    <!-- /.sidebar -->
-  </aside>
 
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
     <!-- Content Header (Page header) -->
-    <section class="content-header">
+    <section class="content-header" style ="padding-top: 70px;">
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
             <h1>Thêm danh mục</h1>
           </div>
-          <!-- <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="#">Trang chủ</a></li>
-              <li class="breadcrumb-item active">Tài khoản Admin</li>
-            </ol>
-          </div>
-        </div> -->
+
       </div><!-- /.container-fluid -->
       <div id="message"></div>
     </section>
@@ -95,7 +80,7 @@ if(isset($_POST['add_category'])){
 
                 <!-- /.card-body -->
                 <div class="card-footer">
-                  <button type="submit" name = "add_category" class="btn btn-primary">Tạo</button>
+                  <button type="submit" name = "add_category" class="btn btn-primary">Thêm</button>
                 </div>
               </form>
             </div>

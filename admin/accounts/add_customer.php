@@ -31,8 +31,8 @@ if(isset($_POST['add_users'])){
    }else{
       
 
-         $insert_users = $conn->prepare("INSERT INTO `users`(name, email, number, password, address) VALUES(?,?,?,?,?)");
-         $insert_users->execute([$name, $email, $number,$password, $address ]);
+         $insert_users = $conn->prepare("INSERT INTO `users`(name, email, number, password, address, admin_id) VALUES(?,?,?,?,?,?)");
+         $insert_users->execute([$name, $email, $number,$password, $address, $admin_id ]);
 
          echo '<script>alert("Tạo tài khoản thành công!");</script>';   
       }
@@ -42,10 +42,8 @@ if(isset($_POST['add_users'])){
 ?>
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="utf-8">
-  <?php include ('../../components/head.php');?>
-</head>
+
+<?php include ('../../components/head.php');?>
 
 <body class="sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
 <div class="wrapper">
@@ -60,14 +58,11 @@ if(isset($_POST['add_users'])){
 
   <?php include ('../../components/sidebar.php');?>
       <!-- /.sidebar-menu -->
-    </div>
-    <!-- /.sidebar -->
-  </aside>
 
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
     <!-- Content Header (Page header) -->
-    <section class="content-header">
+    <section class="content-header" style="padding-top: 70px;">
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
@@ -99,29 +94,41 @@ if(isset($_POST['add_users'])){
               <!-- form start -->
               <form id="quickForm" action="" method="POST" required>
                 <div class="card-body">
-                <div class="form-group" >
-                    <label for="exampleInputName1">Tên tài khoản</label>
-                    <input type="text" name="name" class="form-control" placeholder="Tên tài khoản" required>
-                  </div>
-                  <div class="form-group">
-                    <label for="exampleInputEmail1">Email</label>
-                    <input type="email" name="email" class="form-control" placeholder="Email" required>
-                  </div>
-                  <div class="form-group">
-                    <label for="exampleInputNumber1">Số điện thoại</label>
-                    <input type="text" name="number" class="form-control" placeholder="Số điện thoại" required>
-                  </div>
-                  <div class="form-group">
-                    <label for="exampleInputAddress1">Địa chỉ</label>
-                    <input type="text" name="address" class="form-control" placeholder="Địa chỉ" required>
-                  </div>
+                  <div class = "row">
+                    <div class = "col-md-6">
+                      <div class="form-group" >
+                          <label for="exampleInputName1">Tên tài khoản</label>
+                          <input type="text" name="name" class="form-control" placeholder="Tên tài khoản" required>
+                        </div>
+                      </div>
+                      <div class = "col-md-6">
+                        <div class="form-group">
+                          <label for="exampleInputEmail1">Email</label>
+                          <input type="email" name="email" class="form-control" placeholder="Email" required>
+                        </div>
+                      </div>
+                    </div>
+                    <div class = "row">
+                      <div class = "col-md-6">
+                        <div class="form-group">
+                          <label for="exampleInputNumber1">Số điện thoại</label>
+                          <input type="text" name="number" class="form-control" placeholder="Số điện thoại" required>
+                        </div>
+                      </div>
+                        <div class = "col-md-6">
+                          <div class="form-group">
+                            <label for="exampleInputAddress1">Địa chỉ</label>
+                            <input type="text" name="address" class="form-control" placeholder="Địa chỉ" required>
+                          </div>
+                        </div>
+                      </div>
                   <div class="form-group">
                     <label for="exampleInputPassword1">Password</label>
                     <input type="password" name="password" class="form-control" placeholder="Mật khẩu" required>
                   </div>
                 <!-- /.card-body -->
                 <div class="card-footer">
-                  <button type="submit" name = "add_users" class="btn btn-primary">Tạo</button>
+                  <button type="submit" name = "add_users" class="btn btn-primary">Thêm</button>
                 </div>
               </form>
             </div>

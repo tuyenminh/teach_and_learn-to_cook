@@ -32,8 +32,8 @@ if(!isset($admin_id)){
    $address = filter_var($address, FILTER_SANITIZE_STRING);
 
 
-   $update_users = $conn->prepare("UPDATE `users` SET name = ?, email = ?, number = ?, password = ?, address = ? WHERE id = ?");
-   $update_users->execute([$name, $email, $number,  $password, $address, $uid]);
+   $update_users = $conn->prepare("UPDATE `users` SET name = ?, email = ?, number = ?, password = ?, address = ?, admin_id = ? WHERE id = ?");
+   $update_users->execute([$name, $email, $number,  $password, $address, $admin_id, $uid]);
 
    echo '<script>alert("Cập nhật thành công!");</script>';   
 }
@@ -42,8 +42,10 @@ if(!isset($admin_id)){
 
 <!DOCTYPE html>
 <html lang="en">
-<head>
+
 <?php include ('../../components/head.php');?>
+
+<body class="sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
 <div class="wrapper">
 
   <!-- Preloader -->
@@ -56,25 +58,17 @@ if(!isset($admin_id)){
 
   <?php include ('../../components/sidebar.php');?>
       <!-- /.sidebar-menu -->
-    </div>
-    <!-- /.sidebar -->
-  </aside>
 
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
     <!-- Content Header (Page header) -->
-    <section class="content-header">
+    <section class="content-header" style ="padding-top: 70px;">
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1>Cập nhật tài khoản Khách hàng</h1>
+            <h1>Cập nhật khách hàng</h1>
           </div>
-          <!-- <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="#">Trang chủ</a></li>
-              <li class="breadcrumb-item active">Tài khoản Admin</li>
-            </ol>
-          </div> -->
+
         </div>
       </div><!-- /.container-fluid -->
       <div id="message"></div>
@@ -103,22 +97,34 @@ if(!isset($admin_id)){
               <form id="quickForm" action="" method="POST" enctype="multipart/form-data">
               <input type="hidden" name="uid" value="<?= $fetch_accounts['id']; ?>">
                 <div class="card-body">
-                <div class="form-group" >
-                    <label for="exampleInputName1">Tên tài khoản</label>
-                    <input type="text" name="name" class="form-control" value="<?= $fetch_accounts['name']; ?>" required>
-                  </div>
-                  <div class="form-group">
-                    <label for="exampleInputEmail1">Email</label>
-                    <input type="email" name="email" class="form-control" value="<?= $fetch_accounts['email']; ?>" required>
-                  </div>
-                  <div class="form-group">
-                    <label for="exampleInputNumber1">Số điện thoại</label>
-                    <input type="text" name="number" class="form-control" value="<?= $fetch_accounts['number']; ?>" required>
-                  </div>
-                  <div class="form-group">
-                    <label for="exampleInputAddress1">Địa chỉ</label>
-                    <input type="text" name="address" class="form-control" value="<?= $fetch_accounts['address']; ?>" required>
-                  </div>
+                  <div class = "row">
+                      <div class = "col-md-6">
+                        <div class="form-group" >
+                          <label for="exampleInputName1">Tên tài khoản</label>
+                          <input type="text" name="name" class="form-control" value="<?= $fetch_accounts['name']; ?>" required>
+                        </div>
+                      </div>
+                      <div class = "col-md-6">
+                        <div class="form-group">
+                          <label for="exampleInputEmail1">Email</label>
+                          <input type="email" name="email" class="form-control" value="<?= $fetch_accounts['email']; ?>" required>
+                        </div>
+                      </div>
+                    </div>
+                    <div class = "row">
+                      <div class = "col-md-6">
+                        <div class="form-group">
+                          <label for="exampleInputNumber1">Số điện thoại</label>
+                          <input type="text" name="number" class="form-control" value="<?= $fetch_accounts['number']; ?>" required>
+                        </div>
+                      </div>
+                        <div class = "col-md-6">
+                          <div class="form-group">
+                            <label for="exampleInputAddress1">Địa chỉ</label>
+                            <input type="text" name="address" class="form-control" value="<?= $fetch_accounts['address']; ?>" required>
+                          </div>
+                        </div>
+                        </div>
                   <div class="form-group">
                     <label for="exampleInputPassword1">Password</label>
                     <input type="password" name="password" class="form-control" value="<?= $fetch_accounts['address']; ?>" required>

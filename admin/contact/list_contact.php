@@ -12,7 +12,7 @@ if(!isset($admin_id)){
 
 if(isset($_GET['delete'])){
    $delete_id = $_GET['delete'];
-   $delete_message = $conn->prepare("DELETE FROM `messages` WHERE id = ?");
+   $delete_message = $conn->prepare("DELETE FROM `message` WHERE id = ?");
    $delete_message->execute([$delete_id]);
    header('location:list_contact.php');
 }
@@ -21,24 +21,18 @@ if(isset($_GET['delete'])){
 
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="utf-8">
+
 <?php include ('../../components/head.php');?>
+
+<body class="sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
 <div class="wrapper">
 
-  <!-- Preloader -->
-  <div class="preloader flex-column justify-content-center align-items-center">
-    <img class="animation__wobble" src="../../dist/img/AdminLTELogo.png" alt="AdminLTELogo" height="60" width="60">
-  </div>
 
   <!-- Navbar -->
   <?php include ('../../components/navbar.php');?>
 
   <?php include ('../../components/sidebar.php');?>
       <!-- /.sidebar-menu -->
-    </div>
-    <!-- /.sidebar -->
-  </aside>
 
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
@@ -69,7 +63,7 @@ if(isset($_GET['delete'])){
                     <tr>
                         <th style = "width: 3rem; " data-field="id" data-sortable="true">STT</th>
 						            <th style = "width: 10rem;">Tên khách hàng</th>
-                                    <th style = "width: 10rem;">Email</th>
+                          <th style = "width: 10rem;">Email</th>
 						            <th style = "width: 10rem;">Số điện thoại</th>
 						            <th style = "width: 20rem;">Lời nhắn</th>
 						            <th style = " width: 6.5rem;">Hành động</th>
@@ -91,7 +85,7 @@ if(isset($_GET['delete'])){
                     $offset = ($page - 1) * $rows_per_page;
 
                     // Truy vấn SQL với LIMIT và OFFSET
-                    $select_account = $conn->prepare("SELECT * FROM `messages` LIMIT :offset, :rows_per_page");
+                    $select_account = $conn->prepare("SELECT * FROM `message` INNER JOIN users ON message.user_id = users.id ORDER BY message.user_id LIMIT :offset, :rows_per_page");
                     $select_account->bindValue(':offset', $offset, PDO::PARAM_INT);
                     $select_account->bindValue(':rows_per_page', $rows_per_page, PDO::PARAM_INT);
                     $select_account->execute();
@@ -119,7 +113,7 @@ if(isset($_GET['delete'])){
                     }
 
                     // Tính toán và hiển thị phân trang
-                    $total_rows = $conn->query("SELECT count(*) FROM `messages`")->fetchColumn();
+                    $total_rows = $conn->query("SELECT count(*) FROM `message`")->fetchColumn();
                     $total_pages = ceil($total_rows / $rows_per_page);
 
                     $list_page = "";

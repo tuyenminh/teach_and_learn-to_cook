@@ -38,11 +38,6 @@
         </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button">
-          <i class="fas fa-th-large"></i>
-        </a>
-      </li>
-      <li class="nav-item">
       
       <div class="dropdown">
     <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="userDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -67,3 +62,6 @@
     </ul>
   </nav>
   <!-- /.navbar -->
+  </div>
+    <!-- /.sidebar -->
+  </aside>

@@ -1,42 +1,46 @@
 <?php
 
+use Carbon\Carbon;
 include 'components/connect.php';
+require('carbon/autoload.php');
 
 session_start();
 
-if(isset($_SESSION['user_id'])){
-   $user_id = $_SESSION['user_id'];
-}else{
-   $user_id = '';
-};
+$user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 
-if(isset($_POST['send'])){
+if (isset($_POST['send'])) {
+    $msg = filter_input(INPUT_POST, 'message', FILTER_SANITIZE_STRING);
+    $subject = filter_input(INPUT_POST, 'subject', FILTER_SANITIZE_STRING);
 
-   $name = $_POST['name'];
-   $name = filter_var($name, FILTER_SANITIZE_STRING);
-   $email = $_POST['email'];
-   $email = filter_var($email, FILTER_SANITIZE_STRING);
-   $number = $_POST['number'];
-   $number = filter_var($number, FILTER_SANITIZE_STRING);
-   $msg = $_POST['message'];
-   $msg = filter_var($msg, FILTER_SANITIZE_STRING);
-   $subject = $_POST['subject'];
-   $subject = filter_var($subject, FILTER_SANITIZE_STRING);
-   $select_message = $conn->prepare("SELECT * FROM `messages` WHERE name = ? AND email = ? AND number = ? AND message = ? AND subject = ?");
-   $select_message->execute([$name, $email, $number, $msg, $subject]);
+    if (empty($msg) || empty($subject)) {
+        echo '<script>alert("Vui lòng điền đầy đủ nội dung và chủ đề của tin nhắn.");</script>';
+    } else {
+        if ($user_id) {
+            // Kiểm tra xem tin nhắn đã tồn tại cho người dùng cụ thể hay chưa
+            $select_message = $conn->prepare("SELECT * FROM `message` WHERE message = ? AND subject = ? AND user_id = ?");
+            $select_message->execute([$msg, $subject, $user_id]);
 
-   if($select_message->rowCount() > 0){
-    echo '<script>alert("Tin nhắn đã được gửi");</script>';   
-}else{
+            if ($select_message->rowCount() > 0) {
+                echo '<script>alert("Tin nhắn đã được gửi");</script>';
+            } else {
+                // Nếu tin nhắn chưa tồn tại, chèn nó vào bảng `message` của người dùng
+                $now = Carbon::now('Asia/Ho_Chi_Minh')->toDateString();
+                $insert_message = $conn->prepare("INSERT INTO `message`(message, subject, message_day, user_id) VALUES(?,?,?,?)");
+                $insert_message->execute([$msg, $subject, $now, $user_id]);
 
-      $insert_message = $conn->prepare("INSERT INTO `messages`(user_id, name, email, number, message, subject) VALUES(?,?,?,?,?,?)");
-      $insert_message->execute([$user_id, $name, $email, $number, $msg, $subject]);
-
-      echo '<script>alert("Tin nhắn đã được gửi!");</script>';   
-
-   }
-
+                if ($insert_message->rowCount() > 0) {
+                    echo '<script>alert("Tin nhắn đã được gửi!");</script>';
+                } else {
+                    echo '<script>alert("Có lỗi xảy ra khi gửi tin nhắn. Vui lòng thử lại sau.");</script>';
+                }
+            }
+        } else {
+            // Người dùng chưa đăng nhập, chuyển hướng họ đến trang đăng nhập
+            header('Location: login.php');
+        }
+    }
 }
+
 
 ?>
 <!DOCTYPE html>
@@ -126,11 +130,6 @@ if(isset($_POST['send'])){
 					<div class="contact-form">
 						<form type="POST" id="fruitkha-contact" action="" method="POST" onSubmit="return valid_datas( this );">
 							<p>
-								<input type="text" placeholder="Tên của bạn" name="name" id="name">
-								<input type="email" placeholder="Email" name="email" id="email">
-							</p>
-							<p>
-								<input type="tel" placeholder="Số điện thoại" name="number" id="phone">
 								<input type="text" placeholder="Tiêu đề" name="subject" id="subject">
 							</p>
 							<p><textarea name="message" id="message" cols="30" rows="10" placeholder="Lời nhắn"></textarea></p>
