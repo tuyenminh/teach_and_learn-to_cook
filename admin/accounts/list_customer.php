@@ -25,8 +25,6 @@ if(isset($_GET['delete'])){
 <?php include ('../../components/head.php');?>
 
 <body class="sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
-<div class="wrapper">
-
 
   <!-- Navbar -->
   <?php include ('../../components/navbar.php');?>
@@ -37,7 +35,7 @@ if(isset($_GET['delete'])){
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
     <!-- Content Header (Page header) -->
-    <section class="content-header" style="padding-top: 70px;">
+    <section class="content-header">
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">

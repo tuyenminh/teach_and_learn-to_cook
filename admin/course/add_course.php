@@ -30,8 +30,6 @@ if(isset($_POST['add_course'])){
 
 
    $description = $_POST['description'];
-   $description = filter_var($description, FILTER_SANITIZE_STRING);
-
    $opening_day = $_POST['opening_day'];
    $opening_day = filter_var($opening_day, FILTER_SANITIZE_STRING); 
 
@@ -58,23 +56,15 @@ if(isset($_POST['add_course'])){
 
    }
 
-
 }
 
 ?>
 <!DOCTYPE html>
 <html lang="en">
-<head>
 
 <?php include ('../../components/head.php');?>
 
 <body class="sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
-<div class="wrapper">
-
-  <!-- Preloader -->
-  <div class="preloader flex-column justify-content-center align-items-center">
-    <img class="animation__wobble" src="../../dist/img/AdminLTELogo.png" alt="AdminLTELogo" height="60" width="60">
-  </div>
 
   <!-- Navbar -->
   <?php include ('../../components/navbar.php');?>
@@ -84,7 +74,7 @@ if(isset($_POST['add_course'])){
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
     <!-- Content Header (Page header) -->
-    <section class="content-header" style ="padding-top: 70px;">
+    <section class="content-header">
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
@@ -138,10 +128,6 @@ if(isset($_POST['add_course'])){
                     </div>
                   </div>
                   <div class = "col-md-6">
-                    <!-- <div class="form-group">
-                        <label for="formFileMultiple" class="form-label">Hình ảnh</label>
-                        <input type="file" name="image" class="box" accept="image/jpg, image/jpeg, image/png, image/webp" required>
-                    </div> -->
                     <div class="form-group" >
                         <label for="exampleInputName1">Hình ảnh</label>
                         <input type="file" name="image" class="form-control" accept="image/jpg, image/jpeg, image/png, image/webp" required>
@@ -150,10 +136,17 @@ if(isset($_POST['add_course'])){
                 </div>
                   <div class="form-group" >
                     <label for="exampleInputName1">Mô tả</label>
-                    <textarea name="description" id="post_content" class="form-control" row = "3" ></textarea>
-                    <script>
-                                CKEDITOR.replace('post_content');
-                    </script>
+                    <textarea name="description" id="editor" class="form-control" ></textarea>
+                    <!-- <script>
+        ClassicEditor
+            .create( document.querySelector( '#editor' ) )
+            .catch( error => {
+                console.error( error );
+            } );
+    </script> -->
+    <script>
+  CKEDITOR.replace('editor');
+</script>
                 </div>
                 <div class = "row">
                   <div class = "col-md-6">
@@ -171,7 +164,7 @@ if(isset($_POST['add_course'])){
                 </div>
                 <!-- /.card-body -->
                 <div class="card-footer">
-                  <button type="submit" name = "add_course" class="btn btn-primary">Tạo</button>
+                  <button type="submit" name = "add_course" class="btn btn-primary">Thêm</button>
                 </div>
               </form>
             </div>

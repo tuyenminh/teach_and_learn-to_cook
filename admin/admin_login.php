@@ -152,10 +152,10 @@ body {
    <div class="login-page">
   <div class="form" >
     <form class="login-form" action="" method="POST">
+      <h2 style="font-weight: bold;" >Đăng nhập</h2>
       <input type="email" name = "email" placeholder="Email" require/>
       <input type="password" name = "pass" placeholder="Mật khẩu"/>
       <button type = "submit"  name="submit">Đăng nhập</button>
-      <p class="message">Đã có tài khoản? <a href="register_admin.php">Tạo tài khoản</a></p>
     </form>
   </div>
 </div>

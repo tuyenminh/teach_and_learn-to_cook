@@ -54,22 +54,9 @@ include 'components/add_cart.php';
 	<!-- end header -->
 	
 	<!-- search area -->
-	<div class="search-area">
-		<div class="container">
-			<div class="row">
-				<div class="col-lg-12">
-					<span class="close-btn"><i class="fas fa-window-close"></i></span>
-					<div class="search-bar">
-						<div class="search-bar-tablecell">
-							<h3>Search For:</h3>
-							<input type="text" placeholder="Keywords">
-							<button type="submit">Search <i class="fas fa-search"></i></button>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+	<?php
+		include 'timkiemcongthuc.php';
+	?>
 	<!-- end search area -->
 
 	<!-- home page slider -->
@@ -191,24 +178,43 @@ include 'components/add_cart.php';
 			<div class="row">
                 <div class="col-md-12">
                     <div class="product-filters">
-                        <ul>
-                           <li class="active" data-filter="*">Tất cả</li>
-                           <?php
-                           $select_categories = $conn->query("SELECT * FROM category");
-                           while ($fetch_categories = $select_categories->fetch(PDO::FETCH_ASSOC)) {
-                              echo '<li data-category="' . $fetch_categories['id_cate'] . '">' . $fetch_categories['name_cate'] . '</li>';
-                           }
-                           ?>
-                        </ul>
+						<ul>
+							<li class="active" data-filter="*">Tất cả</li>
+							<?php
+                $select_categories = $conn->query("SELECT * FROM category");
+                while ($fetch_categories = $select_categories->fetch(PDO::FETCH_ASSOC)) {
+                    $activeClass = (isset($category_id) && $category_id == $fetch_categories['id_cate']) ? 'active' : '';
+                    echo '<li class="' . $activeClass . '" data-category="' . $fetch_categories['id_cate'] . '">' . $fetch_categories['name_cate'] . '</li>';
+                }
+                ?>
+						</ul>
                     </div>
                 </div>
             </div>
-			<div id="product-list">
-            <div class="row product-lists">
-                  <?php
-                     $select_products = $conn->prepare("SELECT * FROM `recipe` INNER JOIN category ON category.id_cate=recipe.id_cate WHERE category.id_cate = recipe.id_cate LIMIT 9");
-                     $select_products->execute();
-                        while($fetch_products = $select_products->fetch(PDO::FETCH_ASSOC)){
+			<div class="row product-lists">
+				<?php
+        // Số sản phẩm hiển thị trên mỗi trang
+        $items_per_page = 9;
+
+        // Trang hiện tại
+        $page = isset($_GET['page']) ? $_GET['page'] : 1;
+
+        // Điều chỉnh truy vấn SQL để lấy tên danh mục từ bảng 'category'
+        $sqlQuery = 'SELECT recipe.*, category.name_cate FROM recipe LEFT JOIN category ON category.id_cate = recipe.id_cate';
+
+        // Điều kiện kiểm tra nếu người dùng chọn một danh mục cụ thể
+        if (isset($_GET['category_id']) && is_numeric($_GET['category_id']) && $_GET['category_id'] != 0) {
+            $category_id = $_GET['category_id'];
+            $sqlQuery .= ' WHERE recipe.id_cate = ' . $category_id;
+        }
+
+        // Sửa truy vấn SQL để lấy sản phẩm của trang hiện tại
+        $startIndex = ($page - 1) * $items_per_page;
+        $sqlQuery .= ' LIMIT ' . $startIndex . ', ' . $items_per_page;
+
+        $select_products = $conn->prepare($sqlQuery);
+        $select_products->execute();
+								while($fetch_products = $select_products->fetch(PDO::FETCH_ASSOC)){
                   ?>
                            <div class="col-lg-4 col-md-6 text-center courses">
                               <div class="single-product-item">
@@ -224,7 +230,92 @@ include 'components/add_cart.php';
                   ?>
             </div>
          </div>
-			<div class="row">
+		 <?php
+// Truy vấn SQL để lấy tổng số sản phẩm trong danh mục đã chọn hoặc tất cả sản phẩm
+$total_products_query = $conn->query("SELECT count(*) FROM `recipe`" . (isset($category_id) && $category_id != 0 ? " WHERE id_cate = $category_id" : ""));
+$total_products = $total_products_query->fetchColumn();
+
+// Tính toán số trang dựa trên tổng số sản phẩm
+$total_pages = ceil($total_products / $items_per_page);
+?>
+<!-- Hiển thị số trang -->
+<div class="row">
+    <div class="col-lg-12 text-center">
+        <div class="pagination-wrap">
+            <ul>
+                <?php
+                // Hiển thị nút "Trước" và "Tiếp" cho phân trang
+                if ($page > 1) {
+                    echo '<li><a href="recipe.php?page=' . ($page - 1) . (isset($category_id) ? '&category_id=' . $category_id : '') . '">Trước</a></li>';
+                }
+                for ($i = 1; $i <= $total_pages; $i++) {
+                    $activeClass = ($page == $i) ? 'active' : '';
+                    echo '<li class="' . $activeClass . '"><a href="recipe.php?page=' . $i . (isset($category_id) ? '&category_id=' . $category_id : '') . '">' . $i . '</a></li>';
+                }
+                if ($page < $total_pages) {
+                    echo '<li><a href="recipe.php?page=' . ($page + 1) . (isset($category_id) ? '&category_id=' . $category_id : '') . '">Tiếp</a></li>';
+                }
+                ?>
+            </ul>
+        </div>
+    </div>
+</div>
+<style>
+    .pagination-wrap li.active a {
+        background-color: #F28123;
+        color: #fff;
+    }
+	.product-filters li.active,
+	.product-filters li:hover {
+        background-color: #F28123;
+        color: #fff;
+    }
+</style>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    // Bắt sự kiện click trên các mục danh mục
+    $('.product-filters li').click(function () {
+        $('.product-filters li').removeClass('active');
+        $(this).addClass('active');
+        var categoryId = $(this).data('category');
+        
+        // Redirect trang về trang 1 khi chuyển danh mục
+        window.location.href = 'recipe.php?page=1&category_id=' + categoryId;
+    });
+    // Bắt sự kiện click khi người dùng nhấn "Tất cả"
+    $('.product-filters li[data-filter="*"]').click(function () {
+        // Đặt `categoryId` là 0 (hoặc giá trị mặc định của bạn)
+        var categoryId = 0;
+        window.location.href = 'recipe.php?page=1&category_id=' + categoryId;
+    });
+
+	$(document).ready(function () {
+    // Lấy giá trị category_id từ URL
+    var urlParams = new URLSearchParams(window.location.search);
+    var categoryId = urlParams.get('category_id');
+    
+    // Nếu không có category_id hoặc là '0' (Tất cả), thì tô màu cho 'Tất cả'
+    if (!categoryId || categoryId === '0') {
+        $('.product-filters li[data-filter="*"]').addClass('active');
+    } else {
+        // Nếu có category_id khác '0', tô màu cho danh mục có category_id tương ứng
+        $('.product-filters li[data-category]').removeClass('active'); // Xóa tất cả lớp 'active' trước đó
+        $('.product-filters li[data-category="' + categoryId + '"]').addClass('active');
+    }
+});
+
+// Bắt sự kiện click trên các mục danh mục
+$('.product-filters li').click(function () {
+    $('.product-filters li').removeClass('active');
+    $(this).addClass('active');
+    var categoryId = $(this).data('category');
+    
+    // Redirect trang về trang 1 khi chuyển danh mục
+    window.location.href = 'recipe.php?page=1&category_id=' + categoryId;
+});
+</script>
+			<!-- <div class="row">
 				<div class="col-lg-12 text-center">
 					<div class="pagination-wrap">
 						<ul>
@@ -236,7 +327,7 @@ include 'components/add_cart.php';
 						</ul>
 					</div>
 				</div>
-			</div>
+			</div> -->
 			
 			<?php include 'components/chatbox.php'; ?>
 
@@ -244,209 +335,29 @@ include 'components/add_cart.php';
 	</div>
 	<!-- end products -->
 
-
-	<!-- cart banner section -->
-	<section class="cart-banner pt-100 pb-100">
-    	<div class="container">
-        	<div class="row clearfix">
-            	<!--Image Column-->
-            	<div class="image-column col-lg-6">
-                	<div class="image">
-                    	<div class="price-box">
-                        	<div class="inner-price">
-                                <span class="price">
-                                    <strong>30%</strong> <br> off per kg
-                                </span>
-                            </div>
-                        </div>
-                    	<img src="assets/img/a.jpg" alt="">
-                    </div>
-                </div>
-                <!--Content Column-->
-                <div class="content-column col-lg-6">
-					<h3><span class="orange-text">Deal</span> of the month</h3>
-                    <h4>Hikan Strwaberry</h4>
-                    <div class="text">Quisquam minus maiores repudiandae nobis, minima saepe id, fugit ullam similique! Beatae, minima quisquam molestias facere ea. Perspiciatis unde omnis iste natus error sit voluptatem accusant</div>
-                    <!--Countdown Timer-->
-                    <div class="time-counter"><div class="time-countdown clearfix" data-countdown="2020/2/01"><div class="counter-column"><div class="inner"><span class="count">00</span>Days</div></div> <div class="counter-column"><div class="inner"><span class="count">00</span>Hours</div></div>  <div class="counter-column"><div class="inner"><span class="count">00</span>Mins</div></div>  <div class="counter-column"><div class="inner"><span class="count">00</span>Secs</div></div></div></div>
-                	<a href="cart.html" class="cart-btn mt-3"><i class="fas fa-shopping-cart"></i> Add to Cart</a>
-                </div>
-            </div>
-        </div>
-    </section>
-    <!-- end cart banner section -->
-
-	<!-- testimonail-section -->
-	<div class="testimonail-section mt-150 mb-150">
-		<div class="container">
-			<div class="row">
-				<div class="col-lg-10 offset-lg-1 text-center">
-					<div class="testimonial-sliders">
-						<div class="single-testimonial-slider">
-							<div class="client-avater">
-								<img src="fruitkha-1.0.0/fruitkha-1.0.0/assets/img/avaters/avatar1.png" alt="">
-							</div>
-							<div class="client-meta">
-								<h3>Saira Hakim <span>Local shop owner</span></h3>
-								<p class="testimonial-body">
-									" Sed ut perspiciatis unde omnis iste natus error veritatis et  quasi architecto beatae vitae dict eaque ipsa quae ab illo inventore Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium "
-								</p>
-								<div class="last-icon">
-									<i class="fas fa-quote-right"></i>
-								</div>
-							</div>
-						</div>
-						<div class="single-testimonial-slider">
-							<div class="client-avater">
-								<img src="fruitkha-1.0.0/fruitkha-1.0.0/assets/img/avaters/avatar2.png" alt="">
-							</div>
-							<div class="client-meta">
-								<h3>David Niph <span>Local shop owner</span></h3>
-								<p class="testimonial-body">
-									" Sed ut perspiciatis unde omnis iste natus error veritatis et  quasi architecto beatae vitae dict eaque ipsa quae ab illo inventore Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium "
-								</p>
-								<div class="last-icon">
-									<i class="fas fa-quote-right"></i>
-								</div>
-							</div>
-						</div>
-						<div class="single-testimonial-slider">
-							<div class="client-avater">
-								<img src="fruitkha-1.0.0/fruitkha-1.0.0/assets/img/avaters/avatar3.png" alt="">
-							</div>
-							<div class="client-meta">
-								<h3>Jacob Sikim <span>Local shop owner</span></h3>
-								<p class="testimonial-body">
-									" Sed ut perspiciatis unde omnis iste natus error veritatis et  quasi architecto beatae vitae dict eaque ipsa quae ab illo inventore Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium "
-								</p>
-								<div class="last-icon">
-									<i class="fas fa-quote-right"></i>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- end testimonail-section -->
-	
-	<!-- advertisement section -->
-	<div class="abt-section mb-150">
+<!-- advertisement section -->
+<div class="abt-section mb-150">
 		<div class="container">
 			<div class="row">
 				<div class="col-lg-6 col-md-12">
 					<div class="abt-bg">
-						<a href="https://www.youtube.com/watch?v=DBLlFWYcIGQ" class="video-play-btn popup-youtube"><i class="fas fa-play"></i></a>
+						<a href="https://www.youtube.com/watch?v=EKem2tqU-ic" class="video-play-btn popup-youtube"><i class="fas fa-play"></i></a>
 					</div>
 				</div>
 				<div class="col-lg-6 col-md-12">
 					<div class="abt-text">
-						<p class="top-sub">Since Year 1999</p>
-						<h2>We are <span class="orange-text">Fruitkha</span></h2>
-						<p>Etiam vulputate ut augue vel sodales. In sollicitudin neque et massa porttitor vestibulum ac vel nisi. Vestibulum placerat eget dolor sit amet posuere. In ut dolor aliquet, aliquet sapien sed, interdum velit. Nam eu molestie lorem.</p>
-						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sapiente facilis illo repellat veritatis minus, et labore minima mollitia qui ducimus.</p>
-						<a href="about.html" class="boxed-btn mt-4">know more</a>
+						<p class="top-sub">Phát triển từ năm 2022</p>
+						<h2>Học nấu ăn cùng <span class="orange-text">CookingFood</span></h2>
+						<p>Một khóa học nấu ăn thú vị và bổ ích dành cho những người muốn học cách nấu ăn từ cơ bản đến nâng cao. Khóa học này được thiết kế để giúp bạn phát triển kỹ năng nấu ăn, từ việc chuẩn bị các nguyên liệu đơn giản cho các món ăn hằng ngày cho đến việc tạo ra các món ăn phức tạp và thú vị.</p>
+						<p>Trong khóa học CookingFood, bạn sẽ được hướng dẫn bởi các đầu bếp chuyên nghiệp và các chuyên gia về ẩm thực. Bạn sẽ học cách lựa chọn nguyên liệu tốt nhất, cách thực hiện các kỹ thuật nấu ăn cơ bản và nâng cao, cách tổ chức và trình bày món ăn một cách esthetically, cũng như cách tạo ra các món ăn ngon và độc đáo từ nhiều nền ẩm thực khác nhau.</p>
+						<p>Khóa học CookingFood không chỉ giúp bạn trở thành một đầu bếp tài năng mà còn giúp bạn thư giãn và thúc đẩy sự sáng tạo trong nấu ăn. Bất kể bạn là người mới bắt đầu hay đã có kinh nghiệm, khóa học này sẽ cung cấp cho bạn kiến thức và kỹ năng cần thiết để tự tin nấu ăn và tạo ra những bữa ăn ngon miệng cho gia đình và bạn bè.</p>
+						<a href="about.html" class="boxed-btn mt-4">Tìm hiểu thêm</a>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
 	<!-- end advertisement section -->
-
-	<!-- latest news -->
-	<div class="latest-news pt-150 pb-150">
-		<div class="container">
-
-			<div class="row">
-				<div class="col-lg-8 offset-lg-2 text-center">
-					<div class="section-title">	
-						<h3><span class="orange-text">Our</span> News</h3>
-						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquid, fuga quas itaque eveniet beatae optio.</p>
-					</div>
-				</div>
-			</div>
-
-			<div class="row">
-				<div class="col-lg-4 col-md-6">
-					<div class="single-latest-news">
-						<a href="single-news.html"><div class="latest-news-bg news-bg-1"></div></a>
-						<div class="news-text-box">
-							<h3><a href="single-news.html">You will vainly look for fruit on it in autumn.</a></h3>
-							<p class="blog-meta">
-								<span class="author"><i class="fas fa-user"></i> Admin</span>
-								<span class="date"><i class="fas fa-calendar"></i> 27 December, 2019</span>
-							</p>
-							<p class="excerpt">Vivamus lacus enim, pulvinar vel nulla sed, scelerisque rhoncus nisi. Praesent vitae mattis nunc, egestas viverra eros.</p>
-							<a href="single-news.html" class="read-more-btn">read more <i class="fas fa-angle-right"></i></a>
-						</div>
-					</div>
-				</div>
-				<div class="col-lg-4 col-md-6">
-					<div class="single-latest-news">
-						<a href="single-news.html"><div class="latest-news-bg news-bg-2"></div></a>
-						<div class="news-text-box">
-							<h3><a href="single-news.html">A man's worth has its season, like tomato.</a></h3>
-							<p class="blog-meta">
-								<span class="author"><i class="fas fa-user"></i> Admin</span>
-								<span class="date"><i class="fas fa-calendar"></i> 27 December, 2019</span>
-							</p>
-							<p class="excerpt">Vivamus lacus enim, pulvinar vel nulla sed, scelerisque rhoncus nisi. Praesent vitae mattis nunc, egestas viverra eros.</p>
-							<a href="single-news.html" class="read-more-btn">read more <i class="fas fa-angle-right"></i></a>
-						</div>
-					</div>
-				</div>
-				<div class="col-lg-4 col-md-6 offset-md-3 offset-lg-0">
-					<div class="single-latest-news">
-						<a href="single-news.html"><div class="latest-news-bg news-bg-3"></div></a>
-						<div class="news-text-box">
-							<h3><a href="single-news.html">Good thoughts bear good fresh juicy fruit.</a></h3>
-							<p class="blog-meta">
-								<span class="author"><i class="fas fa-user"></i> Admin</span>
-								<span class="date"><i class="fas fa-calendar"></i> 27 December, 2019</span>
-							</p>
-							<p class="excerpt">Vivamus lacus enim, pulvinar vel nulla sed, scelerisque rhoncus nisi. Praesent vitae mattis nunc, egestas viverra eros.</p>
-							<a href="single-news.html" class="read-more-btn">read more <i class="fas fa-angle-right"></i></a>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-lg-12 text-center">
-					<a href="news.html" class="boxed-btn">More News</a>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- end latest news -->
-
-	<!-- logo carousel -->
-	<div class="logo-carousel-section">
-		<div class="container">
-			<div class="row">
-				<div class="col-lg-12">
-					<div class="logo-carousel-inner">
-						<div class="single-logo-item">
-							<img src="fruitkha-1.0.0/fruitkha-1.0.0/assets/img/company-logos/1.png" alt="">
-						</div>
-						<div class="single-logo-item">
-							<img src="fruitkha-1.0.0/fruitkha-1.0.0/assets/img/company-logos/2.png" alt="">
-						</div>
-						<div class="single-logo-item">
-							<img src="fruitkha-1.0.0/fruitkha-1.0.0/assets/img/company-logos/3.png" alt="">
-						</div>
-						<div class="single-logo-item">
-							<img src="fruitkha-1.0.0/fruitkha-1.0.0/assets/img/company-logos/4.png" alt="">
-						</div>
-						<div class="single-logo-item">
-							<img src="fruitkha-1.0.0/fruitkha-1.0.0/assets/img/company-logos/5.png" alt="">
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- end logo carousel -->
 
 	<!-- footer -->
 	<?php include 'components/user_footer.php'; ?>

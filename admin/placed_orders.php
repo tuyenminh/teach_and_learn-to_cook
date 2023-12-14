@@ -78,7 +78,7 @@ if(isset($_GET['delete'])){
       <p> Email : <span><?= $fetch_orders['email']; ?></span> </p>
       <p> Số điện thoại : <span><?= $fetch_orders['number']; ?></span> </p>
       <!-- <p> address : <span><?= $fetch_orders['address']; ?></span> </p> -->
-      <p> Tên khóa học : <span><?= $fetch_orders['total_course']; ?></span> </p>
+      <p> Tên khóa học : <span><?= $fetch_orders['name']; ?></span> </p>
       <p> Tổng tiền : <span><?= number_format($fetch_orders['total_price']). " VNĐ"; ?></span> </p>
       <p> Phương thức thanh toán : <span><?= $fetch_orders['method']; ?></span> </p>
       <form action="" method="POST">

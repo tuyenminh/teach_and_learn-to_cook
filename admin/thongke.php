@@ -1,11 +1,10 @@
-
 <?php
 include '../components/connect.php'; // Kết nối cơ sở dữ liệu
 
 // Truy vấn cơ sở dữ liệu để lấy dữ liệu tổng hợp doanh thu qua các năm
-$query_revenue = "SELECT YEAR(regis_date) AS year, SUM(total_price) AS revenue
-          FROM receipt
-          GROUP BY YEAR(regis_date)
+$query_revenue = "SELECT YEAR(receipt_date) AS year, SUM(total) AS revenue
+          FROM receipts
+          GROUP BY YEAR(receipt_date)
           ORDER BY year ASC";
 $result_revenue = $conn->query($query_revenue);
 
@@ -42,14 +41,12 @@ while ($row_revenue = $result_revenue->fetch(PDO::FETCH_ASSOC)) {
 
             var options = {
                 title: 'Tổng hợp doanh thu qua các năm',
-                curveType: 'function',
                 legend: { position: 'bottom' }
             };
 
-            var chart = new google.visualization.LineChart(document.getElementById('revenue_chart'));
+            var chart = new google.visualization.ColumnChart(document.getElementById('revenue_chart'));
             chart.draw(data, options);
         }
     </script>
 </body>
 </html>
-

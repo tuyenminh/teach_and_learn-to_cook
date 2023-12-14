@@ -25,8 +25,6 @@ if(isset($_GET['delete'])){
 <?php include ('../../components/head.php');?>
 
 <body class="sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
-<div class="wrapper">
-
 
   <!-- Navbar -->
   <?php include ('../../components/navbar.php');?>
@@ -41,7 +39,7 @@ if(isset($_GET['delete'])){
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1 style = "font-weight: bold; text-color: #5586BO;" >Danh sách liên hệ</h1>
+            <h1>Danh sách liên hệ</h1>
           </div>
         </div>
       </div><!-- /.container-fluid -->
@@ -130,17 +128,20 @@ if(isset($_GET['delete'])){
               <!-- /.card-body -->
             <div class="card-footer clearfix">
                 <ul class="pagination pagination-sm m-0 float-right">
-            <?php
-                if ($page > 1) {
-                    echo '<li class="page-item"><a class="page-link" href="http://localhost/teach_and_learn-to_cook/admin/contact/list_contact.php?page=1">&laquo;&laquo; Trang đầu</a></li>';
-                }
+             <?php
+                  if (is_numeric($page) && $page > 1) {
+                      echo '<li class="page-item"><a class="page-link" href="http://localhost/teach_and_learn-to_cook/admin/contact/list_contact.php?page=1">&laquo;&laquo; Trang đầu</a></li>';
+                  }
 
-                echo $list_page;
+                  for ($i = 1; $i <= $total_pages; $i++) {
+                      $activeClass = ($i == $page) ? 'active' : '';
+                      echo '<li class="page-item ' . $activeClass . '"><a class="page-link" href="http://localhost/teach_and_learn-to_cook/admin/contact/list_contact.php?page=' . $i . '">' . $i . '</a></li>';
+                  }
 
-                if ($page < $total_pages) {
-                    echo '<li class="page-item"><a class="page-link" href="http://localhost/teach_and_learn-to_cook/admin/contact/list_contact.php?page=' . $total_pages . '">Trang cuối &raquo;&raquo;</a></li>';
-                }
-            ?>
+                  if (is_numeric($page) && $page < $total_pages) {
+                      echo '<li class="page-item"><a class="page-link" href="http://localhost/teach_and_learn-to_cook/admin/contact/list_contact.php?page=' . $total_pages . '">Trang cuối &raquo;&raquo;</a></li>';
+                  }
+              ?>
             </ul>
         </div>
         </div>

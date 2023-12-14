@@ -94,75 +94,37 @@
       }
     </script>
 
-    <script type="text/javascript">
-        google.charts.load('current', {'packages':['corechart']});
-        google.charts.setOnLoadCallback(drawChart);
 
-        function drawChart() {
-            // Khởi tạo biến dataPHP
-            var dataPHP = [];
+  
+<script>
+        var ctx = document.getElementById('revenueChart').getContext('2d');
+        var years = <?php echo json_encode(array_keys($data)); ?>;
+        var datasets = <?php echo json_encode(array_values($data)); ?>;
 
-            <?php
-            if(isset($_POST["year"])) {
-                $selectedYear = $_POST["year"];
-                $query = "SELECT MONTH(regis_date) AS month, SUM(total_price) AS revenue
-                          FROM receipt
-                          WHERE YEAR(regis_date) = :year
-                          GROUP BY MONTH(regis_date)";
-                $stmt = $conn->prepare($query);
-                $stmt->bindParam(":year", $selectedYear, PDO::PARAM_INT);
-                $stmt->execute();
+        var chartData = {
+            labels: years,
+            datasets: datasets.map((dataset, index) => ({
+                label: 'Năm ' + years[index],
+                data: dataset,
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }))
+        };
 
-                $data = [];
-                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                    $data[] = [$row['month'], (int)$row['revenue']];
+        var config = {
+            type: 'bar',
+            data: chartData,
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
                 }
-
-                // Chuyển dữ liệu sang định dạng JSON
-                echo "dataPHP = " . json_encode($data) . ";";
             }
-            ?>
+        };
 
-            // Tạo dữ liệu cho biểu đồ
-            var data = new google.visualization.DataTable();
-            data.addColumn('string', 'Tháng');
-            data.addColumn('number', 'Doanh thu');
-            data.addRows(dataPHP);
-
-            // Tùy chọn của biểu đồ
-            var options = {
-                title: 'Doanh thu hàng tháng',
-                curveType: 'function',
-                legend: { position: 'bottom' }
-            };
-
-            // Vẽ biểu đồ
-            var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
-            chart.draw(data, options);
-        }
-    </script>
-  
-
-  
-  <script type="text/javascript">
-        google.charts.load('current', { 'packages': ['corechart'] });
-        google.charts.setOnLoadCallback(drawChart);
-
-        function drawChart() {
-            var data = new google.visualization.DataTable();
-            data.addColumn('string', 'Năm');
-            data.addColumn('number', 'Doanh thu');
-            data.addRows(<?php echo json_encode($data); ?>);
-
-            var options = {
-                title: 'Tổng hợp doanh thu qua các năm',
-                curveType: 'function',
-                legend: { position: 'bottom' }
-            };
-
-            var chart = new google.visualization.LineChart(document.getElementById('revenue_chart'));
-            chart.draw(data, options);
-        }
+        var myChart = new Chart(ctx, config);
     </script>
 
 <script type="text/javascript">
@@ -177,11 +139,29 @@
 
             var options = {
                 title: 'Tổng hợp doanh thu qua các năm',
-                curveType: 'function',
                 legend: { position: 'bottom' }
             };
 
-            var chart = new google.visualization.LineChart(document.getElementById('revenue_chart'));
+            var chart = new google.visualization.ColumnChart(document.getElementById('revenue_chart'));
+            chart.draw(data, options);
+        }
+    </script>
+    <script type="text/javascript">
+        google.charts.load('current', { 'packages': ['corechart'] });
+        google.charts.setOnLoadCallback(drawChart);
+
+        function drawChart() {
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', 'Ngày');
+            data.addColumn('number', 'Doanh thu');
+            data.addRows(<?php echo json_encode($data_revenue); ?>);
+
+            var options = {
+                title: 'Tổng hợp doanh thu theo khoảng ngày',
+                legend: { position: 'bottom' }
+            };
+
+            var chart = new google.visualization.ColumnChart(document.getElementById('revenues_chart'));
             chart.draw(data, options);
         }
     </script>

@@ -29,37 +29,31 @@ $data1 = [];
 while ($fetch_courses = $select_courses->fetch(PDO::FETCH_ASSOC)){ 
     $data1[] = $fetch_courses; 
 }
-// Bước 1: Truy vấn danh sách các năm có trong cơ sở dữ liệu
-$year_query = $conn->prepare("SELECT DISTINCT YEAR(regis_date) AS year FROM receipt");
-$year_query->execute();
+$start_date = isset($_POST['start_date']) ? $_POST['start_date'] : date('Y-m-d', strtotime('-1 year'));
+$end_date = isset($_POST['end_date']) ? $_POST['end_date'] : date('Y-m-d');
 
-$years = array();
-while ($row = $year_query->fetch(PDO::FETCH_ASSOC)) {
-    $years[] = $row['year'];
+$query_daily_revenue = "SELECT DATE(receipt_date) AS date, SUM(total) AS daily_revenue
+                        FROM receipts
+                        WHERE receipt_date BETWEEN :start_date AND :end_date
+                        GROUP BY DATE(receipt_date)
+                        ORDER BY date ASC";
+
+$result_daily_revenue = $conn->prepare($query_daily_revenue);
+$result_daily_revenue->bindParam(':start_date', $start_date);
+$result_daily_revenue->bindParam(':end_date', $end_date);
+$result_daily_revenue->execute();
+
+$data_daily_revenue = [];
+while ($row_daily_revenue = $result_daily_revenue->fetch(PDO::FETCH_ASSOC)) {
+    $date = $row_daily_revenue['date'];
+    $daily_revenue = (float) $row_daily_revenue['daily_revenue'];
+    $data_daily_revenue[] = [$date, $daily_revenue];
 }
 
-// Bước 2: Chọn năm cần hiển thị (ví dụ: năm 2022)
-$selected_year = 2021; // Thay thế bằng năm bạn muốn
-
-// Bước 3: Sử dụng năm đã chọn để truy vấn dữ liệu
-$select_total_sales = $conn->prepare("SELECT DATE_FORMAT(regis_date, '%Y-%m-%d') AS date, SUM(total_price) AS total_price
-                                      FROM receipt
-                                      WHERE YEAR(regis_date) = :selected_year AND pay_status = 'Đã hoàn thành'
-                                      GROUP BY date
-                                      ORDER BY date");
-
-$select_total_sales->bindParam(':selected_year', $selected_year, PDO::PARAM_INT);
-$select_total_sales->execute();
-
-// Bước 4: Xử lý dữ liệu
-$data_sales = array();
-while ($fetch_total_sales = $select_total_sales->fetch(PDO::FETCH_ASSOC)) { 
-    $data_sales[] = array($fetch_total_sales['date'], (float)$fetch_total_sales['total_price']); 
-}
 // Truy vấn cơ sở dữ liệu để lấy dữ liệu tổng hợp doanh thu qua các năm
-$query_revenue = "SELECT YEAR(regis_date) AS year, SUM(total_price) AS revenue
-          FROM receipt
-          GROUP BY YEAR(regis_date)
+$query_revenue = "SELECT YEAR(receipt_date) AS year, SUM(total) AS revenue
+          FROM receipts
+          GROUP BY YEAR(receipt_date)
           ORDER BY year ASC";
 $result_revenue = $conn->query($query_revenue);
 
@@ -132,13 +126,13 @@ while ($row_revenue = $result_revenue->fetch(PDO::FETCH_ASSOC)) {
             <div class="small-box bg-success">
               <div class="inner">
 			  <?php
-                              $select_users = $conn->prepare("SELECT * FROM `receipt`");
+                              $select_users = $conn->prepare("SELECT * FROM `receipts`");
                               $select_users->execute();
                               $numbers_of_users = $select_users->rowCount();
                            ?>
                 <h3><?php echo $numbers_of_users;?><sup style="font-size: 20px"></sup></h3>
 
-                <p>Đơn hàng</p>
+                <p>Đăng ký học</p>
               </div>
               <div class="icon">
                 <i class="ion ion-stats-bars"></i>
@@ -173,10 +167,11 @@ while ($row_revenue = $result_revenue->fetch(PDO::FETCH_ASSOC)) {
               <div class="inner">
 			  <?php
                               $total_completes = 0;
-                              $select_completes = $conn->prepare("SELECT * FROM `receipt` WHERE pay_status = ?");
-                              $select_completes->execute(['Đã hoàn thành']);
+                              $select_completes = $conn->prepare("SELECT * FROM `receipts` INNER JOIN registration_form ON receipts.regis_form_id= registration_form.id
+                              WHERE status = ?");
+                              $select_completes->execute(['Đã thanh toán']);
                               while($fetch_completes = $select_completes->fetch(PDO::FETCH_ASSOC)){
-                                 $total_completes += $fetch_completes['total_price'];
+                                 $total_completes += $fetch_completes['total'];
                               }
                            ?>
                 <h3><?php echo number_format(($total_completes)). " VNĐ";
@@ -202,7 +197,7 @@ while ($row_revenue = $result_revenue->fetch(PDO::FETCH_ASSOC)) {
               <div class="card-header">
                 <h3 class="card-title">
                   <i class="fas fa-chart-pie mr-1"></i>
-                  Đơn hàng
+                  Đăng ký học mới nhất
                 </h3>
               </div><!-- /.card-header -->
               <div class="card-body">
@@ -222,21 +217,23 @@ while ($row_revenue = $result_revenue->fetch(PDO::FETCH_ASSOC)) {
                   </thead>
                   <tbody>
 				            <?php
-                              $select_orders = $conn->prepare("SELECT * FROM `receipt` ORDER BY id ASC LIMIT 3");
+                              $select_orders = $conn->prepare("SELECT receipts.id AS id, courses.name AS courses_name, registration_form.regis_day AS registration_form_regis_day, registration_form.status AS registration_form_status FROM `receipts` INNER JOIN registration_form ON receipts.regis_form_id= registration_form.id
+                              INNER JOIN courses ON registration_form.course_id= courses.id
+                              ORDER BY receipts.id ASC LIMIT 4");
                               $select_orders->execute();
                               if($select_orders->rowCount() > 0){
                                  while($fetch_orders = $select_orders->fetch(PDO::FETCH_ASSOC)){
                            ?>
                             <tr>
-								<td><?php echo $fetch_orders['id'];?></td>
-                                <td style = "width: 200px; "><?php echo $fetch_orders['total_course'];?></td>
-                                <td><?php echo number_format($fetch_orders['total_price'], 0, ',', '.') . " VNĐ" ;?></td>
+								                <td><?php echo $fetch_orders['id'];?></td>
+                                <td style = "width: 200px; "><?php echo $fetch_orders['courses_name'];?></td>
+                                <td style = "width: 200px; "><?php echo $fetch_orders['registration_form_regis_day'];?></td>
                                 <td>
-                                    <?php if ($fetch_orders['pay_status'] == "Đã hoàn thành"){ ?>
-                                          <span class = "badge bg-success"> Đẫ hoàn thành</span>  
+                                    <?php if ($fetch_orders['registration_form_status'] == "Đã thanh toán"){ ?>
+                                          <span class = "badge bg-success"> Đẫ thanh toán</span>  
                                        <?php            
-                                          } if ($fetch_orders['pay_status'] == "Đang xử lý") {
-                                             ?> <span class="badge bg-warning">Đang xử lý</span>
+                                          } if ($fetch_orders['registration_form_status'] == "Chưa thanh toán") {
+                                             ?> <span class="badge bg-warning">Chưa thanh toán</span>
                                           <?php }
                                           ?>
                                 </td>
@@ -268,7 +265,7 @@ while ($row_revenue = $result_revenue->fetch(PDO::FETCH_ASSOC)) {
               <div class="card-header border-0">
                 <h3 class="card-title">
                   <i class="fas fa-map-marker-alt mr-1"></i>
-                  Thổng kê lượt đăng kí khóa học
+                  Thống kê lượt đăng ký khóa học
                 </h3>
               </div>
               <div class="card-body" style = "background: #fff;">
@@ -283,47 +280,43 @@ while ($row_revenue = $result_revenue->fetch(PDO::FETCH_ASSOC)) {
           </div>
             <!-- /.card -->
           </section>
-
           <section class="col-lg-12 connectedSortable" style = "padding-right: 15px; padding-left: 15px;">
             <!-- Map card -->
             <div class="card bg-gradient-primary">
               <div class="card-header border-0">
                 <h3 class="card-title">
                   <i class="fas fa-map-marker-alt mr-1"></i>
-                  Thổng kê doanh thu 
+                  Tổng thống kê doanh thu 
                 </h3>
               </div>
               <div class="card-body" style = "background: #fff;">
+              <div id="revenue_chart" style="width: 900px; height: 500px;"></div>
 
-              <?php include'admin1.php';
-              ?>
-                </div> 
-              </div>
 
             </div>
             </div>
             <!-- /.card -->
             </section>
-            <section class="col-lg-12 connectedSortable" style = "padding-right: 15px; padding-left: 15px;">
+          <section class="col-lg-12 connectedSortable" style = "padding-right: 15px; padding-left: 15px;">
             <!-- Map card -->
             <div class="card bg-gradient-primary">
               <div class="card-header border-0">
                 <h3 class="card-title">
                   <i class="fas fa-map-marker-alt mr-1"></i>
-                  Thổng kê doanh thu 
+                  Thống kê doanh thu theo từng thời điểm
                 </h3>
               </div>
               <div class="card-body" style = "background: #fff;">
 
-              <div id="revenue_chart" style="width: 900px; height: 500px;"></div>
+                <?php include'annual_statistics.php';
+                ?>
 
-                </div> 
-              </div>
 
             </div>
             </div>
             <!-- /.card -->
             </section>
+           
         </div>
         <!-- /.row (main row) -->
       </div><!-- /.container-fluid -->

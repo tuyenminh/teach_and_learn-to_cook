@@ -20,9 +20,16 @@
 <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
 <script src="../../dist/js/pages/dashboard2.js"></script>
 <script>
-  CKEDITOR.replace('post_content');
+  CKEDITOR.replace('content_making');
 </script>
 <script>
-  CKEDITOR.replace('post_content1');
+  CKEDITOR.replace('content_ingre');
 </script>
 
+<script>
+  $(document).ready(function() {
+    $('#teacherSelect').select2();
+    $('#courseSelect').select2();
+    $('#weekSelect').select2();
+  });
+</script>

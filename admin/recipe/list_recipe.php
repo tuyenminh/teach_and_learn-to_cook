@@ -11,60 +11,39 @@ if(!isset($admin_id)){
 };
 if(isset($_GET['delete'])){
 
-   $delete_id = $_GET['delete'];
-   $delete_recipe_image = $conn->prepare("SELECT * FROM `recipe` WHERE id = ?");
-   $delete_recipe_image->execute([$delete_id]);
-   $fetch_delete_image = $delete_recipe_image->fetch(PDO::FETCH_ASSOC);
-   unlink('../../uploaded_img/'.$fetch_delete_image['image']);
-   $delete_recipe = $conn->prepare("DELETE FROM `recipe` WHERE id = ?");
-   $delete_recipe->execute([$delete_id]);
-   $delete_cart = $conn->prepare("DELETE FROM `cart` WHERE pid = ?");
-   $delete_cart->execute([$delete_id]);
-   header('location:list_recipe.php');
+  $delete_id = $_GET['delete'];
+  $delete_product_image = $conn->prepare("SELECT * FROM `recipe` WHERE id = ?");
+  $delete_product_image->execute([$delete_id]);
+  $fetch_delete_image = $delete_product_image->fetch(PDO::FETCH_ASSOC);
+  unlink('../../uploaded_img/'.$fetch_delete_image['image']);
+  $delete_product = $conn->prepare("DELETE FROM `recipe` WHERE id = ?");
+  $delete_product->execute([$delete_id]);
+  header('location:list_recipe.php');
 
 }
 
 ?>
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="utf-8">
-  <?php include ('../../components/head.php');?>
-</head>
+<?php include ('../../components/head.php');?>
 
 <body class="sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
-<div class="wrapper">
-
-  <!-- Preloader -->
-  <div class="preloader flex-column justify-content-center align-items-center">
-    <img class="animation__wobble" src="../../dist/img/AdminLTELogo.png" alt="AdminLTELogo" height="60" width="60">
-  </div>
 
   <!-- Navbar -->
   <?php include ('../../components/navbar.php');?>
 
   <?php include ('../../components/sidebar.php');?>
       <!-- /.sidebar-menu -->
-    </div>
-    <!-- /.sidebar -->
-  </aside>
 
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
     <!-- Content Header (Page header) -->
-    <section class="content-header" style ="padding-top: 70px;">
+    <section class="content-header" >
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
             <h1>Danh sách công thức</h1>
           </div>
-          <!-- <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="#">Trang chủ</a></li>
-              <li class="breadcrumb-item active">Tài khoản Admin</li>
-            </ol>
-          </div>
-        </div> -->
       </div><!-- /.container-fluid -->
       <div id="message"></div>
     </section>
@@ -84,18 +63,17 @@ if(isset($_GET['delete'])){
                   <thead>
                     <tr>
                         <th style = "width: 3rem; " data-field="id" data-sortable="true">STT</th>
-						<th style = "width: 10rem;">Tên công thức </th>
-                        <th style = "width: 7rem;">Danh mục </th>
-                        <th style = "width: 7rem;">Thời gian </th>
-                        <th style = "width: 10rem;">Hình ảnh</th>
-                        <th style = "width: 20rem;">Cách làm</th>
-						<th style = " width: 6.5rem;">Hành động</th>
+						            <th >Tên công thức </th>
+                        <th >Danh mục </th>
+                        <th >Thời gian </th>
+                        <th >Hình ảnh</th>
+						            <th >Hành động</th>
                     </tr>
                   </thead>
                   <tbody>
                     <?php
                     // Số dòng trên mỗi trang
-                    $rows_per_page = 5;
+                    $rows_per_page = 3;
 
                     // Trang hiện tại
                     if (isset($_GET['page'])) {
@@ -125,25 +103,13 @@ if(isset($_GET['delete'])){
                                 <td><img style = "heigth: 10rem; width: 10rem;" 
                                           src="../../uploaded_img/<?= $fetch_admin['image']; ?>" alt="">
                                 </td>
-                                <td>
-                                    <div style="
-                                        display: -webkit-box;
-                                        font-size: 16px;
-                                        line-height: 1.2;
-                                        -webkit-line-clamp: 5;  /* số dòng hiển thị */
-                                        -webkit-box-orient: vertical;
-                                        overflow: hidden;
-                                        text-overflow: ellipsis;">
-                                        <?php echo $fetch_admin['making']; ?>
-                                    </div>
-                                </td>
                                 <td class="form-group">
                                     <ul class="list-inline m-0">
                                         <li class="list-inline-item">
                                             <a href="update_recipe.php?update_recipe=<?= $fetch_admin['id']; ?>"><button class="btn btn-success btn-sm rounded-0" type="button" data-toggle="tooltip" data-placement="top" title="Edit"><i class="fa fa-edit"></i> </button></a>
                                         </li>
                                         <li class="list-inline-item">
-                                            <a href="list_recipe.php?delete=<?= $fetch_admin['id']; ?>" type="button" onclick="return confirm('Bạn có chắn xóa khóa học này? ');"><button class="btn btn-danger btn-sm rounded-0" type="button" data-toggle="tooltip" data-placement="top" title="Delete"><i class="fa fa-trash"></i></button></a>
+                                        <a href="list_recipe.php?delete=<?= $fetch_admin['id']; ?>" type="button" onclick="return confirm('Bạn có chắn xóa khóa học này? ');"><button class="btn btn-danger btn-sm rounded-0" type="button" data-toggle="tooltip" data-placement="top" title="Delete"><i class="fa fa-trash"></i></button></a>
                                         </li>
                                     </ul>
                                 </td>
@@ -168,17 +134,20 @@ if(isset($_GET['delete'])){
               <!-- /.card-body -->
             <div class="card-footer clearfix">
                 <ul class="pagination pagination-sm m-0 float-right">
-            <?php
-                if ($page > 1) {
-                    echo '<li class="page-item"><a class="page-link" href="http://localhost/teach_and_learn-to_cook/admin/recipe/list_recipe.php?page=1">&laquo;&laquo; Trang đầu</a></li>';
-                }
+             <?php
+                  if (is_numeric($page) && $page > 1) {
+                      echo '<li class="page-item"><a class="page-link" href="http://localhost/teach_and_learn-to_cook/admin/recipe/list_recipe.php?page=1">&laquo;&laquo; Trang đầu</a></li>';
+                  }
 
-                echo $list_page;
+                  for ($i = 1; $i <= $total_pages; $i++) {
+                      $activeClass = ($i == $page) ? 'active' : '';
+                      echo '<li class="page-item ' . $activeClass . '"><a class="page-link" href="http://localhost/teach_and_learn-to_cook/admin/recipe/list_recipe.php?page=' . $i . '">' . $i . '</a></li>';
+                  }
 
-                if ($page < $total_pages) {
-                    echo '<li class="page-item"><a class="page-link" href="http://localhost/teach_and_learn-to_cook/admin/recipe/list_recipe.php?page=' . $total_pages . '">Trang cuối &raquo;&raquo;</a></li>';
-                }
-            ?>
+                  if (is_numeric($page) && $page < $total_pages) {
+                      echo '<li class="page-item"><a class="page-link" href="http://localhost/teach_and_learn-to_cook/admin/recipe/list_recipe.php?page=' . $total_pages . '">Trang cuối &raquo;&raquo;</a></li>';
+                  }
+              ?>
             </ul>
         </div>
         <!-- /.row -->

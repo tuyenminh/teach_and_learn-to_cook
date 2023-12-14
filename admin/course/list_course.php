@@ -23,6 +23,8 @@
       header('location:list_course.php');
 
    }
+
+   
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -30,12 +32,6 @@
 <?php include ('../../components/head.php');?>
 
 <body class="sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
-<div class="wrapper">
-
-  <!-- Preloader -->
-  <div class="preloader flex-column justify-content-center align-items-center">
-    <img class="animation__wobble" src="../../dist/img/AdminLTELogo.png" alt="AdminLTELogo" height="60" width="60">
-  </div>
 
   <!-- Navbar -->
   <?php include ('../../components/navbar.php');?>
@@ -46,11 +42,11 @@
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
     <!-- Content Header (Page header) -->
-    <section class="content-header" style ="padding-top: 70px;">
+    <section class="content-header">
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1>Thêm khóa học</h1>
+            <h1>Danh sách khóa học</h1>
           </div>
       </div><!-- /.container-fluid -->
       <div id="message"></div>
@@ -67,23 +63,40 @@
               </div> -->
               <!-- /.card-header -->
               <div class="card-body">
+              <div class="search-container">
+                
+    <!-- <form action="list_course.php" method="GET">
+        <input type="text" placeholder="Tìm kiếm theo tên khóa học" name="search_name">
+        <select name="search_category">
+            <option value="">Tất cả danh mục</option>
+            <?php
+            // Truy vấn SQL để lấy danh sách danh mục
+            $categories_query = $conn->query("SELECT * FROM category");
+            while ($category = $categories_query->fetch(PDO::FETCH_ASSOC)) {
+                echo "<option value='{$category['id_cate']}'>{$category['name_cate']}</option>";
+            }
+            ?>
+        </select>
+        <button type="submit">Tìm kiếm</button>
+    </form> -->
+</div>
                 <table class="table table-bordered">
                   <thead>
                     <tr>
                         <th style = "width: 3rem; " data-field="id" data-sortable="true">STT</th>
-						<th style = "width: 10rem;">Tên khóa học </th>
+						            <th style = "width: 10rem;">Tên khóa học </th>
                         <th style = "width: 7rem;">Danh mục </th>
                         <th style = "width: 7rem;">Giá </th>
                         <th style = "width: 10rem;">Hình ảnh</th>
                         <th style = "width: 10rem;">Ngày khai giảng</th>
                         <th style = "width: 8rem;">Thời gian học</th>
-						<th style = " width: 6.5rem;">Hành động</th>
+						            <th style = " width: 6.5rem;">Hành động</th>
                     </tr>
                   </thead>
                   <tbody>
                     <?php
                     // Số dòng trên mỗi trang
-                    $rows_per_page = 5;
+                    $rows_per_page = 3;
 
                     // Trang hiện tại
                     if (isset($_GET['page'])) {
@@ -121,7 +134,7 @@
                                             <a href="update_course.php?update_course=<?= $fetch_admin['id']; ?>"><button class="btn btn-success btn-sm rounded-0" type="button" data-toggle="tooltip" data-placement="top" title="Edit"><i class="fa fa-edit"></i> </button></a>
                                         </li>
                                         <li class="list-inline-item">
-                                            <a href="list_category.php?delete=<?= $fetch_admin['id']; ?>" type="button" onclick="return confirm('Bạn có chắn xóa khóa học này? ');"><button class="btn btn-danger btn-sm rounded-0" type="button" data-toggle="tooltip" data-placement="top" title="Delete"><i class="fa fa-trash"></i></button></a>
+                                            <a href="list_course.php?delete=<?= $fetch_admin['id']; ?>" type="button" onclick="return confirm('Bạn có chắn xóa khóa học này? ');"><button class="btn btn-danger btn-sm rounded-0" type="button" data-toggle="tooltip" data-placement="top" title="Delete"><i class="fa fa-trash"></i></button></a>
                                         </li>
                                     </ul>
                                 </td>
@@ -149,16 +162,19 @@
             <div class="card-footer clearfix">
                 <ul class="pagination pagination-sm m-0 float-right">
             <?php
-                if ($page > 1) {
-                    echo '<li class="page-item"><a class="page-link" href="http://localhost/teach_and_learn-to_cook/admin/course/list_course.php?page=1">&laquo;&laquo; Trang đầu</a></li>';
-                }
+                  if (is_numeric($page) && $page > 1) {
+                      echo '<li class="page-item"><a class="page-link" href="http://localhost/teach_and_learn-to_cook/admin/course/list_course.php?page=1">&laquo;&laquo; Trang đầu</a></li>';
+                  }
 
-                echo $list_page;
+                  for ($i = 1; $i <= $total_pages; $i++) {
+                      $activeClass = ($i == $page) ? 'active' : '';
+                      echo '<li class="page-item ' . $activeClass . '"><a class="page-link" href="http://localhost/teach_and_learn-to_cook/admin/course/list_course.php?page=' . $i . '">' . $i . '</a></li>';
+                  }
 
-                if ($page < $total_pages) {
-                    echo '<li class="page-item"><a class="page-link" href="http://localhost/teach_and_learn-to_cook/admin/course/list_course.php?page=' . $total_pages . '">Trang cuối &raquo;&raquo;</a></li>';
-                }
-            ?>
+                  if (is_numeric($page) && $page < $total_pages) {
+                      echo '<li class="page-item"><a class="page-link" href="http://localhost/teach_and_learn-to_cook/admin/course/list_course.php?page=' . $total_pages . '">Trang cuối &raquo;&raquo;</a></li>';
+                  }
+              ?>
             </ul>
         </div>
         <!-- /.row -->

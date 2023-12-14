@@ -184,21 +184,40 @@ include 'components/add_cart.php';
 						<ul>
 							<li class="active" data-filter="*">Tất cả</li>
 							<?php
-							$select_categories = $conn->query("SELECT * FROM category");
-							while ($fetch_categories = $select_categories->fetch(PDO::FETCH_ASSOC)) {
-								echo '<li data-category="' . $fetch_categories['id_cate'] . '">' . $fetch_categories['name_cate'] . '</li>';
-							}
-							?>
+                $select_categories = $conn->query("SELECT * FROM category");
+                while ($fetch_categories = $select_categories->fetch(PDO::FETCH_ASSOC)) {
+                    $activeClass = (isset($category_id) && $category_id == $fetch_categories['id_cate']) ? 'active' : '';
+                    echo '<li class="' . $activeClass . '" data-category="' . $fetch_categories['id_cate'] . '">' . $fetch_categories['name_cate'] . '</li>';
+                }
+                ?>
 						</ul>
                     </div>
                 </div>
             </div>
 
-			<div id="product-list">
 				<div class="row product-lists">
-						<?php
-							$select_products = $conn->prepare("SELECT * FROM `courses` INNER JOIN category ON category.id_cate=courses.id_cate WHERE category.id_cate = courses.id_cate LIMIT 9");
-							$select_products->execute();
+				<?php
+        // Số sản phẩm hiển thị trên mỗi trang
+        $items_per_page = 9;
+
+        // Trang hiện tại
+        $page = isset($_GET['page']) ? $_GET['page'] : 1;
+
+        // Điều chỉnh truy vấn SQL để lấy tên danh mục từ bảng 'category'
+        $sqlQuery = 'SELECT courses.*, category.name_cate FROM courses LEFT JOIN category ON category.id_cate = courses.id_cate';
+
+        // Điều kiện kiểm tra nếu người dùng chọn một danh mục cụ thể
+        if (isset($_GET['category_id']) && is_numeric($_GET['category_id']) && $_GET['category_id'] != 0) {
+            $category_id = $_GET['category_id'];
+            $sqlQuery .= ' WHERE courses.id_cate = ' . $category_id;
+        }
+
+        // Sửa truy vấn SQL để lấy sản phẩm của trang hiện tại
+        $startIndex = ($page - 1) * $items_per_page;
+        $sqlQuery .= ' LIMIT ' . $startIndex . ', ' . $items_per_page;
+
+        $select_products = $conn->prepare($sqlQuery);
+        $select_products->execute();
 								while($fetch_products = $select_products->fetch(PDO::FETCH_ASSOC)){
 						?>
 									<div class="col-lg-4 col-md-6 text-center courses">
@@ -226,7 +245,93 @@ include 'components/add_cart.php';
 						?>
 				</div>
 			</div>
-			<div class="row">
+
+			<?php
+// Truy vấn SQL để lấy tổng số sản phẩm trong danh mục đã chọn hoặc tất cả sản phẩm
+$total_products_query = $conn->query("SELECT count(*) FROM `courses`" . (isset($category_id) && $category_id != 0 ? " WHERE id_cate = $category_id" : ""));
+$total_products = $total_products_query->fetchColumn();
+
+// Tính toán số trang dựa trên tổng số sản phẩm
+$total_pages = ceil($total_products / $items_per_page);
+?>
+<!-- Hiển thị số trang -->
+<div class="row">
+    <div class="col-lg-12 text-center">
+        <div class="pagination-wrap">
+            <ul>
+                <?php
+                // Hiển thị nút "Trước" và "Tiếp" cho phân trang
+                if ($page > 1) {
+                    echo '<li><a href="index.php?page=' . ($page - 1) . (isset($category_id) ? '&category_id=' . $category_id : '') . '">Trước</a></li>';
+                }
+                for ($i = 1; $i <= $total_pages; $i++) {
+                    $activeClass = ($page == $i) ? 'active' : '';
+                    echo '<li class="' . $activeClass . '"><a href="index.php?page=' . $i . (isset($category_id) ? '&category_id=' . $category_id : '') . '">' . $i . '</a></li>';
+                }
+                if ($page < $total_pages) {
+                    echo '<li><a href="index.php?page=' . ($page + 1) . (isset($category_id) ? '&category_id=' . $category_id : '') . '">Tiếp</a></li>';
+                }
+                ?>
+            </ul>
+        </div>
+    </div>
+</div>
+<style>
+    .pagination-wrap li.active a {
+        background-color: #F28123;
+        color: #fff;
+    }
+	.product-filters li.active,
+	.product-filters li:hover {
+        background-color: #F28123;
+        color: #fff;
+    }
+</style>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    // Bắt sự kiện click trên các mục danh mục
+    $('.product-filters li').click(function () {
+        $('.product-filters li').removeClass('active');
+        $(this).addClass('active');
+        var categoryId = $(this).data('category');
+        
+        // Redirect trang về trang 1 khi chuyển danh mục
+        window.location.href = 'index.php?page=1&category_id=' + categoryId;
+    });
+    // Bắt sự kiện click khi người dùng nhấn "Tất cả"
+    $('.product-filters li[data-filter="*"]').click(function () {
+        // Đặt `categoryId` là 0 (hoặc giá trị mặc định của bạn)
+        var categoryId = 0;
+        window.location.href = 'index.php?page=1&category_id=' + categoryId;
+    });
+
+	$(document).ready(function () {
+    // Lấy giá trị category_id từ URL
+    var urlParams = new URLSearchParams(window.location.search);
+    var categoryId = urlParams.get('category_id');
+    
+    // Nếu không có category_id hoặc là '0' (Tất cả), thì tô màu cho 'Tất cả'
+    if (!categoryId || categoryId === '0') {
+        $('.product-filters li[data-filter="*"]').addClass('active');
+    } else {
+        // Nếu có category_id khác '0', tô màu cho danh mục có category_id tương ứng
+        $('.product-filters li[data-category]').removeClass('active'); // Xóa tất cả lớp 'active' trước đó
+        $('.product-filters li[data-category="' + categoryId + '"]').addClass('active');
+    }
+});
+
+// Bắt sự kiện click trên các mục danh mục
+$('.product-filters li').click(function () {
+    $('.product-filters li').removeClass('active');
+    $(this).addClass('active');
+    var categoryId = $(this).data('category');
+    
+    // Redirect trang về trang 1 khi chuyển danh mục
+    window.location.href = 'index.php?page=1&category_id=' + categoryId;
+});
+</script>
+			<!-- <div class="row">
 				<div class="col-lg-12 text-center">
 					<div class="pagination-wrap">
 						<ul>
@@ -238,7 +343,8 @@ include 'components/add_cart.php';
 						</ul>
 					</div>
 				</div>
-			</div>		
+			</div>		 -->
+			
 			
 			<?php include 'components/chatbox.php'; ?>
 
@@ -269,82 +375,7 @@ include 'components/add_cart.php';
 		</div>
 	</div>
 	<!-- end advertisement section -->
-	
-	<!-- shop banner -->
-	<section class="shop-banner">
-    	<div class="container">
-        	<!-- <h3>Công thức nấu ăn<br> đa dạng <span class="orange-text">đang chờ bạn khám phá...</span></h3> -->
-            <!-- <div class="sale-percent"><span>Sale! <br> Upto</span>50% <span>off</span></div> -->
-            <a href="recipe.php" class="cart-btn btn-lg">Xem ngay</a>
-        </div>
-    </section>
-	<!-- end shop banner -->
 
-	<!-- latest news -->
-	<div class="latest-news pt-150 pb-150">
-		<div class="container">
-
-			<div class="row">
-				<div class="col-lg-8 offset-lg-2 text-center">
-					<div class="section-title">	
-						<h3><span class="orange-text">Tin tức</span> Mới nhất</h3>
-						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquid, fuga quas itaque eveniet beatae optio.</p>
-					</div>
-				</div>
-			</div>
-
-			<div class="row">
-				<div class="col-lg-4 col-md-6">
-					<div class="single-latest-news">
-						<a href="single-news.html"><div class="latest-news-bg news-bg-1"></div></a>
-						<div class="news-text-box">
-							<h3><a href="single-news.html">You will vainly look for fruit on it in autumn.</a></h3>
-							<p class="blog-meta">
-								<span class="author"><i class="fas fa-user"></i> Admin</span>
-								<span class="date"><i class="fas fa-calendar"></i> 27 December, 2019</span>
-							</p>
-							<p class="excerpt">Vivamus lacus enim, pulvinar vel nulla sed, scelerisque rhoncus nisi. Praesent vitae mattis nunc, egestas viverra eros.</p>
-							<a href="single-news.html" class="read-more-btn">read more <i class="fas fa-angle-right"></i></a>
-						</div>
-					</div>
-				</div>
-				<div class="col-lg-4 col-md-6">
-					<div class="single-latest-news">
-						<a href="single-news.html"><div class="latest-news-bg news-bg-2"></div></a>
-						<div class="news-text-box">
-							<h3><a href="single-news.html">A man's worth has its season, like tomato.</a></h3>
-							<p class="blog-meta">
-								<span class="author"><i class="fas fa-user"></i> Admin</span>
-								<span class="date"><i class="fas fa-calendar"></i> 27 December, 2019</span>
-							</p>
-							<p class="excerpt">Vivamus lacus enim, pulvinar vel nulla sed, scelerisque rhoncus nisi. Praesent vitae mattis nunc, egestas viverra eros.</p>
-							<a href="single-news.html" class="read-more-btn">read more <i class="fas fa-angle-right"></i></a>
-						</div>
-					</div>
-				</div>
-				<div class="col-lg-4 col-md-6 offset-md-3 offset-lg-0">
-					<div class="single-latest-news">
-						<a href="single-news.html"><div class="latest-news-bg news-bg-3"></div></a>
-						<div class="news-text-box">
-							<h3><a href="single-news.html">Good thoughts bear good fresh juicy fruit.</a></h3>
-							<p class="blog-meta">
-								<span class="author"><i class="fas fa-user"></i> Admin</span>
-								<span class="date"><i class="fas fa-calendar"></i> 27 December, 2019</span>
-							</p>
-							<p class="excerpt">Vivamus lacus enim, pulvinar vel nulla sed, scelerisque rhoncus nisi. Praesent vitae mattis nunc, egestas viverra eros.</p>
-							<a href="single-news.html" class="read-more-btn">read more <i class="fas fa-angle-right"></i></a>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-lg-12 text-center">
-					<a href="news.html" class="boxed-btn">More News</a>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- end latest news -->
 
 	<!-- footer -->
 	<?php include 'components/user_footer.php'; ?>

@@ -13,18 +13,18 @@ if(isset($_SESSION['user_id'])){
    $user_id = '';
    header('location:index.php');
 };
-	$grand_total = 0;
-	$cart_items[] = '';
-	$select_cart = $conn->prepare("SELECT * FROM `cart` WHERE user_id = ?");
-	$select_cart->execute([$user_id]);
-	if($select_cart->rowCount() > 0){
-		while($fetch_cart = $select_cart->fetch(PDO::FETCH_ASSOC)){
-		$cart_items[] = $fetch_cart['name'].' ('.$fetch_cart['price'].') - ';
-		$total_course = implode($cart_items);
-		$grand_total += ($fetch_cart['price']);
-	
-		}
-	}
+$grand_total = 0;
+$cart_items[] = '';
+$select_cart = $conn->prepare("SELECT SUM(courses.price) AS total_price
+                            FROM `registration_form`
+                            INNER JOIN courses ON registration_form.course_id = courses.id
+                            WHERE user_id = ? AND registration_form.status = 'Chưa thanh toán'");
+$select_cart->execute([$user_id]);
+if($select_cart->rowCount() > 0){
+    $fetch_cart = $select_cart->fetch(PDO::FETCH_ASSOC);
+    $grand_total = $fetch_cart['total_price'];
+}
+
 function execPostRequest($url, $data)
 	{
 		$ch = curl_init($url);
@@ -45,30 +45,38 @@ function execPostRequest($url, $data)
 	}
 
 if(isset($_POST['payUrl'])){
-    // Kiểm tra giỏ hàng
-    $check_cart = $conn->prepare("SELECT * FROM `cart` WHERE user_id = ?");
-    $check_cart->execute([$user_id]);
+   
+			$cart_items = $conn->prepare("SELECT registration_form.id AS regis_form_id, courses.price AS courses_price
+				FROM registration_form
+				INNER JOIN courses ON registration_form.course_id = courses.id
+				WHERE registration_form.user_id = ? AND registration_form.status = 'Chưa thanh toán'");
+			$cart_items->execute([$user_id]);
 
-    if ($check_cart->rowCount() > 0) {
-        $name = filter_var($_POST['name'], FILTER_SANITIZE_STRING);
-        $number = filter_var($_POST['number'], FILTER_SANITIZE_STRING);
-        $total_course = filter_var($_POST['total_course'], FILTER_SANITIZE_STRING);
-        $total_price = filter_var($_POST['total_price'], FILTER_SANITIZE_STRING);
-        $email = filter_var($_POST['email'], FILTER_SANITIZE_STRING);
-        $now = Carbon::now('Asia/Ho_Chi_Minh')->toDateString();
+			while ($cart_item = $cart_items->fetch(PDO::FETCH_ASSOC)) {
+			$regis_form_id = $cart_item['regis_form_id'];
+			$now = Carbon::now('Asia/Ho_Chi_Minh')->toDateString();
 
-        // Kiểm tra xem đơn hàng đã tồn tại trong cơ sở dữ liệu chưa
-        $check_order = $conn->prepare("SELECT * FROM `receipt` WHERE user_id = ? AND total_course = ? AND total_price = ?");
-        $check_order->execute([$user_id, $total_course, $total_price]);
+			// Kiểm tra xem hóa đơn đã tồn tại trong cơ sở dữ liệu chưa
+			$check_order = $conn->prepare("SELECT * FROM `receipts` WHERE receipt_date = ? AND regis_form_id = ?");
+			$check_order->execute([$now, $regis_form_id]);
 
-        if ($check_order->rowCount() == 0) {
-            // Chèn dữ liệu vào bảng `receipt`
-            $insert_order = $conn->prepare("INSERT INTO `receipt`(user_id, name, number, total_course, total_price, email, regis_date) VALUES(?,?,?,?,?,?,?)");
-            $insert_order->execute([$user_id, $name, $number, $total_course, $total_price, $email, $now]);
+			if ($check_order->rowCount() == 0) {
+			// Chèn dữ liệu vào bảng `receipts`
+			$insert_order = $conn->prepare("INSERT INTO `receipts`(receipt_date, regis_form_id, total ) VALUES(?, ?,?)");
+			$insert_order->execute([$now, $regis_form_id, $grand_total]);
 
-            // Xóa giỏ hàng
-            $delete_cart = $conn->prepare("DELETE FROM `cart` WHERE user_id = ?");
-            $delete_cart->execute([$user_id]);
+			// Cập nhật trạng thái trong bảng `registration_form` thành "Đã thanh toán"
+			$update_status = $conn->prepare("UPDATE `registration_form` SET status = 'Đã thanh toán' WHERE id = ?");
+			$update_status->execute([$regis_form_id]);
+
+			// Kiểm tra việc chèn dữ liệu vào bảng receipts
+			if ($insert_order->rowCount() > 0 && $update_status->rowCount() > 0) {
+			echo '<script>alert("Thanh toán thành công");</script>';
+			} 
+			} else {
+			echo '<script>alert("Đơn hàng đã tồn tại");</script>';
+			}
+			}
 
             // Tiếp tục với thanh toán Momo
             $endpoint = "https://test-payment.momo.vn/v2/gateway/api/create";
@@ -78,7 +86,7 @@ if(isset($_POST['payUrl'])){
 			$orderInfo = 'Thanh toán qua momo';
 			$amount = $grand_total;
 			$orderId = time() ."";
-			$redirectUrl = "http://localhost/teach_and_learn-to_cook/thanhtoan.php";
+			$redirectUrl = "http://localhost/teach_and_learn-to_cook/cart.php";
 			$ipnUrl = "https://webhook.site/b3088a6a-2d17-4f8d-a383-71389a6c600b";
 			$extraData = "";
 	
@@ -117,17 +125,9 @@ if(isset($_POST['payUrl'])){
 	
 			//Just a example, please check more in there
             header('Location: ' . $jsonResult['payUrl']);
-        } else {
-            // Đơn hàng đã tồn tại, không thực hiện thanh toán
-			echo '<script>alert("Bạn đã đăng kí khóa học này. Không thể tiếp tục!");</script>';   
+		
 
-        }
-    } else {
-        // Giỏ hàng trống, không thực hiện thanh toán
-			echo '<script>alert("Giỏ hàng trống. Không thể thanh toán!");</script>';   
-    }
 }
-
 if (isset($_GET['partnerCode'])) {
     if (
         isset($_GET['partnerCode']) &&
@@ -151,29 +151,50 @@ if (isset($_GET['partnerCode'])) {
         $insert_momo = $conn->prepare("INSERT INTO `momo`(partnerCode, orderId, amount, orderType, transId, payType, signature, code_cart) VALUES(?,?,?,?,?,?,?,?)");
         $insert_momo->execute([$partnerCode, $orderId, $amount, $orderType, $transId, $payType, $signature, $code_order]);
 
-        // if ($insert_momo) {
-        //     $name = filter_var($_POST['name'], FILTER_SANITIZE_STRING);
-        //     $number = filter_var($_POST['number'], FILTER_SANITIZE_STRING);
-        //     $total_course =  filter_var($_POST['total_course'], FILTER_SANITIZE_STRING) ;
-        //     $total_price = filter_var($_POST['total_price'], FILTER_SANITIZE_STRING) ;
-        //     $email = filter_var($_POST['email'], FILTER_SANITIZE_STRING);
-		// 	$now = Carbon::now('Asia/Ho_Chi_Minh')->toDateString();
-
-        //     $check_cart = $conn->prepare("SELECT * FROM `cart` WHERE user_id = ?");
-        //     $check_cart->execute([$user_id]);
-
-        //     if ($check_cart->rowCount() > 0) {
-        //         // Chèn dữ liệu vào bảng `receipt`
-
-		// 		$insert_order = $conn->prepare("INSERT INTO `receipt`(user_id, name, number, total_course, total_price, email, regis_date) VALUES(?,?,?,?,?,?,?)");
-		// 		$insert_order->execute([$user_id, $name, $number,  $total_course, $total_price, $email, $now]);
-        //         $delete_cart = $conn->prepare("DELETE FROM `cart` WHERE user_id = ?");
-        //         $delete_cart->execute([$user_id]);
-		// 	}
-               
-        // }
-    } 
+		
+			
+		}
+	
 }
+// if (isset($_POST['payUrl'])) {
+//     // Lặp qua từng sản phẩm trong giỏ hàng
+//     $cart_items = $conn->prepare("SELECT registration_form.id AS regis_form_id, courses.price AS courses_price
+//                                 FROM registration_form
+//                                 INNER JOIN courses ON registration_form.course_id = courses.id
+//                                 WHERE registration_form.user_id = ? AND registration_form.status = 'Chưa thanh toán'");
+//     $cart_items->execute([$user_id]);
+
+//     while ($cart_item = $cart_items->fetch(PDO::FETCH_ASSOC)) {
+//         $regis_form_id = $cart_item['regis_form_id'];
+//         $now = Carbon::now('Asia/Ho_Chi_Minh')->toDateString();
+
+//         // Kiểm tra xem hóa đơn đã tồn tại trong cơ sở dữ liệu chưa
+//         $check_order = $conn->prepare("SELECT * FROM `receipts` WHERE receipt_date = ? AND regis_form_id = ?");
+//         $check_order->execute([$now, $regis_form_id]);
+
+//         if ($check_order->rowCount() == 0) {
+//             // Chèn dữ liệu vào bảng `receipts`
+//             $insert_order = $conn->prepare("INSERT INTO `receipts`(receipt_date, regis_form_id, total ) VALUES(?, ?,?)");
+//             $insert_order->execute([$now, $regis_form_id, $grand_total]);
+
+//             // Cập nhật trạng thái trong bảng `registration_form` thành "Đã thanh toán"
+//             $update_status = $conn->prepare("UPDATE `registration_form` SET status = 'Đã thanh toán' WHERE id = ?");
+//             $update_status->execute([$regis_form_id]);
+
+//             // Kiểm tra việc chèn dữ liệu vào bảng receipts
+//             if ($insert_order->rowCount() > 0 && $update_status->rowCount() > 0) {
+//                 echo '<script>alert("Thanh toán thành công");</script>';
+//             } else {
+//                 echo '<script>alert("Thanh toán không thành công");</script>';
+//             }
+//         } else {
+//             echo '<script>alert("Đơn hàng đã tồn tại");</script>';
+//         }
+//     }
+// }
+
+
+
 
 ?>
 <!DOCTYPE html>
@@ -252,7 +273,7 @@ if (isset($_GET['partnerCode'])) {
 	<div class="checkout-section mt-150 mb-150">
 		<div class="container">
 		<!-- <form action="" method="post" target="_blank" enctype="application/x-www-form-urlencode"> -->
-		<form action="thanhtoan.php" method="post" >
+		<form action="checkout.php" method="post" >
 			<div class="row">
 				<div class="col-lg-8">
 					<div class="checkout-accordion-wrap">
@@ -274,22 +295,22 @@ if (isset($_GET['partnerCode'])) {
                                         <span style= "font-size: 15px;"><strong>
                                             Tên tài khoản
                                         </strong></span>
-						        		<p><input style= "width:100%; border: 1px solid #ccc; padding: 10px;" type="text" name="name" value="<?= $fetch_profile['name'] ?>"placeholder="Tên học viên"></p>
+						        		<p><input style= "width:100%; border: 1px solid #ccc; padding: 10px;" type="text" name="name" value="<?= $fetch_profile['name'] ?>"placeholder="Tên học viên" readonly></p>
                                         <span style= "font-size: 15px;"><strong>
                                             Email
                                         </strong></span>
 
-						        		<p><input style= "width:100%; border: 1px solid #ccc; padding: 10px;" type="email" name="email" value="<?= $fetch_profile['email'] ?>" placeholder="Email"></p>
+						        		<p><input style= "width:100%; border: 1px solid #ccc; padding: 10px;" type="email" name="email" value="<?= $fetch_profile['email'] ?>" placeholder="Email" readonly></p>
                                         <span style= "font-size: 15px;"><strong>
                                             Địa chỉ
                                         </strong></span>
 
-						        		<p><input style= "width:100%; border: 1px solid #ccc; padding: 10px;" type="text" name="address" value="<?= $fetch_profile['address'] ?>" placeholder="Địa chỉ"></p>
+						        		<p><input style= "width:100%; border: 1px solid #ccc; padding: 10px;" type="text" name="address" value="<?= $fetch_profile['address'] ?>" placeholder="Địa chỉ" readonly></p>
                                         <span style= "font-size: 15px;"><strong>
                                             Số điện thoại
                                         </strong></span>
 
-						        		<p><input style= "width:100%; border: 1px solid #ccc; padding: 10px;" type="tel" name="number" value="<?= $fetch_profile['number'] ?>" placeholder="Số điện thoại"></p>
+						        		<p><input style= "width:100%; border: 1px solid #ccc; padding: 10px;" type="tel" name="number" value="<?= $fetch_profile['number'] ?>" placeholder="Số điện thoại" readonly></p>
 						        </div>
                                 <div style ="padding-left:20px;">
                                     <a href="update_profile.php" class="boxed-btn">Cập nhật thông tin</a>
@@ -297,32 +318,6 @@ if (isset($_GET['partnerCode'])) {
 						      </div>
 						    </div>
 						  </div>
-						  <!-- <div class="card single-accordion">
-						    <div class="card-header" id="headingThree">
-						      <h5 class="mb-0">
-						        <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-						          Phương thức thanh toán
-						        </button>
-						      </h5>
-						    </div>
-						    <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordionExample">
-						      <div class="card-body">
-						        <div class="card-details">
-									<div class="input-group mb-3">
-										<div class="input-group-prepend">
-											<label class="input-group-text" for="inputGroupSelect01">Lựa chọn phương thức thanh toán</label>
-										</div>
-
-										<select class="custom-select" id="inputGroupSelect01" name="method" required>
-											<option value="" disabled selected>Chọn...</option>
-											<option value="Momo">Momo</option>
-											<option value="Paypal">Paypal</option>
-										</select>
-									</div>
-						        </div>
-						      </div>
-						    </div>
-						  </div> -->
 						</div>
 
 					</div>
@@ -343,35 +338,31 @@ if (isset($_GET['partnerCode'])) {
                             <?php
                                     $grand_total = 0;
                                     $cart_items[] = '';
-                                    $select_cart = $conn->prepare("SELECT * FROM `cart` WHERE user_id = ?");
+                                    $select_cart = $conn->prepare("SELECT registration_form.status AS regis_status, registration_form.id AS regis_form_id, courses.name AS courses_name, courses.price AS courses_price, users.*
+									FROM registration_form
+									INNER JOIN courses ON registration_form.course_id = courses.id
+									INNER JOIN users ON registration_form.user_id = users.id
+									WHERE registration_form.user_id = ?");
                                     $select_cart->execute([$user_id]);
-                                    if($select_cart->rowCount() > 0){
-                                        while($fetch_cart = $select_cart->fetch(PDO::FETCH_ASSOC)){
-                                        $cart_items[] = $fetch_cart['name'].' ('.$fetch_cart['price'].') - ';
-                                        $total_course = implode($cart_items);
-                                        $grand_total += ($fetch_cart['price']);
-                                ?>
-								<input type="hidden" name="total_course" value="<?= $total_course; ?>">
-								<input type="hidden" name="grand_total" value="<?php echo $grand_total; ?>">
-								<input type="hidden" name="total_price" value="<?= $grand_total; ?>" value="">
-								<input type="hidden" name="name" value="<?= $fetch_profile['name'] ?>">
-								<input type="hidden" name="number" value="<?= $fetch_profile['number'] ?>">
-								<input type="hidden" name="email" value="<?= $fetch_profile['email'] ?>">
-								<!-- <input type="hidden" name="address" value="<?= $fetch_profile['address'] ?>"> -->
 
-								<tr>
-									<td style ="font-size: 15px;"><?= $fetch_cart['name']." "; ?></td>
-									<td style ="font-size: 15px;"><?= number_format($fetch_cart['price']) . " VNĐ"; ?></td>
-                                    
-								</tr>
-                                
-								<?php
-                                
-                                        }
-                                        
-                                    }else{
-                                        echo '<p style="color: red;" class="empty">Giỏ hàng trống!</p>';
-                                    }
+									if ($select_cart->rowCount() > 0) {
+										while ($fetch_cart = $select_cart->fetch(PDO::FETCH_ASSOC)) {
+											if ($fetch_cart['regis_status'] == 'Chưa thanh toán') {
+												// Hiển thị thông tin khóa học từ bảng courses
+												$total_course = implode($cart_items);
+												$grand_total += $fetch_cart['courses_price'];
+												?>
+												<input type="hidden" name="regis_form_id" value="<?= $fetch_cart['regis_form_id']; ?>">
+												<tr>
+													<td style="font-size: 15px;"><?= $fetch_cart['courses_name']; ?></td>
+													<td style="font-size: 15px;"><?= number_format($fetch_cart['courses_price']) . " VNĐ"; ?></td>
+												</tr>
+												<?php
+											}
+										}
+									} else {
+										echo '<p style="color: red;" class="empty">Giỏ hàng trống!</p>';
+									}
                                 ?>
                                 <tr class="total-data">
 									<td><strong>Tổng tiền: </strong></td>
@@ -379,7 +370,7 @@ if (isset($_GET['partnerCode'])) {
 								</tr>
 							</tbody>
 						</table>
-                        <a href="giohang.php" class="boxed-btn">GIỎ HÀNG</a>			
+                        <a href="cart.php" class="boxed-btn">GIỎ HÀNG</a>			
 						<button style="font-family: 'Poppins', sans-serif;
 										display: inline-block;
 										background-color: transparent; /* Đặt nền trong suốt */
@@ -403,7 +394,6 @@ if (isset($_GET['partnerCode'])) {
 		</div>
 	</div>
 	<!-- end check out section -->
-	<?php include 'components/chatbox.php'; ?>
 
 	<!-- footer -->
 	<?php include 'components/user_footer.php'; ?>

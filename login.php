@@ -6,34 +6,36 @@ session_start();
 
 if(isset($_SESSION['user_id'])){
    $user_id = $_SESSION['user_id'];
-}else{
+} else {
    $user_id = '';
-};
+}
 
 if(isset($_POST['submit'])){
-
    $email = $_POST['email'];
    $email = filter_var($email, FILTER_SANITIZE_STRING);
    $pass = sha1($_POST['pass']);
    $pass = filter_var($pass, FILTER_SANITIZE_STRING);
 
-   $select_user = $conn->prepare("SELECT * FROM `users` WHERE email = ? AND password = ?");
-   $select_user->execute([$email, $pass]);
+   $select_user = $conn->prepare("SELECT * FROM `users` WHERE email = ?");
+   $select_user->execute([$email]);
    $row = $select_user->fetch(PDO::FETCH_ASSOC);
 
-   if($select_user->rowCount() > 0){
-      $_SESSION['user_id'] = $row['id'];
-      // header('location:home.php');
-      header('location:index.php');
-      echo '<script>alert("Đăng nhập thành công!");</script>';   
-
-   }else{
-    echo '<script>alert("Tài khoản hoặc mật khẩu sai!");</script>';   
-}
-
+   if($select_user->rowCount() > 0) {
+      // Email tồn tại trong cơ sở dữ liệu, kiểm tra mật khẩu
+      if($pass == $row['password']) {
+         $_SESSION['user_id'] = $row['id'];
+         header('location:index.php');
+         echo '<script>alert("Đăng nhập thành công!");</script>';
+      } else {
+         echo '<script>alert("Mật khẩu sai!");</script>';
+      }
+   } else {
+      echo '<script>alert("Tài khoản không tồn tại!");</script>';
+   }
 }
 
 ?>
+
 <!DOCTYPE HTML>
 <html lang="en">
 <head>

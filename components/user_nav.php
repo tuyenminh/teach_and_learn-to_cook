@@ -3,14 +3,14 @@
 								<li class="current-list-item"><a href="index.php">Trang chủ</a>
 								</li>
 								<li><a href="recipe.php">Công thức nấu ăn</a></li>
-								<li><a href="news.php">Tin tức</a></li>
 								<li><a href="contacts.php">Liên hệ</a></li>
 								<li>
 									<div class="header-icons">
 									<?php
-										$count_cart_items = $conn->prepare("SELECT * FROM `cart` WHERE user_id = ?");
-										$count_cart_items->execute([$user_id]);
-										$total_cart_items = $count_cart_items->rowCount();
+									$count_cart_items = $conn->prepare("SELECT * FROM `registration_form` WHERE user_id = ? AND status = 'Chưa thanh toán'");
+									$count_cart_items->execute([$user_id]);
+									$total_cart_items = $count_cart_items->rowCount();
+
 									?>
 									<style>
 										.shopping-cart {

@@ -94,6 +94,7 @@
 
 	<script src="https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1"></script>
 
+<!-- -----------------------------------index.php (list_courses)------------------------------------------------- -->
 
 	<script>
 	// Bắt sự kiện click trên các mục danh mục
@@ -109,7 +110,7 @@
 			sqlQuery += ' INNER JOIN category ON category.id_cate = courses.id_cate WHERE courses.id_cate = ' + categoryId;
 		}
 
-		sqlQuery += ' LIMIT 9';
+		sqlQuery += ' LIMIT 9 ';
 
 		// Gửi yêu cầu AJAX để lấy sản phẩm theo danh mục
 		$.ajax({
@@ -120,6 +121,7 @@
 				$('#product-list').html(response);
 			}
 		});
+		
 	});
 
 	// Bắt sự kiện click khi người dùng nhấn "Tất cả"
@@ -127,7 +129,7 @@
 		// Điều chỉnh truy vấn SQL để lấy tất cả sản phẩm
 		var sqlQuery = 'SELECT * FROM `courses` INNER JOIN category ON category.id_cate=courses.id_cate WHERE category.id_cate = courses.id_cate ';
 
-		sqlQuery += ' LIMIT 9';
+		sqlQuery += ' LIMIT 9 ';
 
 		// Gửi yêu cầu AJAX để lấy tất cả sản phẩm
 		$.ajax({
@@ -139,56 +141,43 @@
 			}
 		});
 	});
+	
 	</script>
-			<script>
-			// Định nghĩa các biến quan trọng
-				var currentPage = 1; // Trang hiện tại
-				var totalPages = <?php echo $totalPages; ?>; // Tổng số trang
+	<!-- <script>
+		$(document).ready(function () {
+    var offset = 9; // Số sản phẩm ban đầu đã hiển thị, chú ý số này phải tương ứng với LIMIT ban đầu
+    var categoryId = 1; // ID của danh mục sản phẩm, hãy cập nhật theo danh mục mặc định hoặc chọn trước
 
-				// Xử lý khi người dùng nhấn vào nút "Prev"
-				$('#prev-page').click(function (e) {
-					e.preventDefault();
-					if (currentPage > 1) {
-						currentPage--;
-						loadProductsByPage(currentPage);
-					}
-				});
+    $('#load-more').on('click', function () {
+        // Tăng offset lên để tải thêm sản phẩm
+        offset += 9; // Chú ý số này phải tương ứng với LIMIT ban đầu
 
-				// Xử lý khi người dùng nhấn vào nút "Next"
-				$('#next-page').click(function (e) {
-					e.preventDefault();
-					if (currentPage < totalPages) {
-						currentPage++;
-						loadProductsByPage(currentPage);
-					}
-				});
+        // Điều chỉnh truy vấn SQL để lấy thêm sản phẩm từ danh mục
+        var sqlQuery = 'SELECT courses.*, category.name_cate FROM courses';
 
-				// Xử lý khi người dùng nhấn vào một số trang cụ thể
-				$('.page-link').click(function (e) {
-					e.preventDefault();
-					var targetPage = parseInt($(this).data('page'));
-					if (!isNaN(targetPage) && targetPage >= 1 && targetPage <= totalPages) {
-						currentPage = targetPage;
-						loadProductsByPage(currentPage);
-					}
-				});
+        if (categoryId !== '*') {
+            sqlQuery += ' INNER JOIN category ON category.id_cate = courses.id_cate WHERE courses.id_cate = ' + categoryId;
+        }
 
-				// Hàm để tải sản phẩm dựa trên số trang
-				function loadProductsByPage(page) {
-					// Gửi yêu cầu AJAX để lấy sản phẩm cho trang được chỉ định
-					var sqlQuery = 'SELECT courses.*, category.name_cate FROM courses LIMIT ' + (page - 1) * <?php echo $itemsPerPage; ?> + <?php echo $itemsPerPage; ?>;
-					$.ajax({
-						type: 'POST',
-						url: 'get_pages.php',
-						data: { sql: sqlQuery },
-						success: function (response) {
-							$('#product-list').html(response);
-						}
-					});
-				}
+        sqlQuery += ' LIMIT ' + offset + ', 9'; // Lấy thêm 9 sản phẩm từ vị trí offset
 
-			</script>
-<!-- -----------------------------------recipe.php------------------------------------------------- -->
+        // Gửi yêu cầu AJAX để lấy sản phẩm và thêm chúng vào danh sách sản phẩm
+        $.ajax({
+            type: 'POST',
+            url: 'get_products.php',
+            data: { sql: sqlQuery },
+            success: function (response) {
+                // Thêm sản phẩm mới vào danh sách sản phẩm
+                $('.product-lists').append(response);
+            }
+        });
+    });
+});
+
+
+	</script> -->
+
+<!-- -----------------------------------recipe.php (list_recipe)------------------------------------------------- -->
 <script>
    // Bắt sự kiện click trên các mục danh mục
    $('.product-filters li').click(function () {
@@ -211,7 +200,7 @@
          url: 'get_recipes.php',
          data: { sql: sqlQuery },
          success: function (response) {
-               $('#product-list').html(response);
+               $('#recipe-list').html(response);
          }
       });
    });
@@ -229,14 +218,66 @@
          url: 'get_recipes.php',
          data: { sql: sqlQuery },
          success: function (response) {
-               $('#product-list').html(response);
+               $('#recipe-list').html(response);
          }
       });
    });
 
    </script>
+<!-- -----------------------------------index.php (page_course)------------------------------------------------- -->
 
 <script>
+$(document).ready(function() {
+    // Khai báo biến cho trang và số sản phẩm trên mỗi trang
+    var currentPage = 1;
+    var productsPerPage = 9;
+
+    // Hàm AJAX để tải sản phẩm cho trang cụ thể
+    function loadProductsForPage(page) {
+        $.ajax({
+            type: 'POST',
+            url: 'get_pages.php',
+            data: { page: page, productsPerPage: productsPerPage },
+            success: function (response) {
+                $('#page_couses').html(response);
+            }
+        });
+    }
+
+    // Bắt sự kiện click trên các số trang
+    $('#pagination').on('click', 'a', function(e) {
+        e.preventDefault();
+        var page = $(this).data('page');
+
+        if (page === 'previous') {
+            if (currentPage > 1) {
+                currentPage--;
+                loadProductsForPage(currentPage);
+                updatePaginationUI();
+            }
+        } else if (page === 'next') {
+            currentPage++;
+            loadProductsForPage(currentPage);
+            updatePaginationUI();
+        } else {
+            currentPage = page;
+            loadProductsForPage(currentPage);
+            updatePaginationUI();
+        }
+    });
+
+    // Hàm cập nhật giao diện người dùng cho phân trang
+    function updatePaginationUI() {
+        $('#pagination a').removeClass('active');
+        $('#pagination a[data-page="' + currentPage + '"]').addClass('active');
+    }
+	
+    // Tải sản phẩm cho trang đầu tiên khi trang web được nạp
+    loadProductsForPage(currentPage);
+});
+
+			</script>
+<!-- <script>
 				// Trang hiện tại (được truyền từ mã JavaScript)
 $page = isset($_POST['page']) ? $_POST['page'] : 1;
 
@@ -274,4 +315,4 @@ $('.pagination-wrap ul li a').click(function (e) {
     loadProductsByPage(page);
 });
 
-			</script>
+			</script> -->

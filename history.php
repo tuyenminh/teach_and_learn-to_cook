@@ -96,13 +96,10 @@ if(isset($_SESSION['user_id'])){
 						<table class="cart-table">
 							<thead class="cart-table-head">
 								<tr class="table-head-row" >
-									<th class="product-name">Tên tài khoản</th>
-                                    <th class="product-name">Email</th>
-                                    <th class="product-name">Số điện thoại</th>
                                     <th class="product-name">Khóa học</th>
-                                    <th class="product-name">Trạng thái</th>
                                     <th class="product-name">Ngày đăng kí</th>
 									<th class="product-price">Tổng tiền</th>
+									<th class="product-price">Hành động</th>
 
 								</tr>
 							</thead>
@@ -111,7 +108,12 @@ if(isset($_SESSION['user_id'])){
                                 if($user_id == ''){
                                     echo '<p class="empty">Vui lòng đăng nhập để đăng kí</p>';
                                 }else{
-                                    $select_orders = $conn->prepare("SELECT * FROM `receipt` WHERE user_id = ?");
+                                    $select_orders = $conn->prepare("SELECT courses.name AS courses_name, receipts.total AS receipts_total, receipt_date
+									FROM receipts
+									INNER JOIN registration_form ON receipts.regis_form_id = registration_form.id
+									INNER JOIN courses ON registration_form.course_id = courses.id
+									INNER JOIN users ON registration_form.user_id = users.id
+									WHERE user_id = ?");
                                     $select_orders->execute([$user_id]);
                                     if($select_orders->rowCount() > 0){
                                         while($fetch_orders = $select_orders->fetch(PDO::FETCH_ASSOC)){
@@ -119,13 +121,13 @@ if(isset($_SESSION['user_id'])){
 								<tr class="table-body-row">
 									<form action="" method="post">
 										
-										<td class="product-name"><?= $fetch_orders['name']; ?></td>
-										<td class="product-name"><?= $fetch_orders['email']; ?></td>
-                                        <td class="product-name"><?= $fetch_orders['number']; ?></td>
-										<td class="product-name"><?= $fetch_orders['total_course']; ?></td>
-										<td class="product-name"><?= $fetch_orders['pay_status']; ?></td>
-										<td class="product-name"><?= $fetch_orders['regis_date']; ?></td>
-										<td class="product-price"><?= number_format($fetch_orders['total_price'], 0, ',', '.') . " VNĐ" ?></td>
+										<td class="product-name"><?= $fetch_orders['courses_name']; ?></td>
+									
+                                        <td class="product-name"><?= $fetch_orders['receipt_date']; ?></td>
+										<td class="product-price"><?= number_format($fetch_orders['receipts_total'], 0, ',', '.') . " VNĐ" ?></td>
+										<td>
+										<a href="#" class="boxed-btn black" disabled>Mua lại</a>
+										</td>
 									</form>
 									
 								</tr>

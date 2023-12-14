@@ -1,193 +1,168 @@
 <?php
-
 include 'components/connect.php';
-
-session_start();
-
-if(isset($_SESSION['user_id'])){
-   $user_id = $_SESSION['user_id'];
-}else{
-   $user_id = '';
-};
-
-include 'components/add_cart.php';
-
 ?>
-
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-   <meta charset="UTF-8">
-   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>Trang Chủ</title>
-
-   <link rel="stylesheet" href="https://unpkg.com/swiper@8/swiper-bundle.min.css" />
-
-   <!-- font awesome cdn link  -->
-   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
-   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-
-   <!-- custom css file link  -->
-   <link rel="stylesheet" href="home-/css/style.css">
-
+    <!-- Các khai báo khác -->
 </head>
 <body>
 
-<?php include 'components/user_header.php'; ?>
-
-
-
-<div id="carouselExampleCaptions" class="carousel slide" data-bs-ride="carousel">
-  <div class="carousel-indicators">
-    <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-    <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="1" aria-label="Slide 2"></button>
-    <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="2" aria-label="Slide 3"></button>
-  </div>
-  <div class="carousel-inner">
-    <div class="carousel-item active">
-      <img src="images/h1.jpg" class="d-block w-100" alt="...">
-      <div class="carousel-caption d-none d-md-block">
-        <!-- <h5>First slide label</h5>
-        <p>Some representative placeholder content for the first slide.</p> -->
-      </div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="product-filters">
+            <ul>
+                <li class="active" data-filter="*">Tất cả</li>
+                <?php
+                $select_categories = $conn->query("SELECT * FROM category");
+                while ($fetch_categories = $select_categories->fetch(PDO::FETCH_ASSOC)) {
+                    $activeClass = (isset($category_id) && $category_id == $fetch_categories['id_cate']) ? 'active' : '';
+                    echo '<li class="' . $activeClass . '" data-category="' . $fetch_categories['id_cate'] . '">' . $fetch_categories['name_cate'] . '</li>';
+                }
+                ?>
+            </ul>
+        </div>
     </div>
-    <div class="carousel-item">
-      <img src="images/h6.jpg" class="d-block w-100" alt="...">
-      <div class="carousel-caption d-none d-md-block">
-        <!-- <h5>Second slide label</h5>
-        <p>Some representative placeholder content for the second slide.</p> -->
-      </div>
-    </div>
-    <div class="carousel-item">
-      <img src="images/h3.png" class="d-block w-100" alt="...">
-      <div class="carousel-caption d-none d-md-block">
-        <!-- <h5>Third slide label</h5>
-        <p>Some representative placeholder content for the third slide.</p> -->
-      </div>
-    </div>
-  </div>
-  <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="prev">
-    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-    <span class="visually-hidden">Previous</span>
-  </button>
-  <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="next">
-    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-    <span class="visually-hidden">Next</span>
-  </button>
 </div>
 
-<section class="category">
+<div id="product-list">
+    <div class="row product-lists">
+        <?php
+        // Số sản phẩm hiển thị trên mỗi trang
+        $items_per_page = 9;
 
-   <h1 class="title">Danh mục khóa học</h1>
+        // Trang hiện tại
+        $page = isset($_GET['page']) ? $_GET['page'] : 1;
 
-   <div class="box-container">
+        // Điều chỉnh truy vấn SQL để lấy tên danh mục từ bảng 'category'
+        $sqlQuery = 'SELECT courses.*, category.name_cate FROM courses LEFT JOIN category ON category.id_cate = courses.id_cate';
 
-      <a href="category.php?category=Gia đình" class="box">
-         <img src="images/cat-1.png" alt="">
-         <h3>Gia Đình</h3>
-      </a>
+        // Điều kiện kiểm tra nếu người dùng chọn một danh mục cụ thể
+        if (isset($_GET['category_id']) && is_numeric($_GET['category_id']) && $_GET['category_id'] != 0) {
+            $category_id = $_GET['category_id'];
+            $sqlQuery .= ' WHERE courses.id_cate = ' . $category_id;
+        }
 
-      <a href="category.php?category=Tiệc" class="box">
-         <img src="images/cat-2.png" alt="">
-         <h3>Tiệc</h3>
-      </a>
+        // Sửa truy vấn SQL để lấy sản phẩm của trang hiện tại
+        $startIndex = ($page - 1) * $items_per_page;
+        $sqlQuery .= ' LIMIT ' . $startIndex . ', ' . $items_per_page;
 
-      <a href="category.php?category=Đồ uống" class="box">
-         <img src="images/cat-3.png" alt="">
-         <h3>Đồ uống</h3>
-      </a>
+        $select_products = $conn->prepare($sqlQuery);
+        $select_products->execute();
 
-      <a href="category.php?category=Ăn vặt" class="box">
-         <img src="images/cat-4.png" alt="">
-         <h3>Ăn vặt</h3>
-      </a>
+        while ($fetch_products = $select_products->fetch(PDO::FETCH_ASSOC)) {
+            ?>
+            <div class="col-lg-4 col-md-6 text-center courses">
+                <div class="single-product-item">
+                    <form action="" method="post">
+                        <input type="hidden" name="pid" value="<?= $fetch_products['id']; ?>">
+                        <input type="hidden" name="name" value="<?= $fetch_products['name']; ?>">
+                        <!-- <input type="hidden" name="image" value="<?= $fetch_products['image']; ?>"> -->
+                        <input type="hidden" name="price" value="<?= $fetch_products['price']; ?>">
+                        <!-- <div class="product-image">
+                            <a href="view-courses.php?pid=<?= $fetch_products['id']; ?>"><img src="uploaded_img/<?= $fetch_products['image']; ?>" alt=""></a>
+                        </div> -->
+                        <h3><?= $fetch_products['name']; ?></h3>
+                        <p class="product-price"><span><?= $fetch_products['name_cate']; ?></span><?= number_format($fetch_products['price'], 0, ',', '.') . " VNĐ" ?></p>
+                        <button style="border: none; background-color: rgba(0, 0, 0, 0);" type="submit" name="add_to_cart"><a class="cart-btn"><i class="fas fa-shopping-cart"></i></a></button>
+                    </form>
+                </div>
+            </div>
+            <?php
+        }
+        ?>
+    </div>
+</div>
 
-   </div>
+<?php
+// Truy vấn SQL để lấy tổng số sản phẩm trong danh mục đã chọn hoặc tất cả sản phẩm
+$total_products_query = $conn->query("SELECT count(*) FROM `courses`" . (isset($category_id) && $category_id != 0 ? " WHERE id_cate = $category_id" : ""));
+$total_products = $total_products_query->fetchColumn();
 
-</section>
+// Tính toán số trang dựa trên tổng số sản phẩm
+$total_pages = ceil($total_products / $items_per_page);
+?>
+<!-- Hiển thị số trang -->
+<div class="row">
+    <div class="col-lg-12 text-center">
+        <div class="pagination-wrap">
+            <ul>
+                <?php
+                // Hiển thị nút "Trước" và "Tiếp" cho phân trang
+                if ($page > 1) {
+                    echo '<li><a href="home.php?page=' . ($page - 1) . (isset($category_id) ? '&category_id=' . $category_id : '') . '">Trước</a></li>';
+                }
+                for ($i = 1; $i <= $total_pages; $i++) {
+                    $activeClass = ($page == $i) ? 'active' : '';
+                    echo '<li class="' . $activeClass . '"><a href="home.php?page=' . $i . (isset($category_id) ? '&category_id=' . $category_id : '') . '">' . $i . '</a></li>';
+                }
+                if ($page < $total_pages) {
+                    echo '<li><a href="home.php?page=' . ($page + 1) . (isset($category_id) ? '&category_id=' . $category_id : '') . '">Tiếp</a></li>';
+                }
+                ?>
+            </ul>
+        </div>
+    </div>
+</div>
+<style>
+    .pagination-wrap li.active a {
+        background-color: #007bff;
+        color: #fff;
+    }
+    .product-filters li.active {
+        background-color: #007bff;
+        color: #fff;
+    }
+    .product-filters li.active,
+.product-filters li:hover {
+    background-color: #007bff;
+    color: #fff;
+}
 
-
-
-
-<section class="products">
-
-   <h1 class="title">Khóa học mới nhất</h1>
-
-   <div class="box-container">
-
-      <?php
-         $select_products = $conn->prepare("SELECT * FROM `courses` LIMIT 6");
-         $select_products->execute();
-         if($select_products->rowCount() > 0){
-            while($fetch_products = $select_products->fetch(PDO::FETCH_ASSOC)){
-      ?>
-      <form action="" method="post" class="box">
-         <input type="hidden" name="pid" value="<?= $fetch_products['id']; ?>">
-         <input type="hidden" name="name" value="<?= $fetch_products['name']; ?>">
-         <input type="hidden" name="image" value="<?= $fetch_products['image']; ?>">
-         <input type="hidden" name="price" value="<?= $fetch_products['price']; ?>">
-         <a href="quick_view.php?pid=<?= $fetch_products['id']; ?>" class="fas fa-eye"></a>
-         <button type="submit" class="fas fa-shopping-cart" name="add_to_cart"></button>
-         <img src="uploaded_img/<?= $fetch_products['image']; ?>" alt="">
-         <h2 style="color: SlateBlue;">Khóa học</h2>
-         <div class="name"><?= $fetch_products['name']; ?></div>
-         <div class="flex">
-            <!-- <input type="number" name="qty" class="qty" min="1" max="99" value="1" maxlength="2"> -->
-         </div>
-      </form>
-      <?php
-            }
-         }else{
-            echo '<p class="empty">no products added yet!</p>';
-         }
-      ?>
-
-   </div>
-
-   <div class="more-btn">
-      <a href="menu.php" class="btn">Xem tất cả</a>
-   </div>
-
-</section>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<?php include 'components/footer.php'; ?>
-
-
-<script src="https://unpkg.com/swiper@8/swiper-bundle.min.js"></script>
-
-<!-- custom js file link  -->
-<script src="js/script.js"></script>
-
+</style>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-
-var swiper = new Swiper(".hero-slider", {
-   loop:true,
-   grabCursor: true,
-   effect: "flip",
-   pagination: {
-      el: ".swiper-pagination",
-      clickable:true,
-   },
+    // Bắt sự kiện click trên các mục danh mục
+    $('.product-filters li').click(function () {
+        $('.product-filters li').removeClass('active');
+        $(this).addClass('active');
+        var categoryId = $(this).data('category');
+        
+        // Redirect trang về trang 1 khi chuyển danh mục
+        window.location.href = 'home.php?page=1&category_id=' + categoryId;
+    });
+    // Bắt sự kiện click khi người dùng nhấn "Tất cả"
+    $('.product-filters li[data-filter="*"]').click(function () {
+        // Đặt `categoryId` là 0 (hoặc giá trị mặc định của bạn)
+        var categoryId = 0;
+        window.location.href = 'home.php?page=1&category_id=' + categoryId;
+    });
+$(document).ready(function () {
+    // Lấy giá trị category_id từ URL
+    var urlParams = new URLSearchParams(window.location.search);
+    var categoryId = urlParams.get('category_id');
+    
+    // Nếu không có category_id hoặc là '0' (Tất cả), thì tô màu cho 'Tất cả'
+    if (!categoryId || categoryId === '0') {
+        $('.product-filters li[data-category="0"]').addClass('active');
+    } else {
+        // Nếu có category_id khác '0', tô màu cho danh mục có category_id tương ứng
+        $('.product-filters li[data-category]').removeClass('active'); // Xóa tất cả lớp 'active' trước đó
+        $('.product-filters li[data-category="' + categoryId + '"]').addClass('active');
+    }
 });
+
+// Bắt sự kiện click trên các mục danh mục
+$('.product-filters li').click(function () {
+    $('.product-filters li').removeClass('active');
+    $(this).addClass('active');
+    var categoryId = $(this).data('category');
+    
+    // Redirect trang về trang 1 khi chuyển danh mục
+    window.location.href = 'home.php?page=1&category_id=' + categoryId;
+});
+
+
 
 </script>
 

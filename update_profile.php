@@ -170,7 +170,7 @@ if(isset($_POST['submit'])){
 	<div class="checkout-section mt-150 mb-150">
 		<div class="container">
 			<div class="row">
-				<div class="col-lg-8">
+				<div class="col-lg-12">
 					<div class="checkout-accordion-wrap">
 						<div class="accordion" id="accordionExample">
 						  <div class="card single-accordion">
@@ -186,25 +186,39 @@ if(isset($_POST['submit'])){
 						      <div class="card-body">
 						        <div class="billing-address-form">
                       <form action="" method="post">
-
-                        <span style= "font-size: 15px;"><strong>Tên tài khoản</strong></span>
-                          <p><input type="text" name="name" placeholder="<?= $fetch_profile['name']; ?>"></p>
-
-                        <span style= "font-size: 15px;"><strong>Email</strong></span>
-                          <p><input type="email" name="email" placeholder="<?= $fetch_profile['email']; ?>"></p>
-
-                        <span style= "font-size: 15px;"><strong>Địa chỉ</strong></span>
-                          <p><input type="text" name="address" placeholder="<?= $fetch_profile['address']; ?>"></p>
-
-                        <span style= "font-size: 15px;"><strong>Số điện thoại</strong></span>
-                          <p><input type="tel" name="number" placeholder="<?= $fetch_profile['number']; ?>"></p>
-
-                        <span style= "font-size: 15px;"><strong> Mật khẩu cũ</strong></span>
-                          <p><input type="password" name="old_pass" placeholder="Mật khẩu cũ"></p>
-
-                        <span style= "font-size: 15px;"><strong>Mật khẩu mới</strong></span>
-                          <p><input type="password" name="new_pass" placeholder="Mật khẩu mới"></p>
-
+                        <div class= "row">
+                          <div class= "col-lg-6">
+                            <span style= "font-size: 15px;"><strong>Tên tài khoản</strong></span>
+                            <p><input type="text" name="name" placeholder="<?= $fetch_profile['name']; ?>"></p>
+                          </div>
+                        
+                          <div class= "col-lg-6">
+                            <span style= "font-size: 15px;"><strong>Email</strong></span>
+                            <p><input type="email" name="email" placeholder="<?= $fetch_profile['email']; ?>"></p>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class = "col-lg-6">
+                            <span style= "font-size: 15px;"><strong>Địa chỉ</strong></span>
+                            <p><input type="text" name="address" placeholder="<?= $fetch_profile['address']; ?>"></p>
+                          </div>
+                          
+                          <div class = "col-lg-6">
+                            <span style= "font-size: 15px;"><strong>Số điện thoại</strong></span>
+                            <p><input type="tel" name="number" placeholder="<?= $fetch_profile['number']; ?>"></p>
+                          </div>    
+                        </div>
+                        <div class = "row">
+                          <div class = "col-lg-6">
+                            <span style= "font-size: 15px;"><strong> Mật khẩu cũ</strong></span>
+                            <p><input type="password" name="old_pass" placeholder="Mật khẩu cũ"></p>
+                          </div>    
+                          <div class = "col-lg-6">
+                            <span style= "font-size: 15px;"><strong>Mật khẩu mới</strong></span>
+                            <p><input type="password" name="new_pass" placeholder="Mật khẩu mới"></p>
+                          </div>    
+                        </div>
+                                                
                         <span style= "font-size: 15px;"><strong>Xác nhận mật khẩu mới</strong></span>
                           <p><input type="password" name="confirm_pass" placeholder="Xác nhận mật khẩu mới"></p>
 
@@ -233,7 +247,6 @@ if(isset($_POST['submit'])){
 		</div>
 	</div>
 	<!-- end check out section -->
-	<?php include 'components/chatbox.php'; ?>
 
 	<!-- footer -->
 	<?php include 'components/user_footer.php'; ?>

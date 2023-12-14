@@ -47,7 +47,6 @@ if(isset($_POST['submit'])){
   <?php include ('../../components/head.php');?>
 
 <body class="sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
-<div class="wrapper">
 
   <!-- Navbar -->
   <?php include ('../../components/navbar.php');?>
@@ -57,7 +56,7 @@ if(isset($_POST['submit'])){
 
 
   <!-- Content Wrapper. Contains page content -->
-  <div class="content-wrapper" style ="padding-top: 50px;">
+  <div class="content-wrapper">
     <!-- Content Header (Page header) -->
     <div class="content-header">
       <div class="container-fluid">

@@ -87,6 +87,29 @@
           </li>
           <li class="nav-item">
             <a href="#" class="nav-link">
+            <i class="nav-icon fas fa-copy"></i>
+              <p>
+                Giảng viên
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="http://localhost/teach_and_learn-to_cook/admin/teacher/add_teacher.php" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Thêm giảng viên</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="http://localhost/teach_and_learn-to_cook/admin/teacher/list_teacher.php" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Danh sách giảng viên</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link">
               <i class="nav-icon fas fa-chart-pie"></i>
               <p>
                 Danh mục
@@ -160,6 +183,31 @@
             <a href="#" class="nav-link">
               <i class="nav-icon fas fa-table"></i>
               <p>
+                Cập nhật lịch học
+                <i class="fas fa-angle-left right"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="http://localhost/teach_and_learn-to_cook/admin/schedule/add_schedule.php" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Thêm lịch học</p>
+                </a>
+              </li>
+            </ul>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="http://localhost/teach_and_learn-to_cook/admin/schedule/list_schedule.php" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Danh sách lịch học</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-table"></i>
+              <p>
                 Liên hệ
                 <i class="fas fa-angle-left right"></i>
               </p>
@@ -173,7 +221,7 @@
               </li>
             </ul>
           </li>
-        
+          
         </ul>
       </nav>      <!-- /.sidebar-menu -->
     </div>

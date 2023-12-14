@@ -1,40 +1,179 @@
+<?php
+
+include 'components/connect.php';
+
+if (isset($_SESSION['user_id'])) {
+    $user_id = $_SESSION['user_id'];
+} else {
+    $user_id = '';
+}
+
+include 'components/add_cart.php';
+
+// Số sản phẩm hiển thị trên mỗi trang
+$items_per_page = 9;
+
+// Trang hiện tại
+$page = isset($_GET['page']) ? $_GET['page'] : 1;
+
+?>
 <!DOCTYPE html>
-<html>
-<head>
-    <title>Tìm Kiếm</title>
-</head>
+<html lang="en">
+<?php include 'components/user_head.php'; ?>
 <body>
-    <h1>Tìm Kiếm</h1>
-    <form method="POST" action="tk.php">
-        <input type="text" name="keyword" placeholder="Nhập từ khóa tìm kiếm">
-        <button type="submit">Tìm Kiếm</button>
-    </form>
 
+    <!--PreLoader-->
+    <div class="loader">
+        <div class="loader-inner">
+            <div class="circle"></div>
+        </div>
+    </div>
+    <!--PreLoader Ends-->
+
+    <!-- header -->
+    <div class="top-header-area" id="sticker">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 col-sm-12 text-center">
+                    <div class="main-menu-wrap">
+                        <!-- logo -->
+                        <div class="site-logo">
+                            <a href="index.html">
+                                <img style="width: 100%;" src="fruitkha-1.0.0/fruitkha-1.0.0/assets/img/logo.png" alt="">
+                            </a>
+                        </div>
+                        <!-- logo -->
+
+                        <!-- menu start -->
+                        <?php include 'components/user_nav.php'; ?>
+
+                        <a class="mobile-show search-bar-icon" href="#"><i class="fas fa-search"></i></a>
+                        <div class="mobile-menu"></div>
+                        <!-- menu end -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end header -->
+
+    <!-- search area -->
     <?php
-    include 'elasticsearch_connect.php';
+		include 'timkiem.php';
+	?>
+    <!-- end search arewa -->
 
-    // Tạo một đối tượng của lớp SearchElastic
-    $searchElastic = new SearchElastic();
+    <!-- breadcrumb-section -->
+    <div class="breadcrumb-section breadcrumb-bg">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 offset-lg-2 text-center">
+                    <div class="breadcrumb-text">
+                        <h1>Kết quả tìm kiếm</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end breadcrumb section -->
+    <div class="product-section mt-150">
+        <div class="container">
+            <div class="row product-lists">
+                <?php
+                if ($_SERVER["REQUEST_METHOD"] == "POST") {
+                    $search_box = $_POST['keyword'];
+                    $select_products = $conn->prepare("SELECT courses.*, category.name_cate FROM courses LEFT JOIN category ON category.id_cate = courses.id_cate WHERE courses.name LIKE :search_box");
+                    $select_products->bindValue(':search_box', '%' . $search_box . '%', PDO::PARAM_STR);
+                    $select_products->execute();
 
-    // Xử lý tìm kiếm và hiển thị kết quả
-    if (isset($_POST['keyword'])) {
-        $keyword = $_POST['keyword'];
-        $searchResult = $searchElastic->Search($keyword);
+                    if ($select_products->rowCount() > 0) {
+                        while ($fetch_products = $select_products->fetch(PDO::FETCH_ASSOC)) {
+                            ?>
+                            <div class="col-lg-4 col-md-6 text-center courses">
+                                <div class="single-product-item">
+                                    <form action="" method="post">
+                                        <input type="hidden" name="pid" value="<?= $fetch_products['id']; ?>">
+                                        <input type="hidden" name="name" value="<?= $fetch_products['name']; ?>">
+                                        <input type="hidden" name="image" value="<?= $fetch_products['image']; ?>">
+                                        <input type="hidden" name="price" value="<?= $fetch_products['price']; ?>">
+                                        <div class="product-image">
+                                            <a href="view-courses.php?pid=<?= $fetch_products['id']; ?>"><img
+                                                        src="uploaded_img/<?= $fetch_products['image']; ?>" alt=""></a>
+                                        </div>
+                                        <h3><?= $fetch_products['name']; ?></h3>
+                                        <p class="product-price"><span><?= $fetch_products['name_cate']; ?></span><?= number_format($fetch_products['price'], 0, ',', '.') . " VNĐ" ?></p>
 
-        if ($searchResult['searchfound'] > 0) {
-            echo "<h2>Kết quả tìm kiếm cho '$keyword':</h2>";
-            echo "<ul>";
-            foreach ($searchResult['result'] as $item) {
-                echo "<li>";
-                echo "Tên: " . $item['name'] . "<br>";
-                // Hiển thị thông tin khác nếu cần
-                echo "</li>";
-            }
-            echo "</ul>";
-        } else {
-            echo "Không tìm thấy kết quả cho '$keyword'.";
+                                        <button style="border: none; background-color: rgba(0, 0, 0, 0);"
+                                                type="submit" name="add_to_cart"><a class="cart-btn"><i
+                                                        class="fas fa-shopping-cart"></i></a></button>
+
+                                    </form>
+
+                                </div>
+                            </div>
+                            <?php
+                        }
+                    } else {
+                        echo '<p class="empty">Không có khóa học nào!</p>';
+                    }
+                }
+                ?>
+            </div>
+        </div>
+    </div>
+    <?php
+$search_query = $conn->prepare("SELECT COUNT(*) FROM courses LEFT JOIN category ON category.id_cate = courses.id_cate WHERE courses.name LIKE :search_box");
+$search_query->bindValue(':search_box', '%' . $search_box . '%', PDO::PARAM_STR);
+$search_query->execute();
+$total_products = $search_query->fetchColumn();
+
+// Tính toán số trang dựa trên tổng số sản phẩm
+$total_pages = ceil($total_products / $items_per_page);
+
+?>
+
+    <!-- Hiển thị số trang -->
+    <div class="row">
+    <div class="col-lg-12 text-center" style = "margin-bottom: 20px;">
+        <div class="pagination-wrap">
+            <ul>
+                <?php
+                // Hiển thị nút "Trước" và "Tiếp" cho phân trang
+                if ($page > 1) {
+                    echo '<li><a href="tk.php?page=' . ($page - 1) . '">Trước</a></li>';
+                }
+                
+                // Kiểm tra xem $total_pages đã được định nghĩa chưa trước khi sử dụng
+                if (isset($total_pages)) {
+                    for ($i = 1; $i <= $total_pages; $i++) {
+                        $activeClass = ($page == $i) ? 'active' : '';
+                        echo '<li class="' . $activeClass . '"><a href="tk.php?page=' . $i . '">' . $i . '</a></li>';
+                    }
+                }
+
+                if ($page < $total_pages) {
+                    echo '<li><a href="tk.php?page=' . ($page + 1) . '">Tiếp</a></li>';
+                }
+                ?>
+            </ul>
+        </div>
+    </div>
+</div>
+    <style>
+        .pagination-wrap li.active a {
+            background-color: #F28123;
+            color: #fff;
         }
-    }
-    ?>
+
+        .product-filters li.active,
+        .product-filters li:hover {
+            background-color: #F28123;
+            color: #fff;
+        }
+    </style>
+
+    <!-- footer -->
+    <?php include 'components/user_footer.php'; ?>
+
 </body>
 </html>

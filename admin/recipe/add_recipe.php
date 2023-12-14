@@ -1,22 +1,23 @@
 <?php
-
+use Carbon\Carbon;
+use Carbon\CarbonInterval;
+require('../../carbon/autoload.php');
 include '../../components/connect.php';
 
 session_start();
 
 $admin_id = $_SESSION['admin_id'];
 
-if(!isset($admin_id)){
+if (!isset($admin_id)) {
    header('location:admin_login.php');
-};
+}
 
-if(isset($_POST['add_recipe'])){
+if (isset($_POST['add_recipe'])) {
 
+   $id_cate = $_POST['id_cate'];
+   $id_cate = filter_var($id_cate, FILTER_SANITIZE_STRING);
    $name = $_POST['name'];
    $name = filter_var($name, FILTER_SANITIZE_STRING);
-
-   $category = $_POST['category'];
-   $category = filter_var($category, FILTER_SANITIZE_STRING);
 
    $video = $_POST['video'];
    $video = filter_var($video, FILTER_SANITIZE_STRING);
@@ -25,76 +26,101 @@ if(isset($_POST['add_recipe'])){
    $image = filter_var($image, FILTER_SANITIZE_STRING);
    $image_size = $_FILES['image']['size'];
    $image_tmp_name = $_FILES['image']['tmp_name'];
-   $image_folder = '../../uploaded_img/'.$image;
+   $image_folder = '../../uploaded_img/' . $image;
 
    $making = $_POST['making'];
-   $making = filter_var($making, FILTER_SANITIZE_STRING);
 
    $time = $_POST['time'];
-   $time = filter_var($time, FILTER_SANITIZE_STRING); 
+   $time = filter_var($time, FILTER_SANITIZE_STRING);
+   $now = Carbon::now('Asia/Ho_Chi_Minh')->toDateString();
 
    $select_recipes = $conn->prepare("SELECT * FROM `recipe` WHERE name = ?");
    $select_recipes->execute([$name]);
 
-   if($select_recipes->rowCount() > 0){
+   if ($select_recipes->rowCount() > 0) {
       $message[] = 'Công thức đã tồn tại!';
-   }else{
-      if($image_size > 2000000){
+   } else {
+      if ($image_size > 2000000) {
          $message[] = 'Kích thước ảnh không thích hợp';
-      }else{
+      } else {
          move_uploaded_file($image_tmp_name, $image_folder);
 
-         $insert_recipe = $conn->prepare("INSERT INTO `recipe`(name, category, image, making, time, video ) VALUES(?,?,?,?,?,?)");
-         $insert_recipe->execute([$name, $category, $image, $making, $video, $time, ]);
+         $insert_recipe = $conn->prepare("INSERT INTO `recipe`(name, image, making, time, video, regis_date, id_cate, admin_id ) VALUES(?,?,?,?,?,?,?,?)");
+         $insert_recipe->execute([$name, $image, $making, $time, $video, $now, $id_cate, $admin_id]);
+         // Lấy id của công thức vừa thêm
+         $recipe_id = $conn->lastInsertId();
 
-         $message[] = 'Thêm công thức mới thành công!';
-      }
+         // Xử lý và thêm chi tiết nguyên liệu vào bảng `detail_ingre`
+$ingredient_names = $_POST['ingre_name'];
+$unit_names = $_POST['unit_name'];
+$numbers = $_POST['number'];
 
+for ($i = 0; $i < count($ingredient_names); $i++) {
+    $ingre_name = filter_var($ingredient_names[$i], FILTER_SANITIZE_STRING);
+    $unit_name = filter_var($unit_names[$i], FILTER_SANITIZE_STRING);
+    $unit_number = filter_var($numbers[$i], FILTER_SANITIZE_STRING);
+
+    // Kiểm tra xem đơn vị đã tồn tại trong bảng `unit` chưa
+    $select_unit = $conn->prepare("SELECT id FROM `unit` WHERE unit_name = ? AND number = ?");
+    $select_unit->execute([$unit_name, $unit_number]);
+
+    if ($select_unit->rowCount() > 0) {
+        // Nếu đơn vị đã tồn tại, lấy id đơn vị
+        $unit_id = $select_unit->fetch(PDO::FETCH_ASSOC)['id'];
+    } else {
+        // Nếu đơn vị chưa tồn tại, thêm mới và lấy id
+        $insert_unit = $conn->prepare("INSERT INTO `unit` (unit_name, number) VALUES (?, ?) ON DUPLICATE KEY UPDATE number = number + ?");
+        $insert_unit->execute([$unit_name, $unit_number, $unit_number]);
+        $unit_id = $conn->lastInsertId();
+    }
+
+    // Kiểm tra xem nguyên liệu đã tồn tại trong bảng `ingre` chưa
+    $select_ingredient = $conn->prepare("SELECT id FROM `ingre` WHERE ingre_name = ?");
+    $select_ingredient->execute([$ingre_name]);
+
+    if ($select_ingredient->rowCount() > 0) {
+        // Nếu nguyên liệu đã tồn tại, lấy id nguyên liệu
+        $ingre_id = $select_ingredient->fetch(PDO::FETCH_ASSOC)['id'];
+    } else {
+        // Nếu nguyên liệu chưa tồn tại, thêm mới và lấy id
+        $insert_ingredient = $conn->prepare("INSERT IGNORE INTO `ingre` (ingre_name) VALUES (?)");
+        $insert_ingredient->execute([$ingre_name]);
+        $ingre_id = $conn->lastInsertId();
+    }
+
+    // Thêm chi tiết nguyên liệu vào bảng `detail_ingre`
+    $insert_detail_ingre = $conn->prepare("INSERT INTO `detail_ingre` (recipe_id, unit_id, ingre_id) VALUES (?, ?, ?)");
+    $insert_detail_ingre->execute([$recipe_id, $unit_id, $ingre_id]);
+}
+
+  echo '<script>alert("Thêm công thức thành công!");</script>';   
+}
    }
-
-
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="utf-8">
-  <?php include ('../../components/head.php');?>
-</head>
+
+<?php include ('../../components/head.php');?>
 
 <body class="sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
-<div class="wrapper">
-
-  <!-- Preloader -->
-  <div class="preloader flex-column justify-content-center align-items-center">
-    <img class="animation__wobble" src="../../dist/img/AdminLTELogo.png" alt="AdminLTELogo" height="60" width="60">
-  </div>
 
   <!-- Navbar -->
   <?php include ('../../components/navbar.php');?>
 
   <?php include ('../../components/sidebar.php');?>
       <!-- /.sidebar-menu -->
-    </div>
-    <!-- /.sidebar -->
-  </aside>
 
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
     <!-- Content Header (Page header) -->
-    <section class="content-header" style ="padding-top: 70px;">
+    <section class="content-header">
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
             <h1>Thêm công thức</h1>
           </div>
-          <!-- <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="#">Trang chủ</a></li>
-              <li class="breadcrumb-item active">Tài khoản Admin</li>
-            </ol>
-          </div>
-        </div> -->
       </div><!-- /.container-fluid -->
       <div id="message"></div>
     </section>
@@ -117,7 +143,7 @@ if(isset($_POST['add_recipe'])){
                 <div class = "row">
                   <div class = "col-md-6">
                       <div class="form-group" >
-                        <label for="exampleInputName1">Tên khóa học</label>
+                        <label for="exampleInputName1">Tên công thức</label>
                         <input type="text" name="name" class="form-control" placeholder="Tên công thức" required>
                       </div>
                   </div>
@@ -152,14 +178,34 @@ if(isset($_POST['add_recipe'])){
                 <div class = "row">
                     <div class="form-group" >
                         <label for="exampleInputName1">Cách làm</label>
-                        <textarea name="making" id="post_content" class="form-control" row = "3" ></textarea>
+                        <textarea name="making" id="content_making" class="form-control" ></textarea>
                     </div>
                 </div>
-                <div class = "row">
-                    <div class="form-group" >
-                        <label for="exampleInputName1">Nguyên liệu</label>
-                        <textarea name="ingre" id="post_content1" class="form-control" row = "3" ></textarea>
-                    </div>
+                <div class="row">
+                  <div class="form-group" id="ingredient-list">
+                      <label for="exampleInputName1">Nguyên liệu</label>
+                      <div class="ingredient-entry" style="margin-bottom: 10px;
+                  margin-top: 10px;" data-index="1">
+                          <div class="row">
+                              <div class="col-md-1">
+                                  <span class="ingredient-index">1</span>
+                              </div>
+                              <div class="col-md-3">
+                                  <input type="text" name="ingre_name[]" class="form-control" placeholder="Tên nguyên liệu" required>
+                              </div>
+                              <div class="col-md-3">
+                                  <input type="text" name="unit_name[]" class="form-control" placeholder="Tên đơn vị" required>
+                              </div>
+                              <div class="col-md-3">
+                                  <input type="number" name="number[]" class="form-control" placeholder="Số lượng đơn vị" required>
+                              </div>
+                              <div class="col-md-2">
+                                  <button type="button" class="btn btn-success btn-add">+</button>
+                                  <button type="button" class="btn btn-danger btn-remove">-</button>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
                 </div>
                     <div class="form-group" >
                         <label for="exampleInputName1">Link Video</label>
@@ -167,7 +213,7 @@ if(isset($_POST['add_recipe'])){
                     </div>
                 <!-- /.card-body -->
                 <div class="card-footer">
-                  <button type="submit" name = "add_recipe" class="btn btn-primary">Tạo</button>
+                  <button type="submit" name = "add_recipe" class="btn btn-primary">Thêm</button>
                 </div>
               </form>
             </div>
@@ -187,6 +233,72 @@ if(isset($_POST['add_recipe'])){
 </div>
 <!-- ./wrapper -->
 <?php include ('../../components/footer.php');?>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const ingredientList = document.getElementById("ingredient-list");
+    let ingredientCount = 1;
 
+    function addIngredientEntry() {
+        const ingredientEntry = ingredientList.querySelector(".ingredient-entry").cloneNode(true);
+        const currentIndex = ingredientCount + 1;
+
+        // Increment the ingredient count
+        ingredientCount++;
+
+        // Update the index number in the new entry
+        const indexSpan = ingredientEntry.querySelector(".ingredient-index");
+        indexSpan.textContent = currentIndex;
+
+        // Clear input values in the new entry
+        const inputs = ingredientEntry.querySelectorAll("input");
+        inputs.forEach(input => input.value = "");
+
+        // Attach event listeners to the new buttons
+        const btnAdd = ingredientEntry.querySelector(".btn-add");
+        btnAdd.addEventListener("click", addIngredientEntry);
+
+        const btnRemove = ingredientEntry.querySelector(".btn-remove");
+        btnRemove.addEventListener("click", function () {
+            // Check if it's not the first entry before removing
+            if (currentIndex > 1) {
+                ingredientList.removeChild(ingredientEntry);
+                // Reorder the indices after removing an entry
+                reorderIndices();
+            }
+        });
+
+        ingredientList.appendChild(ingredientEntry);
+
+        // Reorder the indices after adding a new entry
+        reorderIndices();
+    }
+
+    // Attach initial event listener
+    const btnAdd = ingredientList.querySelector(".btn-add");
+    btnAdd.addEventListener("click", addIngredientEntry);
+
+    // Attach event listeners to existing remove buttons
+    const btnRemoveList = ingredientList.querySelectorAll(".btn-remove");
+    btnRemoveList.forEach(btnRemove => {
+        btnRemove.addEventListener("click", function () {
+            const ingredientEntry = btnRemove.closest(".ingredient-entry");
+            // Check if it's not the first entry before removing
+            if (ingredientEntry.getAttribute("data-index") > 1) {
+                ingredientList.removeChild(ingredientEntry);
+                // Reorder the indices after removing an entry
+                reorderIndices();
+            }
+        });
+    });
+
+    // Function to reorder the indices
+    function reorderIndices() {
+        const indexSpans = ingredientList.querySelectorAll(".ingredient-entry .ingredient-index");
+        indexSpans.forEach((indexSpan, index) => {
+            indexSpan.textContent = index + 1;
+        });
+    }
+});
+</script>
 </body>
 </html>
