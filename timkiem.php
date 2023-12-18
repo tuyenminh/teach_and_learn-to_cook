@@ -21,7 +21,7 @@ include 'components/add_cart.php';
                     <div class="search-bar-tablecell">
                         <h3>Tìm kiếm:</h3>
                         <form method="POST" action="tk.php">
-                            <input type="text" name="keyword" placeholder="Từ khóa tên khóa học">
+                            <input type="text" name="keyword" placeholder="Tìm kiếm khóa học">
                             <button type="submit">Tìm kiếm <i class="fas fa-search"></i></button>
                         </form>
                     </div>

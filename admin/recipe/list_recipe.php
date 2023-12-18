@@ -8,19 +8,21 @@ $admin_id = $_SESSION['admin_id'];
 
 if(!isset($admin_id)){
    header('location:admin_login.php');
-};
-if(isset($_GET['delete'])){
-
-  $delete_id = $_GET['delete'];
-  $delete_product_image = $conn->prepare("SELECT * FROM `recipe` WHERE id = ?");
-  $delete_product_image->execute([$delete_id]);
-  $fetch_delete_image = $delete_product_image->fetch(PDO::FETCH_ASSOC);
-  unlink('../../uploaded_img/'.$fetch_delete_image['image']);
-  $delete_product = $conn->prepare("DELETE FROM `recipe` WHERE id = ?");
-  $delete_product->execute([$delete_id]);
-  header('location:list_recipe.php');
-
 }
+if (isset($_GET['delete'])) {
+  $delete_id = $_GET['delete'];
+
+  // Xóa dữ liệu từ bảng detail_ingre
+  $delete_detail_ingre = $conn->prepare("DELETE FROM `detail_ingre` WHERE recipe_id = ?");
+  $delete_detail_ingre->execute([$delete_id]);
+
+  // Xóa recipe từ bảng recipe
+  $delete_recipe = $conn->prepare("DELETE FROM `recipe` WHERE id = ?");
+  $delete_recipe->execute([$delete_id]);
+
+  header('location:list_recipe.php');
+}
+
 
 ?>
 <!DOCTYPE html>
@@ -73,7 +75,7 @@ if(isset($_GET['delete'])){
                   <tbody>
                     <?php
                     // Số dòng trên mỗi trang
-                    $rows_per_page = 3;
+                    $rows_per_page = 5;
 
                     // Trang hiện tại
                     if (isset($_GET['page'])) {

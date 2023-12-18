@@ -66,6 +66,7 @@
         chart.draw(data, options);
       }
     </script>
+    
     <script type="text/javascript">
       google.charts.load("current", {packages:["corechart"]});
       google.charts.setOnLoadCallback(drawChart);

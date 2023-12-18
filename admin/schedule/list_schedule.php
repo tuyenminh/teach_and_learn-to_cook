@@ -60,8 +60,8 @@ if(isset($_GET['delete'])){
               <table class="table table-bordered">
     <thead>
         <tr>
-            <th style="width: 3rem; " data-field="id" data-sortable="true">Số thứ tự</th>
-            <th style="width: 3rem;">Thứ</th>
+            <th style="width: 3rem; " data-field="id" data-sortable="true">STT</th>
+            <th style="width: 7rem;">Thứ</th>
             <th style="width: 10rem;">Tên giảng viên</th>
             <th style="width: 10rem;">Khóa học</th>
             <th style="width: 10rem;">Bắt đầu</th>
@@ -71,7 +71,7 @@ if(isset($_GET['delete'])){
     </thead>
     <tbody>
         <?php
-        $rows_per_page = 3;
+        $rows_per_page = 5;
 
         if (isset($_GET['page'])) {
             $page = $_GET['page'];

@@ -96,7 +96,7 @@
                   <tbody>
                     <?php
                     // Số dòng trên mỗi trang
-                    $rows_per_page = 3;
+                    $rows_per_page = 5;
 
                     // Trang hiện tại
                     if (isset($_GET['page'])) {

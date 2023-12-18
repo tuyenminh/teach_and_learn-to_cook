@@ -21,6 +21,7 @@ while ($fetch_courses = $select_courses->fetch(PDO::FETCH_ASSOC)){
     $data[] = $fetch_courses; 
 }
 
+//biểu đồ thống kê doan thu từng năm
 $select_courses = $conn->prepare("SELECT `category`.*, COUNT(recipe.id_cate) AS 'number_recipes' 
 FROM recipe INNER JOIN `category` ON recipe.id_cate = category.id_cate GROUP BY recipe.id_cate");
 $select_courses->execute();
@@ -29,6 +30,8 @@ $data1 = [];
 while ($fetch_courses = $select_courses->fetch(PDO::FETCH_ASSOC)){ 
     $data1[] = $fetch_courses; 
 }
+
+// biểu đồ thống kê từng giai đoạn
 $start_date = isset($_POST['start_date']) ? $_POST['start_date'] : date('Y-m-d', strtotime('-1 year'));
 $end_date = isset($_POST['end_date']) ? $_POST['end_date'] : date('Y-m-d');
 
@@ -211,7 +214,7 @@ while ($row_revenue = $result_revenue->fetch(PDO::FETCH_ASSOC)) {
                     <tr>
                       <th style="width: 10px">Mã</th>
                       <th>Khóa học</th>
-                      <th>Giá</th>
+                      <th>Ngày đăng ký</th>
                       <th>Trạng thái</th>
                     </tr>
                   </thead>
@@ -265,7 +268,7 @@ while ($row_revenue = $result_revenue->fetch(PDO::FETCH_ASSOC)) {
               <div class="card-header border-0">
                 <h3 class="card-title">
                   <i class="fas fa-map-marker-alt mr-1"></i>
-                  Thống kê lượt đăng ký khóa học
+                  Thống kê số lượng khóa học theo danh mục
                 </h3>
               </div>
               <div class="card-body" style = "background: #fff;">

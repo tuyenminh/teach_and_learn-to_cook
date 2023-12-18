@@ -239,13 +239,33 @@ include 'components/add_cart.php';
 						<div class="col-md-12">
 							<p><?= $fetch_products['ingre']; ?></p>
 						</div>
+						<p style = "margin-left: 15px;"><strong>Nguyên liệu:</strong><p>
+						<?php
+							// Lấy giá trị recipe_id từ tham số URL
+							$recipe_id = $_GET['pid'];
+
+							// Truy vấn để lấy thông tin ingre_ingre_name, unit_unit_name, và unit_number
+							$select_ingredients = $conn->prepare("SELECT ingre.ingre_name AS ingre_ingre_name, unit.unit_name AS unit_unit_name, unit.number AS unit_number
+								FROM recipe
+								INNER JOIN detail_ingre ON detail_ingre.recipe_id = recipe.id
+								INNER JOIN ingre ON detail_ingre.ingre_id = ingre.id
+								INNER JOIN unit ON detail_ingre.unit_id = unit.id
+								WHERE recipe.id = ?");
+							$select_ingredients->execute([$recipe_id]);
+
+							if ($select_ingredients->rowCount() > 0) {
+								while ($ingredient = $select_ingredients->fetch(PDO::FETCH_ASSOC)) {
+									echo '<div class="col-md-12">';
+									echo '<p style="margin-bottom: 0px; margin-top: 0px; ">' . $ingredient['unit_number'] . ' ' . $ingredient['unit_unit_name'] . ' ' . $ingredient['ingre_ingre_name'] . '</p><br>';
+									echo '</div>';
+								}
+							} else {
+								echo '<p>Không có thông tin nguyên liệu cho công thức này.</p>';
+							}
+						?>
 						<div class="col-md-12">
 							<p><?= $fetch_products['making']; ?></p>
 						</div>
-						<div class="col-md-12">
-							<p><?= $fetch_products['ingre_ingre_name']; ?></p>
-						</div>
-
 
 					</div>
 				</div>
